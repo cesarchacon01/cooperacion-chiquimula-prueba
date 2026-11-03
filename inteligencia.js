@@ -1018,6 +1018,54 @@ function diagnosticoMapa(){
   let marc=''; try{ marc=(typeof coopLayer!=='undefined'&&coopLayer&&coopLayer.getLayers)?coopLayer.getLayers().length:'sin dato (capa no disponible en este entorno)'; }catch(e){ marc='sin dato'; }
   return `<ul class="int-ul"><li>Librería de mapas (Leaflet): ${typeof L!=='undefined'?'cargada':'<b>no cargada</b>'}.</li><li>Límites municipales: ${esc(me.limites)}${me.n?` (${me.n} municipios)`:''}${me.error?` — ${esc(me.error)}`:''}.</li><li>Puntos de cooperación visibles ahora en el mapa: ${typeof marc==='number'?marc:'sin dato'}.</li><li>Comunidades con atención registrada: ${tot}; <b>${sin}</b> sin coordenadas (no aparecen como punto, pero sí en las fichas y listas).</li></ul>`;
 }
+
+/* =====================================================================
+   FUENTES CARTOGRÁFICAS (documentación visible, solo lectura)
+   Solo se afirma lo que está comprobado en el código o en los archivos del visor;
+   lo demás aparece como PENDIENTE. No se agregan atribuciones no verificadas.
+   ===================================================================== */
+const CARTO_CAPAS=[
+ {n:'Claro',prov:'Esri',srv:'server.arcgisonline.com · Canvas/World_Light_Gray_Base (nombres al acercar: …/World_Light_Gray_Reference)',atr:'Teselas © Esri — Esri, HERE, Garmin, © OpenStreetMap'},
+ {n:'Relieve',prov:'Esri',srv:'server.arcgisonline.com · World_Topo_Map',atr:'Teselas © Esri — Fuentes: Esri, Maxar, USGS, comunidad de usuarios SIG'},
+ {n:'Satélite',prov:'Esri',srv:'server.arcgisonline.com · World_Imagery (nombres al acercar: Reference/World_Boundaries_and_Places, sin atribución propia en el visor)',atr:'Teselas © Esri — Fuentes: Esri, Maxar, USGS, comunidad de usuarios SIG'},
+ {n:'OpenStreetMap',prov:'OpenStreetMap (servidor estándar de teselas)',srv:'tile.openstreetmap.org',atr:'© OpenStreetMap (con enlace a openstreetmap.org/copyright)'}
+];
+function fuentesCartograficas(){
+  const me=window.MAPA_ESTADO||{}; const mb=window.MAPA_BASE||{nombre:'Claro',tileErrores:{}};
+  const capa=CARTO_CAPAS.find(c=>c.n===mb.nombre)||CARTO_CAPAS[0];
+  const err=(mb.tileErrores&&mb.tileErrores[mb.nombre])||0;
+  let lim;
+  if(me.origen==='servicio_en_linea'){
+    lim=`<p><span class="int-est rep">En línea</span> Los límites se obtuvieron <b>de un servicio en línea de CONRED</b> (${esc((me.url||'').replace(/\?.*$/,'').replace(/^https?:\/\//,''))}) al abrir esta página; son ${me.n} municipios. El visor <b>no guarda fecha ni versión</b> de esos datos y no ha comprobado sus condiciones de uso: aparece como fuente porque respondió ahora, no porque esté verificada.</p>`;
+  }else if(me.origen==='archivo_local'){
+    lim=`<p><span class="int-est cal">Archivo local</span> <b>En este momento no se usa el servicio de CONRED</b> (no respondió). Los ${me.n} municipios provienen de un <b>archivo local de respaldo</b> (${esc(me.archivo||'limites_chiquimula.geojson')}), tomado de un archivo público de MINFIN-BI (repositorio <i>minfin-bi/Mapas-TopoJSON-Guatemala</i>, versión del 31-ago-2022). <b>No es una capa oficial certificada.</b> Su licencia no está declarada y su reutilización está <b>pendiente de confirmar con MINFIN</b>: que el archivo sea público no es una autorización.</p>`;
+  }else if(me.origen==='no_disponible'){
+    lim=`<p><span class="int-est pend">No disponibles</span> No se pudieron cargar límites municipales (ni del servicio en línea ni del archivo local). Los puntos y las fichas siguen funcionando; el mapa no muestra polígonos.</p>`;
+  }else{
+    lim=`<p><span class="int-est pend">Sin comprobar</span> Todavía no se ha intentado cargar los límites municipales.</p>`;
+  }
+  const bloque=(t,filas)=>`<div class="int-fuente"><b>${esc(t)}</b><dl>${filas.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></div>`;
+  const capas=CARTO_CAPAS.map(c=>bloque('Mapa base: '+c.n,[['Proveedor',c.prov],['Servicio',c.srv],['Atribución mostrada hoy',c.atr]])).join('');
+  return `
+   <h4 class="int-h4">Mapa base seleccionado</h4>
+   <p><b>${esc(capa.n)}</b> — proveedor: ${esc(capa.prov)}. Atribución que muestra el visor: «${esc(capa.atr)}». ${err?`<span class="int-est pend">Durante esta sesión ${err} teselas no cargaron</span> (puede ser conexión o falla del servicio).`:'No se han detectado teselas sin cargar en esta sesión (esto no sustituye una revisión visual).'}</p>
+   <h4 class="int-h4">Límites municipales</h4>${lim}
+   <h4 class="int-h4">Todas las capas y sus fuentes</h4>
+   ${capas}
+   ${bloque('Límites municipales',[['Proveedor','CONRED (servicio en línea) o MINFIN-BI (archivo local de respaldo)'],['Servicio o archivo','sig.conred.gob.gt · Hosted/Limites_municipales, o limites_chiquimula.geojson'],['Atribución','La nota bajo el mapa indica cuál se está usando']])}
+   ${bloque('Lugares poblados y puntos',[['Origen','Catálogo del formulario (SEGEPLAN/CRS) y coordenadas del visor'],['Archivos','catalogo_xlsform.json · coordenadas_lugares.json']])}
+   <p class="int-note">Los mapas base y los límites son <b>referencia visual</b>; no son una delimitación oficial ni sustituyen la cartografía de SEGEPLAN, IGN o CONRED.</p>
+   <h4 class="int-h4">Qué está comprobado y qué sigue pendiente</h4>
+   <ul class="int-ul">
+    <li><b>Comprobado en las pruebas:</b> que el panel refleja la fuente realmente cargada (servicio en línea, archivo local o ninguno) y el mapa base elegido; que los puntos, municipios y fichas se mantienen.</li>
+    <li><b>Pendiente — licencia de MINFIN-BI:</b> el archivo local de respaldo no declara licencia; hay que confirmar permiso de uso y redistribución.</li>
+    <li><b>Pendiente — Esri:</b> los términos de Esri exigen atribuir a Esri y a sus proveedores de datos y vinculan el uso de sus mapas base a una cuenta o suscripción de ArcGIS. El visor consulta los servicios sin clave; <b>su cumplimiento y el texto exacto de atribución están por confirmar</b>.</li>
+    <li><b>Pendiente — OpenStreetMap:</b> la política de uso del servidor estándar de teselas no se ha revisado para este visor.</li>
+    <li><b>Pendiente — CONRED:</b> sin fecha ni versión documentada de los límites, ni condiciones de uso comprobadas.</li>
+    <li><b>Pendiente — coordenadas:</b> 26 de 816 lugares caen fuera de su municipio según el archivo local de límites (listado en puntos_fuera_de_limite.csv); falta verificación en campo o con SEGEPLAN.</li>
+    <li><b>Necesita validación manual:</b> ver el mapa en un navegador real con Internet (capas Claro, Relieve, Satélite y OpenStreetMap, y el servicio de CONRED).</li></ul>`;
+}
+function abrirFuentesCartograficas(){ abrir('Fuentes cartográficas',fuentesCartograficas()); }
 function metodologia(){
   const g=(DATA.generado&&typeof fechaCorta==='function')?fechaCorta(DATA.generado):'sin dato';
   const c=DATA.control||{};
@@ -1039,6 +1087,7 @@ function metodologia(){
     <li><b>Articulación en tres capas:</b> (1) contrapartes declaradas, (2) espacios compartidos, (3) vínculos documentados, que hoy no se recogen en el formulario. Lo no reconocido se muestra como "Sin clasificar" con su texto original. Compartir contraparte o espacio no prueba coordinación efectiva.</li>
     <li><b>Contactos:</b> no se publican nombres de personas.</li></ul>
    <h4 class="int-h4">Estado del mapa</h4>${diagnosticoMapa()}
+   <h4 class="int-h4">Fuentes cartográficas</h4>${fuentesCartograficas()}
    ${(c.advertencias_integridad||[]).length?`<h4 class="int-h4">Avisos de integridad al procesar los datos</h4><ul class="int-ul">${c.advertencias_integridad.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}`);
 }
 function plegarMapa(){
@@ -1064,6 +1113,9 @@ function barraNav(){
   const g=DATA.generado&&typeof fechaCorta==='function'?'actualizado '+fechaCorta(DATA.generado).split(' · ')[0]:'';
   const b=document.createElement('button'); b.type='button'; b.id='int-meta'; b.className='int-nav-extra'; b.innerHTML=` Metodología${g?` <small>· ${g}</small>`:''}`; b.onclick=metodologia;
   nav.appendChild(b);
+  // Acceso a las fuentes cartográficas desde la nota bajo el mapa.
+  const nota=document.querySelector('.boundary-note');
+  if(nota&&!$('#int-fuentes-btn')){ const f=document.createElement('button'); f.type='button'; f.id='int-fuentes-btn'; f.className='int-linkbtn'; f.textContent='Fuentes cartográficas'; f.onclick=abrirFuentesCartograficas; nota.append(' · ',f); }
 }
 
 

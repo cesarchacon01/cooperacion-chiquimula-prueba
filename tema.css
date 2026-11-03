@@ -181,3 +181,8 @@ main,main:has(#view-instituciones.active){ max-width:none!important; width:100%;
 .pv3-leg>div:has(>.int-est:only-child){ display:block; }
 #pv3-detalle{ margin-top:22px; }
 @media (max-width:900px){ .pv3-accesos{ grid-template-columns:1fr; } .pv3-big{ font-size:32px; } }
+
+/* Etapa 0 Fase 2: botón de enlace dentro de la nota del mapa */
+.int-linkbtn{background:none;border:0;padding:0;color:#22678A;font:inherit;text-decoration:underline;cursor:pointer}
+.int-linkbtn:focus-visible{outline:2px solid #22678A;outline-offset:2px}
+.int-fuente{border:1px solid #D5DEE7;border-radius:8px;padding:10px 12px;margin:0 0 8px;background:#fff}.int-fuente dl{margin:6px 0 0}.int-fuente dt{font-size:12px;color:#4A5B6C;margin-top:4px}.int-fuente dd{margin:0;overflow-wrap:anywhere}

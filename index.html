@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="visor-version" content="fase1-v3">
+<meta name="visor-version" content="fase2-e0">
 <title>Mapeo de Actores de Cooperación — SEGEPLAN Chiquimula</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -396,7 +396,7 @@ table tbody tr:hover td{ background:#F4F1E6; }
 @media (max-width:620px){ .cov-row{ grid-template-columns:104px 1fr 78px; gap:8px; } main{ padding:18px 14px 60px; } }
 @media print{ nav{ position:static; } }
 </style>
-<link rel="stylesheet" href="tema.css?v=4">
+<link rel="stylesheet" href="tema.css?v=5">
 <style id="fix-capas">
 /* El icono del selector de mapa base venía de unpkg (images/layers.png); si no cargaba quedaba un cuadro blanco vacío.
    Se reemplaza por un SVG incrustado: el control (Claro / Relieve / Satélite / OpenStreetMap) funciona igual. */
@@ -473,7 +473,7 @@ table tbody tr:hover td{ background:#F4F1E6; }
           <span><span class="dot" style="background:#fff;border:2px solid #7D91A3;"></span>Lugar poblado de referencia · base territorial (punto hueco)</span>
           <span style="margin-left:8px;">Intensidad:</span><span>menor</span><div class="bar"></div><span>mayor</span>
         </div>
-        <div class="boundary-note"><span id="fuente-limites">Límites municipales: servicio geográfico de CONRED</span> · La ausencia de registro no confirma una brecha de atención.</div>
+        <div class="boundary-note"><span id="fuente-limites">Límites municipales: comprobando la fuente…</span> · La ausencia de registro no confirma una brecha de atención.</div>
       </div>
       <div>
         <div class="card" id="panel-comunidad">
@@ -1219,13 +1219,14 @@ async function cargarLimitesMunicipales(){
       if(!r.ok) throw new Error('HTTP '+r.status);
       geo=await r.json();
       if(!geo.features||!geo.features.length) throw new Error('Respuesta sin municipios');
-      window.MAPA_ESTADO={limites:'CONRED',n:geo.features.length};
+      window.MAPA_ESTADO={limites:'CONRED',origen:'servicio_en_linea',url:endpoint,n:geo.features.length};
+      try{ document.getElementById('fuente-limites').textContent='Límites municipales: servicio en línea de CONRED (consultado al abrir la página)'; }catch(_){}
     }catch(errConred){
       console.warn('CONRED no disponible; se intenta la copia local',errConred);
       const rl=await fetch('limites_chiquimula.geojson');
       if(!rl.ok) throw new Error('Sin servicio CONRED ni copia local');
       geo=await rl.json();
-      window.MAPA_ESTADO={limites:'copia local de respaldo (referencia MINFIN-BI; ver limites_chiquimula.PROCEDENCIA.md)',n:(geo.features||[]).length};
+      window.MAPA_ESTADO={limites:'copia local de respaldo (referencia MINFIN-BI; ver limites_chiquimula.PROCEDENCIA.md)',origen:'archivo_local',archivo:'limites_chiquimula.geojson',n:(geo.features||[]).length};
       try{ document.getElementById('fuente-limites').textContent='Límites municipales: copia local de referencia (MINFIN-BI), no oficial; el servicio de CONRED no respondió'; }catch(_){}
     }
     LIMITES=limpiarGeometriaLimites(geo);
@@ -1296,7 +1297,8 @@ async function cargarLimitesMunicipales(){
     if(coopLayer && coopLayer.bringToFront) coopLayer.bringToFront();
   }catch(e){
     console.warn('Límites municipales no disponibles',e);
-    window.MAPA_ESTADO={limites:'no disponibles',n:0,error:String(e&&e.message||e)};
+    window.MAPA_ESTADO={limites:'no disponibles',origen:'no_disponible',n:0,error:String(e&&e.message||e)};
+    try{ document.getElementById('fuente-limites').textContent='Límites municipales: no disponibles (ni servicio en línea ni copia local)'; }catch(_){}
     try{
       const host=document.getElementById('map')?.parentElement;
       if(host && !document.getElementById('aviso-limites')){
@@ -1696,7 +1698,12 @@ function prepararMapaCalidad(mapa){
       else if(mapa.hasLayer(l)) mapa.removeLayer(l);
     });
   };
+  // Registro para el panel «Fuentes cartográficas» (solo lectura; no cambia el mapa).
+  const NOMBRES_BASE=new Map([[claro,'Claro'],[relieve,'Relieve'],[satelite,'Satélite'],[osm,'OpenStreetMap']]);
+  window.MAPA_BASE={nombre:'Claro',tileErrores:{Claro:0,Relieve:0,'Satélite':0,OpenStreetMap:0}};
+  NOMBRES_BASE.forEach((n,l)=>l.on('tileerror',()=>{ window.MAPA_BASE.tileErrores[n]++; }));
   mapa.on('baselayerchange',e=>{
+    try{ window.MAPA_BASE.nombre=NOMBRES_BASE.get(e.layer)||window.MAPA_BASE.nombre; }catch(_){}
     baseActual=e.layer;
     mapa.getContainer().classList.toggle('fondo-oscuro', e.layer===satelite);
     actualizarNombres();
@@ -2883,6 +2890,6 @@ function renderPanorama(){
 
 iniciar().then(()=>{ try{ agregarBotonesCSV(); }catch(e){ console.warn(e); } });
 </script>
-<script src="inteligencia.js?v=3"></script>
+<script src="inteligencia.js?v=4"></script>
 </body>
 </html>
