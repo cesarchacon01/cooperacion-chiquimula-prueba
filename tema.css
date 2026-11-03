@@ -98,7 +98,9 @@ table tbody td{ border-bottom:1px solid #E1E8EE; } table tbody tr:nth-child(even
 @media (max-width:640px){ .pan-kpis{ grid-template-columns:1fr 1fr; } .pan-kpi{ border-bottom:1px solid var(--border); } .int-consultas{ grid-template-columns:minmax(0,1fr); } }
 
 /* ===== Explorador: mapa protagonista + panel de navegación ===== */
-#view-mapa .layout{ grid-template-columns:minmax(0,1.6fr) minmax(390px,1fr); gap:16px; align-items:start; }
+#view-mapa .layout{ grid-template-columns:minmax(0,1.85fr) minmax(360px,1fr); gap:16px; align-items:start; }
+main:has(#view-mapa.active){ max-width:none; width:100%; padding-left:3vw; padding-right:3vw; box-sizing:border-box; }
+@media(min-width:1800px){ main:has(#view-mapa.active){ padding-left:2vw; padding-right:2vw; } }
 #view-mapa #map{ height:calc(100vh - 250px); min-height:540px; }
 #view-mapa .legend{ font-size:12px; }
 #panel-comunidad.int-panel{ position:sticky; top:62px; max-height:calc(100vh - 78px); overflow:auto; padding:16px 18px; }
@@ -228,3 +230,6 @@ main,main:has(#view-instituciones.active){ max-width:none!important; width:100%;
 .int-ficha-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:8px 28px;margin:6px 0 12px}
 #int-ficha-org .org-toolbar{margin-top:18px}
 @media(max-width:760px){.int-ogrid{grid-template-columns:1fr}#int-csv{margin-left:0}.int-search select,.int-search input{flex:1 1 100%}.int-vista button{min-height:44px}.int-dircard{padding:14px}}
+
+.int-h5{font-size:13px;margin:10px 0 4px;color:#183652}
+.int-link{background:none;border:0;color:#22678A;text-decoration:underline;font:inherit;font-size:13px;cursor:pointer;padding:4px 0}

@@ -1052,25 +1052,49 @@ function rolesHtml(){
    <div class="int-rol"><b>Trabajo en planificación o territorio</b><span>Vea dónde coinciden varias intervenciones y qué oportunidades de coordinación existen.</span><div><button type="button" class="int-btn" data-go="preg:5">Dónde coinciden</button> <button type="button" class="int-btn ghost" data-go="preg:6">Oportunidades</button></div></div>
    <div class="int-rol"><b>Represento a una organización</b><span>Escriba su nombre en el buscador de arriba y abra su ficha.</span><button type="button" class="int-btn ghost" id="int-rol-o">Buscar mi organización</button></div></div>`;
 }
+
+/* --- Tercer nivel del panel territorial: convergencia / análisis --- */
+function bloqueConvergencia(munisSel){
+  const ops=oportunidades(munisSel); const o1=ops.find(o=>o.id==='o1'), o2=ops.find(o=>o.id==='o2');
+  const total=(o1?o1.n:0)+(o2?o2.n:0);
+  if(!total) return `<h4 class="int-h4">Convergencia territorial (análisis)</h4><p class="int-note">No se detectan coincidencias de sector u organización en más de un lugar/organización para esta selección.</p>`;
+  const li=(arr,n)=>arr.slice(0,n).map(x=>`<li><div>${x.txt}</div>${x.sub?`<div class="int-sub2">${x.sub}</div>`:''}</li>`).join('');
+  return `<h4 class="int-h4">Convergencia territorial (análisis)</h4>
+   <div class="int-kpis">${kpi(o1?o1.n:0,'municipio × sector con 2+ organizaciones')}${kpi(o2?o2.n:0,'comunidades con 2+ programas')}</div>
+   ${o1&&o1.n?`<h5 class="int-h5">Mismo sector, varias organizaciones</h5><ul class="int-ul">${li(o1.items,5)}</ul>${o1.n>5?`<button type="button" class="int-link" data-go="preg:5">Ver las ${o1.n}</button>`:''}`:''}
+   ${o2&&o2.n?`<h5 class="int-h5">Comunidades con varias intervenciones</h5><ul class="int-ul">${li(o2.items,5)}</ul>${o2.n>5?`<button type="button" class="int-link" data-go="preg:5">Ver las ${o2.n}</button>`:''}`:''}
+   <p class="int-note warn">Esto identifica coincidencias en los registros, no coordinación comprobada, duplicidad ni atención a las mismas familias. Es un punto de partida para conversar y verificar.</p>`;
+}
+
+function notaFiltrosActivos(){
+  try{
+    const etq={organizacion:'Organización',sector:'Sector',programa:'Programa',atencion:'Tipo de atención',actor:'Tipo de actor',estado:'Estado'};
+    const activos=Object.entries(filtros).filter(([k,v])=>v&&etq[k]).map(([k,v])=>`${etq[k]}: ${v}`);
+    if(!activos.length) return '';
+    return `<p class="int-note warn">Filtros del mapa activos (arriba): <b>${activos.map(esc).join(' · ')}</b>. Ya se aplican al mapa y a las cifras generales. Este panel sigue mostrando el perfil completo del municipio/departamento para no perder contexto; use «Dónde coinciden» u «Oportunidades» para ver solo lo filtrado.</p>`;
+  }catch(e){ return ''; }
+}
 function nivelDep(){
   const ds=nombresMunicipios().map(datosMunicipio).sort((a,b)=>b.progs.length-a.progs.length||cmp(a.m,b.m));
   const mx=Math.max(1,...ds.map(d=>d.progs.length));
   const orgs=uniq(P.map(p=>p.organizacion)).length, mc=ds.filter(d=>d.progs.length).length;
-  return `<p class="int-big">${orgs} ${plural(orgs,'organización reporta','organizaciones reportan')} ${P.length} ${plural(P.length,'programa','programas')} con presencia registrada en ${mc} de ${ds.length} municipios. Elija un municipio en el mapa o en la lista, o haga una pregunta.</p>
+  return notaFiltrosActivos()+`<p class="int-big">${orgs} ${plural(orgs,'organización reporta','organizaciones reportan')} ${P.length} ${plural(P.length,'programa','programas')} con presencia registrada en ${mc} de ${ds.length} municipios. Elija un municipio en el mapa o en la lista, o haga una pregunta.</p>
    ${rolesHtml()}
    <h4 class="int-h4">Preguntas</h4>${preguntasHtml()}
    <h4 class="int-h4">Municipios</h4>${ds.map(d=>`<button type="button" class="int-mrow" data-go="muni:${esc(d.m)}"><span>${esc(d.m)}</span><i style="--w:${(d.progs.length/mx*100).toFixed(1)}%"></i><small>${d.orgs.length?`${d.orgs.length} org. · ${d.progs.length} prog.`:'sin registros'}</small></button>`).join('')}
-   <p class="int-note">Un municipio "sin registros" no es un municipio sin cooperación: solo indica que nadie la ha reportado todavía.</p>`;
+   <p class="int-note">Un municipio "sin registros" no es un municipio sin cooperación: solo indica que nadie la ha reportado todavía.</p>
+   ${bloqueConvergencia(null)}`;
 }
 function nivelMuni(m){
   const d=datosMunicipio(m);
   const lug=d.lug.slice().sort((a,b)=>b.orgs.size-a.orgs.size||cmp(a.lugar_poblado,b.lugar_poblado));
   const cat=nombreLugares().filter(l=>l.muni===m);
-  return `<p class="int-big">${resumenTexto(d)}</p>
+  return notaFiltrosActivos()+`<p class="int-big">${resumenTexto(d)}</p>
    <div class="int-kpis">${kpi(d.orgs.length,plural(d.orgs.length,'organización','organizaciones'))}${kpi(d.progs.length,plural(d.progs.length,'programa','programas'))}${kpi(`${d.lugCat.length}${d.total?' de '+d.total:''}`,'comunidades con atención registrada')}</div>
    <h4 class="int-h4">Preguntas sobre ${esc(m)}</h4>${preguntasHtml()}
    <h4 class="int-h4">Organizaciones</h4><div>${d.orgs.map(chipOrg).join('')||'<span class="int-empty">Ninguna registrada.</span>'}</div>
    <h4 class="int-h4">Comunidades con atención registrada</h4><div>${lug.map(c=>`<button type="button" class="int-chip lugar${c.fuera_catalogo?' pend':''}" data-go="lugar:${esc(c.k)}">${esc(c.lugar_poblado)}${c.orgs.size>1?` <small>${c.orgs.size} org.</small>`:''}${c.fuera_catalogo?' <small>por validar</small>':''}</button>`).join('')||'<span class="int-empty">Sin comunidades registradas.</span>'}</div>
+   ${bloqueConvergencia([m])}
    <h4 class="int-h4">Buscar otra comunidad de ${esc(m)}</h4><div class="int-search"><input id="int-cb" list="int-cb-dl" placeholder="escriba el nombre" aria-label="Comunidad"><datalist id="int-cb-dl">${cat.map(l=>`<option value="${esc(l.lugar)}">`).join('')}</datalist><button type="button" class="int-btn" id="int-cb-go">Ver</button></div>
    <p class="int-note">Las comunidades que no aparecen arriba están "sin atención registrada", no necesariamente sin cooperación.</p>
    <div class="int-actions"><button type="button" class="int-btn ghost" data-go="ficha:${esc(m)}">Ficha municipal completa</button> <button type="button" class="int-btn ghost" data-go="cmp:${esc(m)}">Comparar municipios</button></div>`;

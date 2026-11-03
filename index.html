@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="visor-version" content="fase2-e1">
+<meta name="visor-version" content="fase2-e2">
 <title>Mapeo de Actores de Cooperación — SEGEPLAN Chiquimula</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -396,7 +396,7 @@ table tbody tr:hover td{ background:#F4F1E6; }
 @media (max-width:620px){ .cov-row{ grid-template-columns:104px 1fr 78px; gap:8px; } main{ padding:18px 14px 60px; } }
 @media print{ nav{ position:static; } }
 </style>
-<link rel="stylesheet" href="tema.css?v=7">
+<link rel="stylesheet" href="tema.css?v=8">
 <style id="fix-capas">
 /* El icono del selector de mapa base venía de unpkg (images/layers.png); si no cargaba quedaba un cuadro blanco vacío.
    Se reemplaza por un SVG incrustado: el control (Claro / Relieve / Satélite / OpenStreetMap) funciona igual. */
@@ -446,12 +446,15 @@ table tbody tr:hover td{ background:#F4F1E6; }
 
     <div class="filters">
       <label>FILTROS</label>
+      <select id="f-organizacion"><option value="">Organización: todas</option></select>
       <select id="f-sector"><option value="">Sector: todos</option></select>
+      <select id="f-programa"><option value="">Programa / proyecto: todos</option></select>
       <select id="f-atencion"><option value="">Tipo de atención: todos</option></select>
       <select id="f-actor"><option value="">Tipo de actor: todos</option></select>
       <select id="f-estado"><option value="">Estado: todos</option></select>
       <select id="f-municipio" style="display:none" aria-hidden="true"><option value="">Municipio: todos</option></select>
       <button class="clear-btn" onclick="limpiarFiltros()">Limpiar filtros</button>
+      <span class="int-note" id="filtros-resumen" style="width:100%;margin-top:2px"></span>
     </div>
 
     <div class="territorial-tools">
@@ -469,10 +472,13 @@ table tbody tr:hover td{ background:#F4F1E6; }
         <div class="side-sub">Los puntos sólidos muestran cooperación registrada. Active “Base territorial” para consultar los lugares poblados georreferenciados; un punto hueco significa “sin presencia de cooperación registrada”.</div>
         <div id="map"></div>
         <div class="legend">
-          <span><span class="dot" style="background:#183652;border:2px solid #fff;box-shadow:0 0 0 1px #183652;"></span>Cooperación comunitaria registrada (círculo sólido)</span>
-          <span><span class="dot" style="background:#fff;border:2px solid #7D91A3;"></span>Lugar poblado de referencia · base territorial (punto hueco)</span>
-          <span style="margin-left:8px;">Intensidad:</span><span>menor</span><div class="bar"></div><span>mayor</span>
+          <span><span class="dot" style="background:#183652;border:2px solid #fff;box-shadow:0 0 0 1px #183652;"></span>1 organización</span>
+          <span><span class="dot" style="background:#F2AD5C;border:2px solid #9A4D00;"></span>2 organizaciones (convergencia)</span>
+          <span><span class="dot" style="background:#E8913A;border:2px solid #9A4D00;box-shadow:0 0 0 2px #fff,0 0 0 3px #9A4D00;"></span>3 o más organizaciones</span>
+          <span><span class="dot" style="background:#fff;border:2px solid #22678A;box-shadow:0 0 0 1px #22678A;"></span>Presencia institucional / municipal</span>
+          <span><span class="dot" style="background:#fff;border:2px solid #7D91A3;"></span>Lugar de referencia · sin cooperación registrada</span>
         </div>
+        <p class="int-note warn" style="margin:6px 0 0">La convergencia territorial (2 o más organizaciones en un mismo lugar) <b>no demuestra coordinación, duplicidad de servicios ni atención a las mismas familias</b>; es un punto de partida para conversar y verificar.</p>
         <div class="boundary-note"><span id="fuente-limites">Límites municipales: comprobando la fuente…</span> · La ausencia de registro no confirma una brecha de atención.</div>
       </div>
       <div>
@@ -842,7 +848,7 @@ function mostrarVista(id){
   if(ancla) setTimeout(()=>document.getElementById(ancla)?.scrollIntoView({behavior:'smooth'}),120);
 }
 
-const filtros = { sector:'', atencion:'', actor:'', estado:'', municipio:'' };
+const filtros = { sector:'', atencion:'', actor:'', estado:'', municipio:'', organizacion:'', programa:'' };
 let CATALOGO=null, COORDS={}, baseLayer=null, coopLayer=null, instLayer=null, basePlaces=[], limitesLayer=null, exteriorMaskLayer=null, LIMITES=null;
 
 
@@ -927,13 +933,16 @@ function normalizarPresentacionData(data){
 
 function limpiarFiltros(){
   Object.keys(filtros).forEach(k=>filtros[k]='');
-  ['f-sector','f-atencion','f-actor','f-estado','f-municipio'].forEach(id=>document.getElementById(id).value='');
+  ['f-organizacion','f-sector','f-programa','f-atencion','f-actor','f-estado','f-municipio'].forEach(id=>document.getElementById(id).value='');
+  try{actualizarResumenFiltros();}catch(_){}
   const tm=document.getElementById('t-municipio');
   if(tm && tm.value){ tm.value=''; tm.dispatchEvent(new Event('change')); return; }
   renderMapaYStats();
 }
 
 function coincide(p){
+  if(filtros.organizacion && p.organizacion!==filtros.organizacion) return false;
+  if(filtros.programa && nombreProg(p)!==filtros.programa) return false;
   if(filtros.sector && !p.sector.includes(filtros.sector)) return false;
   if(filtros.atencion && p.tipo_atencion !== filtros.atencion) return false;
   if(filtros.actor && p.tipo_actor !== filtros.actor) return false;
@@ -946,12 +955,14 @@ function coincide(p){
 }
 
 function poblarSelects(){
-  const sectores=new Set(), atenciones=new Set(), actores=new Set(), estados=new Set(), municipios=new Set();
+  const sectores=new Set(), atenciones=new Set(), actores=new Set(), estados=new Set(), municipios=new Set(), organizaciones=new Set(), programas=new Set();
   DATA.programas.forEach(p=>{
     p.sector.forEach(s=>sectores.add(s));
     atenciones.add(p.tipo_atencion);
     actores.add(p.tipo_actor);
     estados.add(p.estado_programa);
+    organizaciones.add(p.organizacion);
+    if(p.nombre_programa) programas.add(p.nombre_programa);
     p.comunidades.forEach(c=>municipios.add(c.municipio));
     p.municipios_cobertura_institucional.forEach(m=>municipios.add(m));
   });
@@ -961,14 +972,26 @@ function poblarSelects(){
       const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o);
     });
   };
-  fill('f-sector', sectores); fill('f-atencion', atenciones); fill('f-actor', actores);
+  fill('f-organizacion', organizaciones); fill('f-sector', sectores); fill('f-programa', programas);
+  fill('f-atencion', atenciones); fill('f-actor', actores);
   fill('f-estado', estados); fill('f-municipio', municipios);
 
-  document.getElementById('f-sector').onchange = e=>{filtros.sector=e.target.value; renderMapaYStats();};
+  document.getElementById('f-organizacion').onchange = e=>{filtros.organizacion=e.target.value; actualizarResumenFiltros(); renderMapaYStats();};
+  document.getElementById('f-programa').onchange = e=>{filtros.programa=e.target.value; actualizarResumenFiltros(); renderMapaYStats();};
+  document.getElementById('f-sector').onchange = e=>{filtros.sector=e.target.value; actualizarResumenFiltros(); renderMapaYStats();};
   document.getElementById('f-atencion').onchange = e=>{filtros.atencion=e.target.value; renderMapaYStats();};
   document.getElementById('f-actor').onchange = e=>{filtros.actor=e.target.value; renderMapaYStats();};
-  document.getElementById('f-estado').onchange = e=>{filtros.estado=e.target.value; renderMapaYStats();};
-  document.getElementById('f-municipio').onchange = e=>{filtros.municipio=e.target.value; renderMapaYStats();};
+  document.getElementById('f-estado').onchange = e=>{filtros.estado=e.target.value; actualizarResumenFiltros(); renderMapaYStats();};
+  document.getElementById('f-municipio').onchange = e=>{filtros.municipio=e.target.value; actualizarResumenFiltros(); renderMapaYStats();};
+  document.getElementById('f-atencion').onchange = e=>{filtros.atencion=e.target.value; actualizarResumenFiltros(); renderMapaYStats();};
+  document.getElementById('f-actor').onchange = e=>{filtros.actor=e.target.value; actualizarResumenFiltros(); renderMapaYStats();};
+  actualizarResumenFiltros();
+}
+function actualizarResumenFiltros(){
+  const el=document.getElementById('filtros-resumen'); if(!el) return;
+  const etq={organizacion:'Organización',sector:'Sector',programa:'Programa',atencion:'Tipo de atención',actor:'Tipo de actor',estado:'Estado',municipio:'Municipio'};
+  const activos=Object.entries(filtros).filter(([,v])=>v).map(([k,v])=>`${etq[k]||k}: ${v}`);
+  el.textContent=activos.length?`Filtros activos (combinados): ${activos.join(' · ')}`:'';
 }
 
 function renderStats(filtrados){
@@ -1023,10 +1046,14 @@ function renderStats(filtrados){
   `;
 }
 
-function colorPorConteo(n, max){
-  const t = max > 1 ? (n-1)/(max-1) : 1;
-  const c1=[143,176,198], c2=[24,54,82];
-  return `rgb(${c1.map((v,i)=>Math.round(v+(c2[i]-v)*t)).join(',')})`;
+// Convergencia territorial: 3 niveles por organizaciones DISTINTAS (no por número de programas).
+// 1 organización = presencia simple (azul marino, igual que antes). 2 organizaciones = posible
+// convergencia (naranja suave, igual lenguaje visual que "oportunidad"). 3 o más = convergencia
+// múltiple (naranja, marcador mayor con doble anillo y el número). No implica coordinación ni duplicidad.
+function nivelConvergencia(n){
+  if(n>=3) return {tier:3,radius:13,fillColor:'#E8913A',color:'#9A4D00',weight:2.4,fillOpacity:.95,anillo:true};
+  if(n===2) return {tier:2,radius:10,fillColor:'#F2AD5C',color:'#9A4D00',weight:2,fillOpacity:.92,anillo:false};
+  return {tier:1,radius:7,fillColor:'#183652',color:'#fff',weight:1.5,fillOpacity:.92,anillo:false};
 }
 
 function renderMapa(filtrados){
@@ -1067,9 +1094,12 @@ function renderMapa(filtrados){
     puntos.forEach(p=>{
       const orgsUnicas = new Set(p.entradas.map(e=>e.organizacion));
       const n = orgsUnicas.size;
-      const marker = L.circleMarker([p.lat,p.lon], {radius:7+n*3, fillColor:colorPorConteo(n,maxConteo), color:'#fff', weight:1.5, fillOpacity:0.92});
+      const niv=nivelConvergencia(n);
+      const marker = L.circleMarker([p.lat,p.lon], {radius:niv.radius, fillColor:niv.fillColor, color:niv.color, weight:niv.weight, fillOpacity:niv.fillOpacity, convergencia:niv.tier});
+      if(niv.anillo){ L.circleMarker([p.lat,p.lon],{radius:niv.radius+4,fillOpacity:0,color:niv.color,weight:1.4,opacity:.6,interactive:false}).addTo(coopLayer); }
       const programasUnicos=new Set(p.entradas.map(e=>e.programa).filter(Boolean));
-      marker.bindPopup(`<b>${escaparHtml(p.lugar)}</b> · ${escaparHtml(p.municipio)}<br><br><b>${n}</b> organización(es) · <b>${programasUnicos.size}</b> programa(s) / proyecto(s)<br><span style="color:#6B7280">El detalle completo se muestra en el panel lateral.</span>`,{maxWidth:285});
+      const avisoConv=n>=2?`<br><br><b style="color:#9A4D00">Convergencia territorial: ${n} organizaciones distintas.</b><br><span style="color:#6B7280">No implica coordinación, duplicidad ni atención a las mismas familias.</span>`:'';
+      marker.bindPopup(`<b>${escaparHtml(p.lugar)}</b> · ${escaparHtml(p.municipio)}<br><br><b>${n}</b> organización(es) · <b>${programasUnicos.size}</b> programa(s) / proyecto(s)${avisoConv}<br><span style="color:#6B7280">El detalle completo se muestra en el panel lateral.</span>`,{maxWidth:285});
       marker.on('click', ()=>mostrarPanelComunidad(p));
       marker.addTo(coopLayer);
     });
@@ -2662,7 +2692,7 @@ async function cargarBaseTerritorial(){
       const m=tm.value;
       // Un solo selector de municipio: la consulta territorial también filtra la cooperación
       // (incluida la presencia institucional/municipal).
-      filtros.municipio=m;
+      filtros.municipio=m; try{actualizarResumenFiltros();}catch(_){}
       const fm=document.getElementById('f-municipio'); if(fm) fm.value=m;
       // Cada cambio de municipio inicia una consulta territorial nueva.
       // Evita conservar en el panel la comunidad seleccionada previamente.
@@ -2895,6 +2925,6 @@ function renderPanorama(){
 
 iniciar().then(()=>{ try{ agregarBotonesCSV(); }catch(e){ console.warn(e); } });
 </script>
-<script src="inteligencia.js?v=6"></script>
+<script src="inteligencia.js?v=7"></script>
 </body>
 </html>
