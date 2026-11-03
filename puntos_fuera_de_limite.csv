@@ -1,0 +1,27 @@
+﻿codigo_lugar,lugar_poblado,municipio_en_catalogo,distancia_al_limite_m,municipio_donde_cae_segun_limites,lat,lon
+jocotan_agua_fria,Agua Fria,Jocotán,1291,ninguno de los 11 (fuera del departamento o en el borde),14.910379,-89.36469
+chiquimula_la_puente,La Puente,Chiquimula,1100,jocotan,14.793521,-89.46036
+olopa_el_tercero,El Tercero,Olopa,842,san juan ermita,14.703366,-89.38441
+olopa_la_consolacion,La Consolacion,Olopa,773,esquipulas,14.726939,-89.23904
+chiquimula_tapazan,Tapazan,Chiquimula,660,jocotan,14.865126,-89.47399
+jocotan_el_filo,El Filo,Jocotán,638,ninguno de los 11 (fuera del departamento o en el borde),14.905908,-89.36014
+olopa_los_vasquez,Los Vasquez,Olopa,571,esquipulas,14.686296,-89.2795
+san_juan_ermita_el_coco,El Coco,San Juan Ermita,547,jocotan,14.770472,-89.41069
+camotan_el_cementerio,El Cementerio,Camotán,402,jocotan,14.818097,-89.37767
+camotan_el_cementerio_2,El Cementerio,Camotán,402,jocotan,14.818097,-89.37767
+san_jacinto_valle_de_la_escuela,Valle De La Escuela,San Jacinto,346,san juan ermita,14.735186,-89.47043
+san_jacinto_valle_de_la_escuela_2,Valle De La Escuela,San Jacinto,346,san juan ermita,14.735186,-89.47043
+olopa_los_cafetales,Los Cafetales,Olopa,325,san juan ermita,14.717676,-89.37046
+san_juan_ermita_minas_arriba,Minas Arriba,San Juan Ermita,300,jocotan,14.784261,-89.45182
+san_juan_ermita_el_magueyal,El Magueyal,San Juan Ermita,292,jocotan,14.724867,-89.38212
+quezaltepeque_los_espana,Los España,Quezaltepeque,178,san jacinto,14.64456,-89.50634
+ipala_los_horcones,Los Horcones,Ipala,162,ninguno de los 11 (fuera del departamento o en el borde),14.547861,-89.69342
+olopa_los_lirios,Los Lirios,Olopa,145,esquipulas,14.682987,-89.28461
+ipala_cruz_de_villeda,Cruz De Villeda,Ipala,104,ninguno de los 11 (fuera del departamento o en el borde),14.620772,-89.66801
+camotan_tempizque,Tempizque,Camotán,71,jocotan,14.81531,-89.37399
+chiquimula_san_jorge,San Jorge,Chiquimula,61,san juan ermita,14.738026,-89.47866
+ipala_chaguiton,Chaguiton,Ipala,58,ninguno de los 11 (fuera del departamento o en el borde),14.550425,-89.65381
+camotan_el_plan,El Plan,Camotán,43,jocotan,14.787343,-89.26257
+jocotan_los_perez,Los Perez,Jocotán,34,ninguno de los 11 (fuera del departamento o en el borde),14.898728,-89.36397
+chiquimula_rincon_de_santa_barbara,Rincon De Santa Barbara,Chiquimula,25,jocotan,14.849267,-89.46606
+camotan_shalom,Shalom,Camotán,1,jocotan,14.817468,-89.37365
