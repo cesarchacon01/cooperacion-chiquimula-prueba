@@ -639,13 +639,13 @@ function renderHallazgos(){
    ===================================================================== */
 const PREGUNTAS = {
   panorama:'¿Qué está pasando en el territorio y a quién debo consultar?',
-  mapa:'¿Dónde hay atención comunitaria registrada y dónde no?',
+  mapa:'¿En qué comunidades hay intervenciones registradas y dónde no?',
   municipio:'¿Quién trabaja en mi municipio y en qué comunidades?',
-  instituciones:'¿Quiénes son los actores y qué hacen?',
-  articulacion:'¿Con quién trabajan las organizaciones y en qué espacios?',
+  instituciones:'¿Quién trabaja en el territorio y qué hace cada organización?',
+  articulacion:'¿Qué instituciones mencionan como contrapartes y en qué espacios?',
   inversion:'¿Qué recursos financieros reporta la cooperación?',
   'poblacion-accion':'¿A quiénes se dirigen las intervenciones y en qué temas?',
-  brechas:'¿Dónde conviene conversar, coordinar o completar información?'
+  brechas:'¿Dónde existen oportunidades de complementariedad para conversar y coordinar?'
 };
 function insertarPreguntas(){
   Object.entries(PREGUNTAS).forEach(([id,t])=>{
@@ -716,6 +716,125 @@ function renderTablaMunicipios(){
   enlazar(box);
   $$('tbody tr',box).forEach(tr=>tr.addEventListener('keydown',e=>{ if(e.key==='Enter') ir(tr.dataset.go); }));
   $('#int-tmun-csv').onclick=()=>csv('municipios_resumen.csv',[['Municipio','Organizaciones','Programas','Lugares con atención registrada','Lugares en catálogo','Sectores más frecuentes','Programas por finalizar'],...ds.map(d=>[d.m,d.orgs.length,d.progs.length,d.lugCat.length,d.total,d.sect.slice(0,3).map(x=>x[0]).join('; '),d.cierre.length])]);
+}
+
+
+/* =====================================================================
+   PANORAMA v3: primero el departamento ("Chiquimula en conjunto"), después los municipios.
+   Solo reorganiza y presenta; no cambia datos ni cálculos. Los rangos de inversión no se suman
+   y no se muestra población en esta vista.
+   ===================================================================== */
+const ESTADOS={
+  rep:{t:'Reportado por organización',d:'Lo escribió o marcó la organización en Kobo; el visor no lo ha contrastado con otra fuente.'},
+  cal:{t:'Calculado por el visor',d:'Conteo o clasificación hecha por el visor a partir de lo reportado.'},
+  ver:{t:'Verificado',d:'Contrastado con otra fuente o validado por SEGEPLAN/CRS. Hoy ningún dato se presenta con este estado.'}
+};
+function etq(k){ return `<span class="int-est ${k}" title="${esc(ESTADOS[k].d)}">${k==='ver'?'✓ ':''}${esc(ESTADOS[k].t)}</span>`; }
+function barraSimple(nombre,n,mx,extra){ return `<div class="pv3-bar"><span>${esc(nombre)}</span><i style="--w:${(mx?n/mx*100:0).toFixed(1)}%"></i><b>${n}</b>${extra||''}</div>`; }
+
+function renderPanoramaV3(){
+  const sec=$('#view-panorama'); if(!sec||!DATA||!$('#pan-hero')) return;
+  const M=nombresMunicipios();
+  const datos=M.map(datosMunicipio);
+  // --- Nivel 1: departamento
+  const orgTipo=new Map(); P.forEach(p=>{ if(!orgTipo.has(p.organizacion)) orgTipo.set(p.organizacion,p.tipo_actor||'Sin dato'); });
+  const porTipo=top(cuenta([...orgTipo.values()],x=>x),20);
+  const porEstado=top(cuenta(P.map(p=>p.estado_programa||'Sin dato'),x=>x),6);
+  const dr=distRangos(P); const mxR=Math.max(1,...dr.filas.map(f=>f.n),dr.sin);
+  const munisConPres=datos.filter(d=>d.progs.length>0).length;
+  const lugPres=new Set(); P.forEach(p=>(p.comunidades||[]).forEach(c=>{ if(c.codigo_lugar&&c.lat!==null&&c.lat!==undefined&&c.lat!=='') lugPres.add(c.codigo_lugar); }));
+  const georef=(DATA.control&&DATA.control.lugares_con_coordenadas)||0;
+  const conjunto=`
+   <h3 class="pv3-h">Chiquimula en conjunto</h3>
+   <div class="pv3-cards">
+    <div class="pv3-card"><h4>Actores de la cooperación ${etq('cal')}</h4><b class="pv3-big">${orgTipo.size}</b><span class="pv3-sub">${plural(orgTipo.size,'organización','organizaciones')} con programas reportados</span>
+      ${porTipo.map(([k,n])=>`<div class="pv3-li"><span>${esc(k)}</span><b>${n}</b></div>`).join('')}</div>
+    <div class="pv3-card"><h4>Programas y proyectos ${etq('cal')}</h4><b class="pv3-big">${P.length}</b><span class="pv3-sub">${plural(P.length,'programa o proyecto','programas y proyectos')} reportados</span>
+      ${porEstado.map(([k,n])=>`<div class="pv3-li"><span>${esc(k)}</span><b>${n}</b></div>`).join('')}</div>
+    <div class="pv3-card"><h4>Inversión reportada ${etq('cal')}</h4><span class="pv3-sub">Programas según el rango que declaró cada organización</span>
+      ${dr.filas.map(f=>barraSimple(f.etq,f.n,mxR)).join('')}${barraSimple('Prefiere no indicar',dr.sin,mxR)}
+      <p class="pv3-aviso">Cuenta programas por rango. <b>Los rangos no se suman</b>: no equivalen a un presupuesto total.</p></div>
+    <div class="pv3-card"><h4>Cobertura territorial ${etq('cal')}</h4><b class="pv3-big">${munisConPres}<small> de ${M.length}</small></b><span class="pv3-sub">municipios con presencia registrada</span>
+      <div class="pv3-li"><span>Lugares poblados con atención comunitaria registrada</span><b>${fmt(lugPres.size)} de ${fmt(georef)}</b></div>
+      <p class="pv3-aviso">La ausencia de registro no confirma ausencia de cooperación.</p></div>
+   </div>`;
+  const accesos=`
+   <div class="pv3-accesos">
+    <button type="button" class="pv3-destacado" data-nav="brechas"><b>◆ Oportunidades de articulación</b><span>¿Dónde varias organizaciones coinciden en un mismo lugar o sector? Son motivos para conversar y complementar, no alianzas ni duplicidades confirmadas.</span><i>Ver oportunidades de articulación →</i></button>
+    <div class="pv3-accesos-grid">
+     <button type="button" data-nav="mapa"><b>Mapa territorial</b><small>¿En qué comunidades hay intervenciones registradas?</small></button>
+     <button type="button" data-nav="instituciones"><b>Organizaciones</b><small>¿Quién trabaja en el territorio y qué hace?</small></button>
+     <button type="button" data-nav="articulacion"><b>Coordinación</b><small>¿Qué instituciones se mencionan como contrapartes?</small></button>
+     <button type="button" data-nav="inversion"><b>Inversión</b><small>¿Qué rangos de inversión se reportan?</small></button>
+    </div>
+   </div>`;
+  // --- Nivel 2: municipios (dos indicadores separados, sin mezclarlos)
+  const menosProg=datos.slice().sort((a,b)=>a.progs.length-b.progs.length||cmp(a.m,b.m)).slice(0,5);
+  const menosLug=datos.slice().sort((a,b)=>a.lugCat.length-b.lugCat.length||cmp(a.m,b.m)).slice(0,5);
+  const fila=(m,txt)=>`<button type="button" class="pv3-row" data-muni="${esc(m)}"><span>${esc(m)}</span><b>${txt}</b></button>`;
+  const cierre=P.filter(porCerrar).sort((a,b)=>(fechaFin(a)||new Date(9e12))-(fechaFin(b)||new Date(9e12)));
+  const secs=top(cuenta(P.flatMap(p=>p.sector||[]),x=>x),5); const mxS=Math.max(1,...secs.map(x=>x[1]));
+  const nivel2=`
+   <div class="pv3-grid2">
+    <div class="pv3-card"><h4>Municipios con menos programas registrados ${etq('cal')}</h4>
+      <p class="pv3-sub">Cuenta los programas con presencia comunitaria o institucional en el municipio.</p>
+      ${menosProg.map(d=>fila(d.m,d.progs.length===0?'sin programas registrados':`${d.progs.length} ${plural(d.progs.length,'programa','programas')}`)).join('')}
+      <p class="pv3-aviso">Menos programas registrados no significa menos cooperación: puede haber programas aún no reportados.</p></div>
+    <div class="pv3-card"><h4>Municipios con menos lugares con atención comunitaria registrada ${etq('cal')}</h4>
+      <p class="pv3-sub">Cuenta lugares poblados del catálogo con atención comunitaria registrada. La presencia institucional o municipal no se cuenta aquí.</p>
+      ${menosLug.map(d=>fila(d.m,`${d.lugCat.length} de ${fmt(d.total)} ${plural(d.total,'lugar','lugares')}`)).join('')}
+      <p class="pv3-aviso">Un lugar sin registro no es un lugar sin cooperación: solo indica que nadie ha reportado atención allí.</p></div>
+   </div>
+   <div class="pv3-grid2">
+    <div class="pv3-card"><h4>¿Qué proyectos están por finalizar? ${etq('rep')}</h4>
+      <p class="pv3-sub">Fechas y estados tal como los declaró cada organización.</p>
+      ${cierre.slice(0,5).map(p=>`<div class="pv3-prog"><b>${esc(p.nombre_programa||'(sin nombre)')}</b><span>${esc(p.organizacion)}${p.fecha_fin?' · fin '+esc(p.fecha_fin):''}</span><small>${esc(munisTodos(p).join(', ')||'sin municipio indicado')}</small></div>`).join('')||'<div class="int-empty">Ningún programa reporta cierre próximo.</div>'}
+      ${cierre.length?`<button type="button" class="int-link" id="pv3-cierre">Ver los ${cierre.length} ${plural(cierre.length,'programa','programas')} →</button>`:''}</div>
+    <div class="pv3-card"><h4>¿Qué sectores concentran más intervenciones? ${etq('cal')}</h4>
+      ${secs.map(([k,n])=>barraSimple(k,n,mxS)).join('')}
+      <button type="button" class="int-link" data-nav="brechas">Ver matriz sector × municipio →</button></div>
+   </div>`;
+  const leyenda=`
+   <div class="pv3-leyenda">
+    <h4>Cómo leer los colores y las etiquetas</h4>
+    <div class="pv3-leg">
+     <div><span class="map-symbol community"></span><b>Cooperación comunitaria registrada</b><small>círculo sólido azul profundo</small></div>
+     <div><span class="map-symbol institutional"></span><b>Presencia institucional o municipal</b><small>círculo con anillo azul medio</small></div>
+     <div><span class="map-symbol territorial"></span><b>Lugar poblado de referencia</b><small>punto pequeño hueco</small></div>
+     <div><span class="int-est pend">Pendiente</span><b>Información pendiente de completar</b><small>etiqueta naranja con texto</small></div>
+     <div><span class="int-est opo">◆ Oportunidad</span><b>Oportunidad potencial de articulación</b><small>etiqueta naranja suave con símbolo</small></div>
+    </div>
+    <div class="pv3-leg">
+     <div>${etq('rep')}<small>${esc(ESTADOS.rep.d)}</small></div>
+     <div>${etq('cal')}<small>${esc(ESTADOS.cal.d)}</small></div>
+     <div>${etq('ver')}<small>${esc(ESTADOS.ver.d)}</small></div>
+    </div>
+    <p class="int-note">El naranja solo indica "revisar, completar u oportunidad". No es una clasificación oficial de prioridad ni de riesgo.</p>
+   </div>`;
+  // --- montaje (una sola vez) y refresco de los bloques dinámicos
+  let v3=$('#pv3',sec);
+  if(!v3){
+    v3=document.createElement('div'); v3.id='pv3';
+    v3.innerHTML='<div id="pv3-conjunto"></div><div id="pv3-accesos"></div><h3 class="pv3-h">Qué pasa en los municipios</h3><div id="pv3-tmun"></div><div id="pv3-nivel2"></div>';
+    $('#pan-hero').after(v3);
+    const det=document.createElement('details'); det.id='pv3-detalle'; det.className='int-fold';
+    det.innerHTML='<summary>Más detalle del Panorama: consultas rápidas, lecturas automáticas, gráficas y guía de colores</summary><div class="int-fold-body"></div>';
+    v3.after(det);
+    const cuerpo=det.querySelector('.int-fold-body');
+    const mover=el=>{ if(el) cuerpo.appendChild(el); };
+    mover($('#int-consultas',sec));
+    const ins=$('#pan-insights'); mover(ins&&ins.closest('.pan-sec'));
+    const cob=$('#pan-cobertura'); mover(cob&&cob.closest('.pan-grid'));
+    const exp=$('#pan-explore'); mover(exp&&exp.closest('.pan-sec'));
+    const ley=document.createElement('div'); ley.id='pv3-ley'; cuerpo.appendChild(ley);
+    const tm=$('#int-tmun',sec); if(tm) $('#pv3-tmun',v3).appendChild(tm);
+    v3.addEventListener('click',e=>{
+      const nav=e.target.closest('[data-nav]'); if(nav){ mostrarVista(nav.dataset.nav); window.scrollTo({top:0,behavior:'smooth'}); return; }
+      const mu=e.target.closest('[data-muni]'); if(mu){ irAMunicipio(mu.dataset.muni); return; }
+      if(e.target.id==='pv3-cierre') resultadoProgramas(`Programas que terminan en los próximos ${MESES_CIERRE} meses`,P.filter(porCerrar).sort((a,b)=>(fechaFin(a)||new Date(9e12))-(fechaFin(b)||new Date(9e12))),'Incluye programas marcados como "Próximo a finalizar" y los que declaran fecha de cierre dentro del plazo.');
+    });
+  }
+  $('#pv3-conjunto',v3).innerHTML=conjunto; $('#pv3-accesos',v3).innerHTML=accesos; $('#pv3-nivel2',v3).innerHTML=nivel2; $('#pv3-ley').innerHTML=leyenda;
 }
 
 
@@ -900,13 +1019,16 @@ function diagnosticoMapa(){
   return `<ul class="int-ul"><li>Librería de mapas (Leaflet): ${typeof L!=='undefined'?'cargada':'<b>no cargada</b>'}.</li><li>Límites municipales: ${esc(me.limites)}${me.n?` (${me.n} municipios)`:''}${me.error?` — ${esc(me.error)}`:''}.</li><li>Puntos de cooperación visibles ahora en el mapa: ${typeof marc==='number'?marc:'sin dato'}.</li><li>Comunidades con atención registrada: ${tot}; <b>${sin}</b> sin coordenadas (no aparecen como punto, pero sí en las fichas y listas).</li></ul>`;
 }
 function metodologia(){
-  const g=DATA.generado?new Date(DATA.generado).toLocaleString('es-GT',{dateStyle:'long',timeStyle:'short'}):'sin dato';
+  const g=(DATA.generado&&typeof fechaCorta==='function')?fechaCorta(DATA.generado):'sin dato';
   const c=DATA.control||{};
   abrir('Metodología y fuentes',`
    <div class="int-kpis">${kpi(esc(g),'Última sincronización')}${kpi(c.registros_kobo??'—','Registros recibidos')}${kpi(c.programas_procesados??P.length,'Programas procesados')}</div>
    <h4 class="int-h4">Fuente</h4><p>Información reportada por las propias organizaciones mediante el formulario "Mapeo de Actores de Cooperación" (KoboToolbox). Se sincroniza automáticamente varias veces al día. El catálogo de lugares poblados (${fmt(c.lugares_catalogo||0)}) es la base territorial oficial; ${fmt(c.lugares_con_coordenadas||0)} tienen coordenadas.</p>
-   <h4 class="int-h4">Qué es dato, qué es cálculo y qué es lectura</h4>
-   <ul class="int-ul"><li><b>Dato reportado:</b> lo que cada organización escribió o marcó.</li><li><b>Indicador calculado:</b> conteos y sumas hechas por el visor (programas, organizaciones, lugares).</li><li><b>Lectura automática:</b> frases generadas con reglas fijas a partir de los indicadores. No usan inteligencia artificial externa.</li></ul>
+   <h4 class="int-h4">Estados de la información: qué significa cada etiqueta</h4>
+   <ul class="int-ul">
+    <li>${etq('rep')} Lo que cada organización escribió o marcó en el formulario (KoboToolbox). El visor no lo ha contrastado con otra fuente.</li>
+    <li>${etq('cal')} Conteos y clasificaciones que hace el visor a partir de lo reportado (por ejemplo, cuántos programas hay por rango). Las lecturas automáticas son frases con reglas fijas, sin inteligencia artificial externa.</li>
+    <li>${etq('ver')} Dato contrastado con otra fuente o validado por SEGEPLAN o CRS. <b>Hoy ningún dato se presenta como verificado</b>: una declaración en Kobo no es una verificación.</li></ul>
    <h4 class="int-h4">Reglas de interpretación</h4>
    <ul class="int-ul">
     <li><b>Inversión:</b> el formulario recoge rangos, no montos. Los rangos se cuentan por programa y <b>no se suman</b>: un rango no es un monto, un programa puede abarcar varios municipios y el formulario no distingue presupuesto total de lo ejecutado. No equivale a presupuesto municipal ni a recursos disponibles.</li>
@@ -928,7 +1050,7 @@ function plegarMapa(){
 function barraNav(){
   const nav=$('#nav'); if(!nav||$('#int-meta')) return;
   // Navegación principal corta; lo demás queda en "Más análisis".
-  const mas=['municipio','poblacion-accion'];
+  const mas=['brechas','municipio','poblacion-accion'];
   const btn=id=>nav.querySelector(`button[data-view="${id}"]`);
   mas.forEach(id=>{ const b=btn(id); if(b) b.style.display='none'; });
   const m=document.createElement('div'); m.className='int-mas';
@@ -939,8 +1061,8 @@ function barraNav(){
   mb.onclick=e=>{ e.stopPropagation(); menu.hidden=!menu.hidden; mb.setAttribute('aria-expanded',String(!menu.hidden)); };
   $$('button',menu).forEach(b=>b.onclick=()=>{ menu.hidden=true; mostrarVista(b.dataset.v); });
   document.addEventListener('click',()=>{ menu.hidden=true; });
-  const g=DATA.generado?new Date(DATA.generado).toLocaleDateString('es-GT',{day:'numeric',month:'short',year:'numeric'}):'';
-  const b=document.createElement('button'); b.type='button'; b.id='int-meta'; b.className='int-nav-extra'; b.innerHTML=` Metodología${g?` <small>· datos al ${g}</small>`:''}`; b.onclick=metodologia;
+  const g=DATA.generado&&typeof fechaCorta==='function'?'actualizado '+fechaCorta(DATA.generado).split(' · ')[0]:'';
+  const b=document.createElement('button'); b.type='button'; b.id='int-meta'; b.className='int-nav-extra'; b.innerHTML=` Metodología${g?` <small>· ${g}</small>`:''}`; b.onclick=metodologia;
   nav.appendChild(b);
 }
 
@@ -964,41 +1086,41 @@ function plegar(viewId, anchorId, titulo, abierto){
 function estilos(){
   if($('#int-css')) return;
   const s=document.createElement('style'); s.id='int-css'; s.textContent=`
-  .int-card{background:#fff;border:1px solid #E3E8EF;border-radius:14px;padding:20px;margin:16px 0;box-shadow:0 1px 2px rgba(0,32,64,.06),0 4px 14px rgba(0,32,64,.05)}
-  .int-eyebrow{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#1971A8;margin-bottom:8px}
-  .int-big{font-size:17px;line-height:1.55;margin:4px 0 16px;color:#0E1B2D}
+  .int-card{background:#fff;border:1px solid #D5DEE6;border-radius:14px;padding:20px;margin:16px 0;box-shadow:0 1px 2px rgba(0,32,64,.06),0 4px 14px rgba(0,32,64,.05)}
+  .int-eyebrow{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#22678A;margin-bottom:8px}
+  .int-big{font-size:17px;line-height:1.55;margin:4px 0 16px;color:#183652}
   .int-note{font-size:13px;color:#5B6675;margin:8px 0;line-height:1.5}.int-note.warn{background:#FFF8E6;border-left:3px solid #E0A100;padding:8px 12px;border-radius:6px;color:#5A4600}
-  .int-h,.int-h4,.int-h5{color:#0E1B2D}.int-h{font-size:22px;margin:0 0 6px;padding-right:40px}.int-h4{font-size:14px;margin:18px 0 8px}.int-h4 small{font-weight:400;color:#6B7280}.int-h5{font-size:13px;margin:14px 0 6px}
+  .int-h,.int-h4,.int-h5{color:#183652}.int-h{font-size:22px;margin:0 0 6px;padding-right:40px}.int-h4{font-size:14px;margin:18px 0 8px}.int-h4 small{font-weight:400;color:#6B7280}.int-h5{font-size:13px;margin:14px 0 6px}
   .int-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
-  .int-kpi{background:#F4F7FB;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}.int-kpi b{font-size:22px;color:#0E1B2D;line-height:1.2;word-break:break-word}.int-kpi span{font-size:12px;color:#4B5563}.int-kpi em{font-size:11px;color:#6B7280;font-style:normal}
-  .int-chip{display:inline-flex;gap:5px;align-items:baseline;border:1px solid #CBD5E1;background:#fff;color:#0E1B2D;border-radius:12px;padding:5px 11px;margin:3px 4px 3px 0;font:inherit;font-size:13px;cursor:pointer;text-align:left}
-  .int-chip:hover,.int-chip:focus-visible{border-color:#1971A8;background:#EEF6FC;outline:none}.int-chip small{color:#6B7280;font-size:11px}
+  .int-kpi{background:#F4F7FA;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}.int-kpi b{font-size:22px;color:#183652;line-height:1.2;word-break:break-word}.int-kpi span{font-size:12px;color:#4B5563}.int-kpi em{font-size:11px;color:#6B7280;font-style:normal}
+  .int-chip{display:inline-flex;gap:5px;align-items:baseline;border:1px solid #CBD5E1;background:#fff;color:#183652;border-radius:12px;padding:5px 11px;margin:3px 4px 3px 0;font:inherit;font-size:13px;cursor:pointer;text-align:left}
+  .int-chip:hover,.int-chip:focus-visible{border-color:#22678A;background:#EEF6FC;outline:none}.int-chip small{color:#6B7280;font-size:11px}
   .int-chip.alt{background:#F1F5F9}.int-chip.muni{background:#EAF4EC;border-color:#BBD9C2}.int-chip.lugar{background:#EEF6FC;border-color:#BCD9EE}.int-chip.pend{background:#FFF8E6;border-color:#EBCB7A}
-  .int-chip.big{padding:8px 14px;font-size:14px}.int-chip.on{background:#1971A8;color:#fff;border-color:#1971A8}.int-chip.on small{color:#DCEBF6}
+  .int-chip.big{padding:8px 14px;font-size:14px}.int-chip.on{background:#22678A;color:#fff;border-color:#22678A}.int-chip.on small{color:#DCEBF6}
   .int-tag{display:inline-block;background:#EEF2F7;color:#334155;border-radius:6px;padding:3px 9px;margin:2px 4px 2px 0;font-size:12px}.int-tag.ok{background:#E6F4EA;color:#17602B}.int-tag.warn{background:#FFF1D6;color:#7A4B00}
-  .int-lnk{color:#1971A8;cursor:pointer;text-decoration:underline;text-underline-offset:2px}.int-link{background:none;border:0;color:#1971A8;font:inherit;font-size:13px;cursor:pointer;padding:4px 0;font-weight:600}
-  .int-btn{border:1px solid #1971A8;background:#1971A8;color:#fff;border-radius:8px;padding:8px 14px;font:inherit;font-size:13px;cursor:pointer}.int-btn.ghost{background:#fff;color:#1971A8}.int-btn:hover{filter:brightness(1.08)}
+  .int-lnk{color:#22678A;cursor:pointer;text-decoration:underline;text-underline-offset:2px}.int-link{background:none;border:0;color:#22678A;font:inherit;font-size:13px;cursor:pointer;padding:4px 0;font-weight:600}
+  .int-btn{border:1px solid #22678A;background:#22678A;color:#fff;border-radius:8px;padding:8px 14px;font:inherit;font-size:13px;cursor:pointer}.int-btn.ghost{background:#fff;color:#22678A}.int-btn:hover{filter:brightness(1.08)}
   .int-actions{margin-top:14px}
   .int-empty{color:#6B7280;font-size:13px;padding:8px 0}
   .int-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:10px}
-  .int-orgcard{border:1px solid #E3E8EF;border-radius:12px;padding:14px;cursor:pointer;background:#fff;transition:.15s}.int-orgcard:hover,.int-orgcard:focus-visible{border-color:#1971A8;box-shadow:0 4px 14px rgba(25,113,168,.15);outline:none}.int-orgcard h5{margin:0 0 6px;font-size:14px;line-height:1.3;color:#0E1B2D}.int-orgcard p{margin:8px 0 4px;font-size:13px}.int-orgcard small{color:#5B6675}
+  .int-orgcard{border:1px solid #D5DEE6;border-radius:12px;padding:14px;cursor:pointer;background:#fff;transition:.15s}.int-orgcard:hover,.int-orgcard:focus-visible{border-color:#22678A;box-shadow:0 4px 14px rgba(25,113,168,.15);outline:none}.int-orgcard h5{margin:0 0 6px;font-size:14px;line-height:1.3;color:#183652}.int-orgcard p{margin:8px 0 4px;font-size:13px}.int-orgcard small{color:#5B6675}
   .int-search{display:flex;flex-wrap:wrap;gap:8px}.int-search input{flex:1 1 280px;min-width:0;border:1px solid #CBD5E1;border-radius:8px;padding:9px 12px;font:inherit;font-size:14px}.int-search select{border:1px solid #CBD5E1;border-radius:8px;padding:9px;font:inherit;font-size:14px}
-  .int-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.int-tabs button{border:1px solid #CBD5E1;background:#fff;border-radius:8px;padding:8px 14px;font:inherit;font-size:13px;cursor:pointer}.int-tabs button.on{background:#0E1B2D;color:#fff;border-color:#0E1B2D}
+  .int-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.int-tabs button{border:1px solid #CBD5E1;background:#fff;border-radius:8px;padding:8px 14px;font:inherit;font-size:13px;cursor:pointer}.int-tabs button.on{background:#183652;color:#fff;border-color:#183652}
   .int-detail{background:#F8FAFC;border-radius:12px;padding:16px;margin-top:14px}
-  .int-tbl-wrap{overflow-x:auto}.int-tbl{width:100%;border-collapse:collapse;font-size:13px}.int-tbl th,.int-tbl td{padding:8px 10px;border-bottom:1px solid #E3E8EF;text-align:left;vertical-align:top}.int-tbl thead th{background:#F1F5F9;font-size:12px;color:#334155}.int-cmp tbody th{background:#F8FAFC;width:30%;font-weight:600}
+  .int-tbl-wrap{overflow-x:auto}.int-tbl{width:100%;border-collapse:collapse;font-size:13px}.int-tbl th,.int-tbl td{padding:8px 10px;border-bottom:1px solid #D5DEE6;text-align:left;vertical-align:top}.int-tbl thead th{background:#F1F5F9;font-size:12px;color:#334155}.int-cmp tbody th{background:#F8FAFC;width:30%;font-weight:600}
   .int-cmp-sel{display:flex;flex-wrap:wrap;gap:6px 14px;margin:10px 0}.int-chk{font-size:13px;display:flex;gap:6px;align-items:center}
-  .int-help{margin:10px 0;background:#F4F9FD;border:1px solid #D4E6F4;border-radius:10px;padding:8px 14px}.int-help summary{cursor:pointer;font-weight:600;font-size:13px;color:#1971A8}.int-help-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px;margin-top:10px}.int-help h5{margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#334155}.int-help p{margin:0;font-size:13px;line-height:1.5;color:#334155}.int-help .ok h5{color:#17602B}.int-help .no h5{color:#9A3412}
-  .int-oport-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:14px}.int-op{border:1px solid #E3E8EF;border-radius:12px;padding:14px;background:#fff}.int-op.vacia{opacity:.75}.int-op-h{display:flex;gap:10px;align-items:flex-start}.int-op-h h4{flex:1;margin:0;font-size:15px;line-height:1.3}.int-op-h b{background:#0E1B2D;color:#fff;border-radius:999px;min-width:28px;text-align:center;padding:2px 8px;font-size:13px}.int-why{font-size:13px;color:#4B5563;line-height:1.5;margin:8px 0}.int-op summary{cursor:pointer;color:#1971A8;font-weight:600;font-size:13px}
-  .int-fold{margin:16px 0;border:1px solid #E3E8EF;border-radius:12px;background:#fff}.int-fold>summary{cursor:pointer;padding:14px 18px;font-weight:700;color:#0E1B2D;font-size:15px}.int-fold-body{padding:0 14px 14px}
+  .int-help{margin:10px 0;background:#F4F9FD;border:1px solid #D4E6F4;border-radius:10px;padding:8px 14px}.int-help summary{cursor:pointer;font-weight:600;font-size:13px;color:#22678A}.int-help-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px;margin-top:10px}.int-help h5{margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#334155}.int-help p{margin:0;font-size:13px;line-height:1.5;color:#334155}.int-help .ok h5{color:#17602B}.int-help .no h5{color:#9A3412}
+  .int-oport-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:14px}.int-op{border:1px solid #D5DEE6;border-radius:12px;padding:14px;background:#fff}.int-op.vacia{opacity:.75}.int-op-h{display:flex;gap:10px;align-items:flex-start}.int-op-h h4{flex:1;margin:0;font-size:15px;line-height:1.3}.int-op-h b{background:#183652;color:#fff;border-radius:999px;min-width:28px;text-align:center;padding:2px 8px;font-size:13px}.int-why{font-size:13px;color:#4B5563;line-height:1.5;margin:8px 0}.int-op summary{cursor:pointer;color:#22678A;font-weight:600;font-size:13px}
+  .int-fold{margin:16px 0;border:1px solid #D5DEE6;border-radius:12px;background:#fff}.int-fold>summary{cursor:pointer;padding:14px 18px;font-weight:700;color:#183652;font-size:15px}.int-fold-body{padding:0 14px 14px}
   .int-ul{padding-left:18px;margin:8px 0;font-size:13px;line-height:1.5}.int-ul li{margin:8px 0}.int-sub2{margin-top:4px}
   .int-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}
-  .int-bar{display:grid;grid-template-columns:minmax(120px,1.2fr) 2fr 28px;gap:8px;align-items:center;font-size:13px;margin:6px 0}.int-bar i{display:block;height:10px;border-radius:6px;background:linear-gradient(90deg,#1971A8 var(--w),#E8EEF5 var(--w))}.int-bar b{text-align:right}.int-bar small{grid-column:2/4;color:#6B7280;margin-top:-4px}
+  .int-bar{display:grid;grid-template-columns:minmax(120px,1.2fr) 2fr 28px;gap:8px;align-items:center;font-size:13px;margin:6px 0}.int-bar i{display:block;height:10px;border-radius:6px;background:linear-gradient(90deg,#22678A var(--w),#E8EEF5 var(--w))}.int-bar b{text-align:right}.int-bar small{grid-column:2/4;color:#6B7280;margin-top:-4px}
   .int-hall{display:flex;flex-direction:column;gap:6px}.int-hall .int-link{margin-top:auto}.int-hall .int-link{align-self:flex-start}
   .int-nav-extra{margin-left:auto;background:transparent!important;color:#fff!important;border:1px solid rgba(255,255,255,.45)!important;border-radius:999px!important;font-size:13px;white-space:nowrap;padding:6px 14px!important}.int-nav-extra small{color:#CFE0EE}.int-nav-extra:hover{background:rgba(255,255,255,.14)!important}
   #int-veil{position:fixed;inset:0;background:rgba(14,27,45,.45);opacity:0;pointer-events:none;transition:.2s;z-index:9998}#int-veil.open{opacity:1;pointer-events:auto}
   #int-drawer{position:fixed;top:0;right:0;height:100%;width:min(640px,100%);background:#fff;box-shadow:-8px 0 30px rgba(0,0,0,.2);transform:translateX(105%);transition:transform .25s;z-index:9999;display:flex;flex-direction:column}#int-drawer.open{transform:none}
-  .int-dr-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #E3E8EF}.int-dr-sp{flex:1}.int-back,.int-x{background:none;border:0;font:inherit;cursor:pointer;color:#1971A8;font-size:14px}.int-x{font-size:26px;color:#334155;line-height:1}.int-dr-body{padding:18px 20px 40px;overflow-y:auto;flex:1}
-  .int-prog{border:1px solid #E3E8EF;border-radius:10px;padding:10px 12px;margin:8px 0;cursor:pointer}.int-prog:hover{border-color:#1971A8;background:#F8FBFE}.int-prog small{display:block;color:#5B6675;margin-top:3px}
+  .int-dr-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #D5DEE6}.int-dr-sp{flex:1}.int-back,.int-x{background:none;border:0;font:inherit;cursor:pointer;color:#22678A;font-size:14px}.int-x{font-size:26px;color:#334155;line-height:1}.int-dr-body{padding:18px 20px 40px;overflow-y:auto;flex:1}
+  .int-prog{border:1px solid #D5DEE6;border-radius:10px;padding:10px 12px;margin:8px 0;cursor:pointer}.int-prog:hover{border-color:#22678A;background:#F8FBFE}.int-prog small{display:block;color:#5B6675;margin-top:3px}
   .int-dl{display:grid;grid-template-columns:minmax(120px,1fr) 2fr;gap:6px 14px;font-size:13px}.int-dl dt{color:#5B6675}.int-dl dd{margin:0}
   .int-oport{background:#EEF6FC;border-radius:8px;padding:10px 12px;font-size:13px}
   .int-sub{margin-bottom:6px}.int-orgs{color:#5B6675;line-height:1.5}
@@ -1014,7 +1136,7 @@ function estilos(){
 function renderVista(id){
   try{
     if(id==='mapa') pintarPanel();
-    if(id==='panorama'){ renderConsultas(); renderTablaMunicipios(); renderHallazgos(); }
+    if(id==='panorama'){ renderConsultas(); renderTablaMunicipios(); renderHallazgos(); renderPanoramaV3(); }
     if(id==='municipio') renderMuniExtra();
     if(id==='instituciones') renderDirectorio();
     if(id==='articulacion'){ renderArtExtra(); plegar('articulacion','int-art','Detalle técnico: filtros, matrices y tabla original de articulación',false); }

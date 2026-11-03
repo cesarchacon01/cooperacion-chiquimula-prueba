@@ -3,17 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="visor-version" content="fase1-v3">
 <title>Mapeo de Actores de Cooperación — SEGEPLAN Chiquimula</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap">
 <style>
   :root{
-    --navy:#003058; --navy-deep:#002040; --gold:#DFB26F; --gold-deep:#C99048;
-    --bg:#F7F5F0; --card:#FFFFFF; --border:#E6E1D6;
-    --text:#16232E; --muted:#5B6672;
-    --line:#E6E1D6; --warn-bg:#FBF3E4; --warn-border:#E9D5A8; --warn-text:#5C3F0C;
-    --gap-bg:#FCE9E4; --gap-border:#EBB7A6; --gap-text:#7A3420;
+    --navy:#183652; --navy-deep:#183652; --gold:#22678A; --gold-deep:#1B5573;
+    --bg:#F4F7FA; --card:#FFFFFF; --border:#D5DEE6;
+    --text:#183652; --muted:#5B6B7A;
+    --line:#D5DEE6; --warn-bg:#FFF4E5; --warn-border:#F0D3A8; --warn-text:#9A4D00;
+    --gap-bg:#FFF4E5; --gap-border:#F0D3A8; --gap-text:#9A4D00;
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif;}
@@ -54,7 +55,7 @@
   .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;}
   #map{height:560px;border-radius:12px;overflow:hidden;margin-top:6px;}
   .legend{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:12px;color:var(--muted);flex-wrap:wrap;}
-  .legend .bar{width:140px;height:8px;border-radius:6px;background:linear-gradient(90deg,#D6DDE2,#003058);}
+  .legend .bar{width:140px;height:8px;border-radius:6px;background:linear-gradient(90deg,#8FB0C6,#183652);}
   .legend .dot{width:11px;height:11px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle;}
   .territorial-summary{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.territorial-summary .mini{border:1px solid var(--line);border-radius:9px;padding:10px;background:#fff}.territorial-summary .mini b{display:block;font-family:'Source Serif 4',serif;font-size:22px;color:var(--navy);line-height:1}.territorial-summary .mini span{font-size:11px;color:var(--muted)}.boundary-note{font-size:10px;color:var(--muted);margin-top:7px}
   .side-title{font-size:17px;font-weight:700;color:var(--navy);margin:0 0 4px;}
@@ -150,11 +151,11 @@ main:has(#view-instituciones.active){max-width:none;width:100%;padding-left:4vw;
     border-radius:8px; box-shadow:0 1px 5px rgba(0,0,0,.14); color:#334155;
     font-size:11px; line-height:1.65;
   }
-  .map-legend-title{font-weight:700;color:#003058;margin-bottom:2px;}
+  .map-legend-title{font-weight:700;color:#183652;margin-bottom:2px;}
   .map-symbol{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px;box-sizing:border-box;}
-  .map-symbol.community{background:#003058;border:1.5px solid #fff;box-shadow:0 0 0 1px #003058;}
-  .map-symbol.institutional{background:#F1C47C;border:2px dashed #B97824;}
-  .map-symbol.territorial{background:#fff;border:1.5px solid #C98A6B;}
+  .map-symbol.community{background:#183652;border:1.5px solid #fff;box-shadow:0 0 0 1px #183652;}
+  .map-symbol.institutional{background:#fff;border:3px solid #22678A;}
+  .map-symbol.territorial{background:#fff;border:1.5px solid #7D91A3;}
 
 
   /* ===== Lenguaje cartográfico común para todos los mapas ===== */
@@ -162,7 +163,7 @@ main:has(#view-instituciones.active){max-width:none;width:100%;padding-left:4vw;
   .municipio-tip{
     background:rgba(255,255,255,.94)!important;
     border:1px solid #D8DEE5!important;
-    color:#003058!important;
+    color:#183652!important;
     font-weight:700!important;
     box-shadow:0 2px 8px rgba(0,32,64,.10)!important;
   }
@@ -193,7 +194,7 @@ main:has(#view-instituciones.active){max-width:none;width:100%;padding-left:4vw;
 
 
   .coverage-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:16px 0 18px}
-  .coverage-kpi{background:#fff;border:1px solid #E2DDD4;border-top:3px solid #DFB26F;border-radius:10px;padding:14px 16px}
+  .coverage-kpi{background:#fff;border:1px solid #E2DDD4;border-top:3px solid #22678A;border-radius:10px;padding:14px 16px}
   .coverage-kpi .klabel{font-size:11px;color:#5B6672;margin-bottom:5px}.coverage-kpi .kvalue{font-family:Georgia,serif;font-size:25px;font-weight:700;color:#003058}.coverage-kpi .ksub{font-size:10px;color:#6B7280;margin-top:3px}
   .coverage-filter-row{display:grid;grid-template-columns:280px 1fr;gap:18px;align-items:end}.coverage-filter-row select{width:100%;margin-top:6px}
   .method-note{background:#FFF8EC;border:1px solid #E7D3AE;border-radius:8px;padding:10px 12px;font-size:11px;line-height:1.45;color:#5C4B31}
@@ -395,7 +396,7 @@ table tbody tr:hover td{ background:#F4F1E6; }
 @media (max-width:620px){ .cov-row{ grid-template-columns:104px 1fr 78px; gap:8px; } main{ padding:18px 14px 60px; } }
 @media print{ nav{ position:static; } }
 </style>
-<link rel="stylesheet" href="tema.css?v=3">
+<link rel="stylesheet" href="tema.css?v=4">
 <style id="fix-capas">
 /* El icono del selector de mapa base venía de unpkg (images/layers.png); si no cargaba quedaba un cuadro blanco vacío.
    Se reemplaza por un SVG incrustado: el control (Claro / Relieve / Satélite / OpenStreetMap) funciona igual. */
@@ -468,8 +469,8 @@ table tbody tr:hover td{ background:#F4F1E6; }
         <div class="side-sub">Los puntos sólidos muestran cooperación registrada. Active “Base territorial” para consultar los lugares poblados georreferenciados; un punto hueco significa “sin presencia de cooperación registrada”.</div>
         <div id="map"></div>
         <div class="legend">
-          <span><span class="dot" style="background:#003058;border:2px solid #fff;box-shadow:0 0 0 1px #003058;"></span>Cooperación registrada</span>
-          <span><span class="dot" style="background:#fff;border:2px solid #C98A6B;"></span>Lugar poblado · base territorial</span>
+          <span><span class="dot" style="background:#183652;border:2px solid #fff;box-shadow:0 0 0 1px #183652;"></span>Cooperación comunitaria registrada (círculo sólido)</span>
+          <span><span class="dot" style="background:#fff;border:2px solid #7D91A3;"></span>Lugar poblado de referencia · base territorial (punto hueco)</span>
           <span style="margin-left:8px;">Intensidad:</span><span>menor</span><div class="bar"></div><span>mayor</span>
         </div>
         <div class="boundary-note"><span id="fuente-limites">Límites municipales: servicio geográfico de CONRED</span> · La ausencia de registro no confirma una brecha de atención.</div>
@@ -659,7 +660,7 @@ table tbody tr:hover td{ background:#F4F1E6; }
         <div class="side-title">Presencia territorial de la organización</div>
         <div class="side-sub" id="submap-organizacion">Lugares poblados e intervención institucional/municipal reportada.</div>
         <div id="map-organizacion" class="org-map"></div>
-        <div class="legend"><span><span class="dot" style="background:#003058"></span>Presencia comunitaria</span><span><span class="dot" style="background:#DFB26F"></span>Presencia institucional / municipal</span></div>
+        <div class="legend"><span><span class="dot" style="background:#183652"></span>Presencia comunitaria (círculo sólido)</span><span><span class="dot" style="background:#fff;border:3px solid #22678A;box-sizing:border-box"></span>Presencia institucional / municipal (círculo con anillo)</span></div>
         <div class="org-note">La presencia institucional/municipal puede existir sin que se hayan reportado lugares poblados específicos. La ausencia de un punto comunitario no confirma una brecha de atención.</div>
       </div>
       <div class="org-side">
@@ -799,19 +800,19 @@ let DATA = null;
 let map, markersLayer;
 
 const VISTAS = [
-  {id:'mapa', label:'Explorar'},
-  {id:'instituciones', label:'Actores'},
+  {id:'panorama', label:'Panorama'},
+  {id:'mapa', label:'Mapa territorial'},
+  {id:'instituciones', label:'Organizaciones'},
   {id:'articulacion', label:'Coordinación'},
-  {id:'brechas', label:'Oportunidades'},
   {id:'inversion', label:'Inversión'},
-  {id:'panorama', label:'Resumen'},
+  {id:'brechas', label:'Oportunidades de articulación'},
   {id:'municipio', label:'Ficha municipal'},
   {id:'poblacion-accion', label:'Población y sectores'},
 ];
 
 function initNav(){
   const nav = document.getElementById('nav');
-  nav.innerHTML = VISTAS.map(v => `<button data-view="${v.id}" class="${v.id==='mapa'?'active':''}">${v.label}</button>`).join('');
+  nav.innerHTML = VISTAS.map(v => `<button data-view="${v.id}" class="${v.id==='panorama'?'active':''}">${v.label}</button>`).join('');
   nav.querySelectorAll('button').forEach(btn=>{
     btn.onclick = () => mostrarVista(btn.dataset.view);
   });
@@ -1020,7 +1021,7 @@ function renderStats(filtrados){
 
 function colorPorConteo(n, max){
   const t = max > 1 ? (n-1)/(max-1) : 1;
-  const c1=[214,221,226], c2=[0,48,88];
+  const c1=[143,176,198], c2=[24,54,82];
   return `rgb(${c1.map((v,i)=>Math.round(v+(c2[i]-v)*t)).join(',')})`;
 }
 
@@ -1093,8 +1094,8 @@ function renderMapa(filtrados){
       const orgs=[...new Set(progs.map(p=>p.organizacion).filter(Boolean))];
       const programas=[...new Set(progs.map(p=>p.nombre_programa).filter(Boolean))];
       const mk=L.circleMarker([lat,lon],{
-        pane:'coopPane',radius:8,color:'#B97824',fillColor:'#F1C47C',
-        fillOpacity:.72,weight:2.2,dashArray:'4 3'
+        pane:'coopPane',radius:8,color:'#22678A',fillColor:'#FFFFFF',
+        fillOpacity:.96,weight:3.6,esInstitucional:true
       });
       mk.bindTooltip(`${escaparHtml(m)} · presencia institucional/municipal`,{direction:'top',opacity:.95,permanent:false,sticky:false});
       mk.bindPopup(`<b>${escaparHtml(m)}</b><br><b>Presencia institucional / municipal</b><br>${orgs.length} organización(es)<br>${programas.length} programa(s) / proyecto(s)<br><br><span style="color:#5B6672">Marcador de referencia municipal; no representa una comunidad específica.</span>`,{closeButton:true,autoPan:true});
@@ -1116,10 +1117,10 @@ function renderMapa(filtrados){
       // vista departamental = discreta; municipio/comunidad = más legible.
       const z=map.getZoom();
       const baseStyle = z >= 13
-        ? {radius:5.2,fillColor:'#fff',color:'#C98A6B',weight:1.6,fillOpacity:.88,opacity:.92}
+        ? {radius:5.2,fillColor:'#fff',color:'#7D91A3',weight:1.6,fillOpacity:.88,opacity:.92}
         : z >= 11
-          ? {radius:3.8,fillColor:'#fff',color:'#C98A6B',weight:1.25,fillOpacity:.62,opacity:.72}
-          : {radius:2.5,fillColor:'#fff',color:'#C98A6B',weight:1.0,fillOpacity:.32,opacity:.48};
+          ? {radius:3.8,fillColor:'#fff',color:'#7D91A3',weight:1.25,fillOpacity:.62,opacity:.72}
+          : {radius:2.5,fillColor:'#fff',color:'#7D91A3',weight:1.0,fillOpacity:.32,opacity:.48};
       const marker=L.circleMarker([p.lat,p.lon],baseStyle);
       marker._territorialBase=true;
       marker.bindTooltip(`${escaparHtml(p.lugar)} · ${escaparHtml(p.municipio)}`,{direction:'top',opacity:.9});
@@ -2240,7 +2241,7 @@ function initOrgMap(){
   const legOrg=L.control({position:'bottomleft'});
   legOrg.onAdd=function(){
     const d=L.DomUtil.create('div','map-legend-control');
-    d.innerHTML='<div class="map-legend-title">Simbología</div><div><span class="map-symbol community"></span> Presencia comunitaria</div><div><span class="map-symbol institutional"></span> Presencia institucional / municipal</div>';
+    d.innerHTML='<div class="map-legend-title">Simbología</div><div><span class="map-symbol community"></span> Presencia comunitaria (círculo sólido)</div><div><span class="map-symbol institutional"></span> Presencia institucional / municipal (círculo con anillo)</div>';
     L.DomEvent.disableClickPropagation(d); return d;
   };
   legOrg.addTo(orgMap);
@@ -2605,7 +2606,7 @@ function renderPoblacionAccion(){
     const orgSet=[...new Set(x.rows.map(r=>r.organizacion))];
     const popSet=[...new Set(x.rows.map(r=>r.poblacion))];
     const actSet=[...new Set(x.rows.map(r=>r.accion))];
-    const mk=L.circleMarker([x.lat,x.lon],{radius:7+Math.min(4,orgSet.length)*1.6,fillColor:'#003058',color:'#FFFFFF',weight:2,fillOpacity:.96});
+    const mk=L.circleMarker([x.lat,x.lon],{radius:7+Math.min(4,orgSet.length)*1.6,fillColor:'#183652',color:'#FFFFFF',weight:2,fillOpacity:.96});
     mk.bindPopup(`<b>${esc(x.lugar)}</b> (${esc(x.municipio)})<br><b>${orgSet.length}</b> organización(es)<br><br><b>Población:</b> ${popSet.map(esc).join(', ')}<br><b>Acción:</b> ${actSet.map(esc).join(', ')}`);
     mk.addTo(paLayer); bounds.push([x.lat,x.lon]);
   });
@@ -2674,6 +2675,15 @@ async function cargarBaseTerritorial(){
   }
 }
 
+// Fecha corta y legible: "2 nov 2026 · 18:57" (hora local del navegador)
+function fechaCorta(iso){
+  if(!iso) return '';
+  const d=new Date(iso); if(isNaN(d)) return '';
+  const f=d.toLocaleDateString('es-GT',{day:'numeric',month:'short',year:'numeric'}).replace(/\./g,'');
+  const h=d.toLocaleTimeString('es-GT',{hour:'2-digit',minute:'2-digit',hour12:false});
+  return `${f} · ${h}`;
+}
+
 async function iniciar(){
   initNav();
   try{
@@ -2690,9 +2700,9 @@ async function iniciar(){
   }
   try{
     const ctl=DATA.control||{};
-    const corte=DATA.generado ? new Date(DATA.generado).toLocaleDateString('es-GT',{day:'2-digit',month:'short',year:'numeric'}) : '';
+    const corte=fechaCorta(DATA.generado);
     document.getElementById('data-badge').textContent=
-      `Datos al ${corte||'—'} · ${ctl.registros_kobo??'—'} registros Kobo · ${ctl.programas_procesados??DATA.programas.length} programas`;
+      `Actualizado ${corte||'—'} · ${ctl.registros_kobo??'—'} registros Kobo · ${ctl.programas_procesados??DATA.programas.length} programas`;
     document.getElementById('data-badge').title=
       `Base territorial: ${ctl.lugares_catalogo??''} lugares poblados · ${ctl.lugares_con_coordenadas??''} georreferenciados`;
     if(CALIDAD.negativos.length){
@@ -2726,9 +2736,9 @@ async function iniciar(){
     const div=L.DomUtil.create('div','map-legend-control');
     div.innerHTML=`
       <div class="map-legend-title">Simbología</div>
-      <div><span class="map-symbol community"></span> Cooperación comunitaria</div>
-      <div><span class="map-symbol institutional"></span> Presencia institucional / municipal</div>
-      <div><span class="map-symbol territorial"></span> Base territorial</div>`;
+      <div><span class="map-symbol community"></span> Cooperación comunitaria registrada (círculo sólido)</div>
+      <div><span class="map-symbol institutional"></span> Presencia institucional / municipal (círculo con anillo)</div>
+      <div><span class="map-symbol territorial"></span> Lugar poblado de referencia (punto hueco)</div>`;
     L.DomEvent.disableClickPropagation(div);
     return div;
   };
@@ -2746,7 +2756,7 @@ async function iniciar(){
   });
   // La vista inicial es el Panorama; el mapa se dimensionó mientras estaba visible.
   try{ if(window.initInteligencia) initInteligencia(); }catch(err){ console.error('inteligencia.js', err); }
-  try{ mostrarVista('mapa'); }catch(err){ console.error(err); }
+  try{ mostrarVista('panorama'); }catch(err){ console.error(err); }
 }
 
 function exportarTablaCSV(tabla){
@@ -2794,20 +2804,13 @@ function renderPanorama(){
   const georef=ctl.lugares_con_coordenadas||0;
   const catalogo=ctl.lugares_catalogo||0;
   const pct=georef? Math.round(lugaresPres.size/georef*1000)/10 : 0;
-  const fecha=DATA.generado? new Date(DATA.generado).toLocaleDateString('es-GT',{day:'numeric',month:'long',year:'numeric'}):'';
+  const fecha=fechaCorta(DATA.generado);
 
   document.getElementById('pan-hero').innerHTML=`
-    <span class="pan-eyebrow">Panorama territorial${fecha?' · datos al '+esc(fecha):''}</span>
+    <span class="pan-eyebrow">Panorama${fecha?' · Actualizado '+esc(fecha):''}</span>
     <h2>La cooperación en Chiquimula, de un vistazo</h2>
     <p class="lead"><b>${orgs.length} organizaciones</b> reportan <b>${progs.length} programas y proyectos</b> con presencia en <b>${munisPresencia.size} de ${totalMunis} municipios</b>. Hay cooperación comunitaria registrada en <b>${fmt(lugaresPres.size)} de ${fmt(georef)}</b> lugares poblados georreferenciados (${String(pct).replace('.',',')} %).</p>
-    <div class="pan-kpis">
-      <div class="pan-kpi"><div class="k-value">${orgs.length}</div><div class="k-label">Organizaciones cooperantes</div></div>
-      <div class="pan-kpi"><div class="k-value">${progs.length}</div><div class="k-label">Programas y proyectos</div></div>
-      <div class="pan-kpi"><div class="k-value">${munisPresencia.size}<small>de ${totalMunis}</small></div><div class="k-label">Municipios con presencia</div></div>
-      <div class="pan-kpi gold"><div class="k-value">${fmt(lugaresPres.size)}<small>de ${fmt(georef)}</small></div><div class="k-label">Lugares poblados con cooperación registrada</div></div>
-      ${regsPobH?`<div class="pan-kpi"><div class="k-value">${regsPobH.con}<small>de ${regsPobH.regs}</small></div><div class="k-label">Registros de población con cantidad (no es un total de personas)</div></div>`:''}
-      ${rgH?`<div class="pan-kpi"><div class="k-value">${rgH.con}<small>de ${rgH.total}</small></div><div class="k-label">Programas con rango de inversión declarado (los rangos no se suman)</div></div>`:''}
-    </div>`;
+    `;
 
   // ---- Cobertura por municipio
   const rm=DATA.resumen_municipio||{};
@@ -2866,13 +2869,13 @@ function renderPanorama(){
 
   // ---- Explorar
   const ex=[
-    ['mapa','','Mapa','Dónde hay cooperación y dónde no, comunidad por comunidad.'],
-    ['municipio','','Por municipio','Ficha ejecutiva con programas, población, acciones e instituciones.'],
-    ['instituciones','','Por organización','Qué hace cada organización y en qué territorios.'],
-    ['brechas','','Cobertura y sectores','Matriz de sectores por municipio y comunidades sin registro.'],
-    ['inversion','','Programas e inversión','Programas, vigencia y rangos de inversión reportados.'],
-    ['articulacion','','Articulación','Contrapartes y espacios de coordinación.'],
-    ['poblacion-accion','','Población × Acción','A quién se atiende y con qué acciones.']
+    ['mapa','','Mapa territorial','¿Dónde hay intervenciones registradas y dónde no, comunidad por comunidad?'],
+    ['municipio','','Ficha municipal','¿Quién trabaja en mi municipio? Programas, población, acciones e instituciones.'],
+    ['instituciones','','Organizaciones','¿Quién trabaja en el territorio y qué hace cada organización?'],
+    ['brechas','','Oportunidades de articulación','¿Dónde existen oportunidades de complementariedad? Matriz sector × municipio y comunidades sin registro.'],
+    ['inversion','','Inversión','¿Qué recursos reporta la cooperación? Programas, vigencia y rangos de inversión.'],
+    ['articulacion','','Coordinación','¿Qué instituciones mencionan como contrapartes y en qué espacios?'],
+    ['poblacion-accion','','Población y sectores','¿A quiénes se dirigen las intervenciones y con qué acciones?']
   ];
   document.getElementById('pan-explore').innerHTML=ex.map(e=>`<button type="button" class="exp-card" data-v="${e[0]}"><div class="e-ico">${e[1]}</div><b>${e[2]}</b><span>${e[3]}</span></button>`).join('');
   document.querySelectorAll('#pan-explore .exp-card').forEach(b=>b.onclick=()=>{ mostrarVista(b.dataset.v); window.scrollTo({top:0,behavior:'smooth'}); });
@@ -2880,6 +2883,6 @@ function renderPanorama(){
 
 iniciar().then(()=>{ try{ agregarBotonesCSV(); }catch(e){ console.warn(e); } });
 </script>
-<script src="inteligencia.js?v=2"></script>
+<script src="inteligencia.js?v=3"></script>
 </body>
 </html>
