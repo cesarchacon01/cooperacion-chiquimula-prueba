@@ -644,7 +644,10 @@ function oportunidades(munisSel){
   const sm=sectores.map(s=>{ const mm=munis.filter(m=>programasEnMunicipio(m).some(p=>(p.sector||[]).includes(s))); return {s,mm,n:P.filter(p=>(p.sector||[]).includes(s)).length}; }).sort((a,b)=>a.mm.length-b.mm.length||a.n-b.n);
   out.push({id:'o3',icono:'',n:Math.min(5,sm.length),titulo:'Sectores con menor presencia registrada',
     porque:'Son los temas con menos municipios con registros. Puede deberse a que hay poca cooperación o a que todavía no se ha reportado; conviene verificarlo antes de concluir.',
-    items:sm.slice(0,5).map(x=>({txt:`<b>${esc(x.s)}</b>: registrado en ${x.mm.length} de ${munis.length} municipios (${x.n} ${plural(x.n,'programa','programas')})`,sub:x.mm.map(chipMuni).join('')||'<span class="int-empty">Sin municipios con registro.</span>'}))});
+    items:sm.slice(0,5).map(x=>({txt:`<b>${esc(x.s)}</b>: registrado en ${x.mm.length} de ${munis.length} municipios (${x.n} ${plural(x.n,'programa','programas')})`,
+      sub:x.mm.length?x.mm.map(chipMuni).join(''):(x.n>0
+        ?`<span class="int-empty">Sin municipios con ubicación declarada para este sector. Puede existir información sectorial de ${x.n} ${plural(x.n,'programa','programas')} sin una ubicación municipal registrada; esto no significa ausencia de cooperación, sino un dato pendiente de precisar.</span>`
+        :'<span class="int-empty">Sin municipios con registro.</span>')}))});
   }
   // 4. Contrapartes en común
   const cc={}; PS.forEach(p=>contrapartesDe(p).forEach(c=>{ (cc[c]=cc[c]||new Set()).add(p.organizacion); }));
@@ -684,9 +687,11 @@ function renderOportunidades(){
   const ops=oportunidades();
   ops.forEach(o=>registrarLista(o.id,o.titulo,()=>`<p class="int-note">${esc(o.porque)}</p><ul class="int-ul">${o.items.map(i=>`<li><div>${i.txt}</div><div class="int-sub2">${i.sub||''}</div></li>`).join('')}</ul>`));
   box.innerHTML=`<div class="int-card"><div class="int-eyebrow">Oportunidades de análisis y coordinación</div>
-   <p class="int-note">Situaciones detectadas automáticamente en los registros. No son duplicidades, brechas ni problemas confirmados: son motivos para conversar y verificar.</p>
+   <p class="int-note warn">Situaciones detectadas automáticamente en los registros. No son duplicidades, brechas ni problemas confirmados: son motivos para conversar y verificar.</p>
    <div class="int-oport-grid">${ops.map(o=>`<section class="int-op ${o.n?'':'vacia'}"><div class="int-op-h"><span aria-hidden="true">${o.icono}</span><h4>${esc(o.titulo)}</h4><b>${o.n}</b></div><p class="int-why">${esc(o.porque)}</p>
-     ${o.n?`<details><summary>Ver registros (${o.items.length})</summary><ul class="int-ul">${o.items.slice(0,6).map(i=>`<li><div>${i.txt}</div><div class="int-sub2">${i.sub||''}</div></li>`).join('')}</ul>${o.items.length>6?`<button type="button" class="int-link" data-go="lista:${o.id}">Ver los ${o.items.length} registros →</button>`:''}</details>`:'<div class="int-empty">No se detectaron casos con los registros actuales.</div>'}</section>`).join('')}</div></div>`;
+     ${o.n?`<div class="int-op-destacado"><div>${o.items[0].txt}</div>${o.items[0].sub?`<div class="int-sub2">${o.items[0].sub}</div>`:''}</div>
+      <details class="int-acc"><summary>Ver los primeros ${Math.min(6,o.items.length)} de ${o.items.length}</summary><div class="int-acc-body"><ul class="int-ul">${o.items.slice(1,6).map(i=>`<li><div>${i.txt}</div><div class="int-sub2">${i.sub||''}</div></li>`).join('')||'<li class="int-empty">No hay registros adicionales.</li>'}</ul></div></details>
+      ${o.items.length>1?`<button type="button" class="int-link" data-go="lista:${o.id}">Ver todos (${o.items.length}) →</button>`:''}`:'<div class="int-empty">No se detectaron casos con los registros actuales.</div>'}</section>`).join('')}</div></div>`;
   enlazar(box);
 }
 
@@ -1080,23 +1085,91 @@ function nivelDep(){
   const orgs=uniq(P.map(p=>p.organizacion)).length, mc=ds.filter(d=>d.progs.length).length;
   return notaFiltrosActivos()+`<p class="int-big">${orgs} ${plural(orgs,'organización reporta','organizaciones reportan')} ${P.length} ${plural(P.length,'programa','programas')} con presencia registrada en ${mc} de ${ds.length} municipios. Elija un municipio en el mapa o en la lista, o haga una pregunta.</p>
    ${rolesHtml()}
-   <h4 class="int-h4">Preguntas</h4>${preguntasHtml()}
-   <h4 class="int-h4">Municipios</h4>${ds.map(d=>`<button type="button" class="int-mrow" data-go="muni:${esc(d.m)}"><span>${esc(d.m)}</span><i style="--w:${(d.progs.length/mx*100).toFixed(1)}%"></i><small>${d.orgs.length?`${d.orgs.length} org. · ${d.progs.length} prog.`:'sin registros'}</small></button>`).join('')}
-   <p class="int-note">Un municipio "sin registros" no es un municipio sin cooperación: solo indica que nadie la ha reportado todavía.</p>
-   ${bloqueConvergencia(null)}`;
+   <details class="int-acc" open>
+    <summary>Preguntas por tema</summary>
+    <div class="int-acc-body">${preguntasHtml()}</div>
+   </details>
+   <details class="int-acc" open>
+    <summary>Municipios <span class="int-acc-n">${mc} de ${ds.length} con registros</span></summary>
+    <div class="int-acc-body">
+     ${ds.map(d=>`<button type="button" class="int-mrow" data-go="muni:${esc(d.m)}"><span>${esc(d.m)}</span><i style="--w:${(d.progs.length/mx*100).toFixed(1)}%"></i><small>${d.orgs.length?`${d.orgs.length} org. · ${d.progs.length} prog.`:'sin registros'}</small></button>`).join('')}
+     <p class="int-note">Un municipio "sin registros" no es un municipio sin cooperación: solo indica que nadie la ha reportado todavía.</p>
+    </div>
+   </details>
+   <details class="int-acc">
+    <summary>Coincidencias territoriales</summary>
+    <div class="int-acc-body">
+     <p class="int-note">Coincidencia de <b>organizaciones distintas</b> en un mismo municipio y sector, o de <b>varios programas</b> en un mismo lugar poblado del catálogo.</p>
+     ${bloqueConvergencia(null)}
+    </div>
+   </details>`;
 }
 function nivelMuni(m){
   const d=datosMunicipio(m);
   const lug=d.lug.slice().sort((a,b)=>b.orgs.size-a.orgs.size||cmp(a.lugar_poblado,b.lugar_poblado));
   const cat=nombreLugares().filter(l=>l.muni===m);
+  // Oportunidades de coordinación de este municipio (contrapartes compartidas / programas por finalizar),
+  // reutilizando el mismo motor que la vista general "Oportunidades" (sin recalcular criterios).
+  const opsM=oportunidades([m]);
+  const o4=opsM.find(o=>o.id==='o4'), o5=opsM.find(o=>o.id==='o5');
+  const sinRango=d.progs.filter(p=>!RANGOS[p.monto_rango_codigo]);
   return notaFiltrosActivos()+`<p class="int-big">${resumenTexto(d)}</p>
-   <div class="int-kpis">${kpi(d.orgs.length,plural(d.orgs.length,'organización','organizaciones'))}${kpi(d.progs.length,plural(d.progs.length,'programa','programas'))}${kpi(`${d.lugCat.length}${d.total?' de '+d.total:''}`,'comunidades con atención registrada')}</div>
-   <h4 class="int-h4">Preguntas sobre ${esc(m)}</h4>${preguntasHtml()}
-   <h4 class="int-h4">Organizaciones</h4><div>${d.orgs.map(chipOrg).join('')||'<span class="int-empty">Ninguna registrada.</span>'}</div>
-   <h4 class="int-h4">Comunidades con atención registrada</h4><div>${lug.map(c=>`<button type="button" class="int-chip lugar${c.fuera_catalogo?' pend':''}" data-go="lugar:${esc(c.k)}">${esc(c.lugar_poblado)}${c.orgs.size>1?` <small>${c.orgs.size} org.</small>`:''}${c.fuera_catalogo?' <small>por validar</small>':''}</button>`).join('')||'<span class="int-empty">Sin comunidades registradas.</span>'}</div>
-   ${bloqueConvergencia([m])}
-   <h4 class="int-h4">Buscar otra comunidad de ${esc(m)}</h4><div class="int-search"><input id="int-cb" list="int-cb-dl" placeholder="escriba el nombre" aria-label="Comunidad"><datalist id="int-cb-dl">${cat.map(l=>`<option value="${esc(l.lugar)}">`).join('')}</datalist><button type="button" class="int-btn" id="int-cb-go">Ver</button></div>
-   <p class="int-note">Las comunidades que no aparecen arriba están "sin atención registrada", no necesariamente sin cooperación.</p>
+   <div class="int-kpis">${kpi(d.orgs.length,plural(d.orgs.length,'organización','organizaciones'))}${kpi(d.progs.length,plural(d.progs.length,'programa','programas'))}${kpi(`${d.lugCat.length}${d.total?' de '+d.total:''}`,'lugares poblados del catálogo con intervención reportada')}</div>
+
+   <details class="int-acc" open>
+    <summary>Organizaciones y programas <span class="int-acc-n">${d.orgs.length} org. · ${d.progs.length} prog.</span></summary>
+    <div class="int-acc-body">
+     <h4 class="int-h4" style="margin-top:0">Preguntas sobre ${esc(m)}</h4>${preguntasHtml()}
+     <h4 class="int-h4">Organizaciones con presencia registrada</h4><div>${d.orgs.map(chipOrg).join('')||'<span class="int-empty">Ninguna registrada.</span>'}</div>
+    </div>
+   </details>
+
+   <details class="int-acc" open>
+    <summary>Comunidades con intervención registrada <span class="int-acc-n">${d.lugCat.length}${d.total?' de '+d.total:''}</span></summary>
+    <div class="int-acc-body">
+     <p class="int-note">Son lugares poblados del catálogo (SEGEPLAN/CRS) donde al menos una organización registró una intervención. Un lugar sin registro no implica ausencia de cooperación: puede no haberse reportado todavía.</p>
+     <div>${lug.map(c=>`<button type="button" class="int-chip lugar${c.fuera_catalogo?' pend':''}" data-go="lugar:${esc(c.k)}">${esc(c.lugar_poblado)}${c.orgs.size>1?` <small>${c.orgs.size} org.</small>`:''}${c.fuera_catalogo?' <small>por validar</small>':''}</button>`).join('')||'<span class="int-empty">Sin comunidades registradas.</span>'}</div>
+     <h5 class="int-h5">Buscar otra comunidad de ${esc(m)}</h5><div class="int-search"><input id="int-cb" list="int-cb-dl" placeholder="escriba el nombre" aria-label="Comunidad"><datalist id="int-cb-dl">${cat.map(l=>`<option value="${esc(l.lugar)}">`).join('')}</datalist><button type="button" class="int-btn" id="int-cb-go">Ver</button></div>
+     <p class="int-note">Las comunidades que no aparecen arriba están "sin intervención reportada", no necesariamente sin cooperación.</p>
+    </div>
+   </details>
+
+   <details class="int-acc">
+    <summary>Sectores y acciones comunitarias <span class="int-acc-n">${d.sect.length} ${plural(d.sect.length,'sector','sectores')}</span></summary>
+    <div class="int-acc-body">
+     ${d.sect.length?`<div>${d.sect.slice(0,15).map(([s,n])=>tag(`${s} (${n})`)).join('')}</div>`:'<span class="int-empty">Sin sectores registrados.</span>'}
+     <p class="int-note">El número junto a cada sector es la cantidad de programas que lo declaran en este municipio; un mismo programa puede declarar varios sectores.</p>
+    </div>
+   </details>
+
+   <details class="int-acc">
+    <summary>Coincidencias territoriales</summary>
+    <div class="int-acc-body">
+     <p class="int-note">Coincidencia de <b>organizaciones distintas</b> en el mismo municipio y sector, o de <b>varios programas</b> (de una o varias organizaciones) en el mismo lugar poblado del catálogo. No distingue por sí sola presencia comunitaria de cobertura institucional declarada.</p>
+     ${bloqueConvergencia([m])}
+    </div>
+   </details>
+
+   <details class="int-acc">
+    <summary>Oportunidades de coordinación <span class="int-acc-n">${(o4?o4.n:0)+(o5?o5.n:0)}</span></summary>
+    <div class="int-acc-body">
+     ${o4&&o4.n?`<h5 class="int-h5">Contrapartes compartidas</h5><ul class="int-ul">${o4.items.slice(0,3).map(i=>`<li><div>${i.txt}</div>${i.sub?`<div class="int-sub2">${i.sub}</div>`:''}</li>`).join('')}</ul>${o4.n>3?`<button type="button" class="int-link" data-go="preg:4">Ver las ${o4.n}</button>`:''}`:''}
+     ${o5&&o5.n?`<h5 class="int-h5">Programas próximos a finalizar</h5><ul class="int-ul">${o5.items.slice(0,3).map(i=>`<li><div>${i.txt}</div>${i.sub?`<div class="int-sub2">${i.sub}</div>`:''}</li>`).join('')}</ul>${o5.n>3?`<button type="button" class="int-link" data-go="preg:6">Ver las ${o5.n}</button>`:''}`:''}
+     ${(!o4||!o4.n)&&(!o5||!o5.n)?'<div class="int-empty">No se detectaron contrapartes compartidas ni cierres próximos para este municipio con los registros actuales.</div>':''}
+     <p class="int-note warn">Esto señala coincidencias en los registros, no coordinación comprobada. Es un punto de partida para conversar y verificar.</p>
+    </div>
+   </details>
+
+   <details class="int-acc">
+    <summary>Información pendiente de verificar <span class="int-acc-n">${d.lugAd.length+sinRango.length}</span></summary>
+    <div class="int-acc-body">
+     ${d.lugAd.length?`<p class="int-note"><b>${d.lugAd.length}</b> lugar${d.lugAd.length===1?'':'es'} con registro de atención ${d.lugAd.length===1?'está':'están'} fuera del catálogo territorial y pendiente${d.lugAd.length===1?'':'s'} de validación.</p>`:''}
+     ${sinRango.length?`<p class="int-note"><b>${sinRango.length}</b> de ${d.progs.length} ${plural(d.progs.length,'programa','programas')} no declara un rango de inversión.</p>`:''}
+     ${!d.lugAd.length&&!sinRango.length?'<div class="int-empty">No hay pendientes específicos de este municipio además de los generales del visor.</div>':''}
+     <p class="int-note">Pendientes generales de todo el visor (licencias cartográficas, puntos fuera de límite, etc.): ver «Fuentes cartográficas».</p>
+    </div>
+   </details>
+
    <div class="int-actions"><button type="button" class="int-btn ghost" data-go="ficha:${esc(m)}">Ficha municipal completa</button> <button type="button" class="int-btn ghost" data-go="cmp:${esc(m)}">Comparar municipios</button></div>`;
 }
 function migas(){
@@ -1119,7 +1192,7 @@ function pintarPanel(){
   if(NAV.muni) mm.push(()=>navegar(NAV.muni,''));
   if(NAV.lugar) mm.push(()=>navegar(NAV.muni,NAV.lugar));
   pila.forEach((e,i)=>mm.push(()=>navegar(NAV.muni,NAV.lugar,i+1)));
-  panel.innerHTML=buscadorHtml()+migas()+`<h2 class="int-h">${esc(titulo)}</h2><div id="int-panel-body">${cuerpo}</div>`;
+  panel.innerHTML=`<div class="int-panel-head">${buscadorHtml()}${migas()}<h2 class="int-h">${esc(titulo)}</h2></div><div id="int-panel-body">${cuerpo}</div>`;
   enlazar(panel);
   $$('.int-crumbs button[data-i]',panel).forEach(b=>b.onclick=mm[+b.dataset.i]);
   $('#int-pp',panel).onclick=()=>{ asegurarDrawer(); $('#int-dr-body').innerHTML=`<h2 class="int-h">${esc(titulo)}</h2>`+$('#int-panel-body').innerHTML; document.body.classList.add('int-printing'); window.print(); setTimeout(()=>document.body.classList.remove('int-printing'),500); };

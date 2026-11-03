@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="visor-version" content="fase2-e2">
+<meta name="visor-version" content="fase2-e2-ajustes">
 <title>Mapeo de Actores de Cooperación — SEGEPLAN Chiquimula</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -396,7 +396,7 @@ table tbody tr:hover td{ background:#F4F1E6; }
 @media (max-width:620px){ .cov-row{ grid-template-columns:104px 1fr 78px; gap:8px; } main{ padding:18px 14px 60px; } }
 @media print{ nav{ position:static; } }
 </style>
-<link rel="stylesheet" href="tema.css?v=8">
+<link rel="stylesheet" href="tema.css?v=9">
 <style id="fix-capas">
 /* El icono del selector de mapa base venía de unpkg (images/layers.png); si no cargaba quedaba un cuadro blanco vacío.
    Se reemplaza por un SVG incrustado: el control (Claro / Relieve / Satélite / OpenStreetMap) funciona igual. */
@@ -849,7 +849,7 @@ function mostrarVista(id){
 }
 
 const filtros = { sector:'', atencion:'', actor:'', estado:'', municipio:'', organizacion:'', programa:'' };
-let CATALOGO=null, COORDS={}, baseLayer=null, coopLayer=null, instLayer=null, basePlaces=[], limitesLayer=null, exteriorMaskLayer=null, LIMITES=null;
+let CATALOGO=null, COORDS={}, baseLayer=null, coopLayer=null, instLayer=null, basePlaces=[], limitesLayer=null, exteriorMaskLayer=null, LIMITES=null, seleccionLayer=null;
 
 
 const SIGLAS_VISOR = new Set([
@@ -1189,6 +1189,7 @@ function renderMapa(filtrados){
     else if(base) mostrarPanelTerritorial(base);
     else renderResumenTerritorial(filtrados);
   } else {
+    if(seleccionLayer && map){ map.removeLayer(seleccionLayer); seleccionLayer=null; }
     renderResumenTerritorial(filtrados);
   }
 }
@@ -1218,14 +1219,31 @@ function estiloLimite(feature){
   const sel=document.getElementById('t-municipio')?.value||'';
   const nombre=feature?.properties?.nombre_1||'';
   const activo=sel && normalizarTexto(nombre)===normalizarTexto(sel);
+  const z=(map&&map.getZoom)?map.getZoom():9;
+  // El límite municipal debe ser claramente visible a escala departamental/municipal,
+  // pero perder grosor y contraste al acercarse a una comunidad, para que los puntos
+  // de intervención mantengan protagonismo visual. No se modifica la geometría, solo el estilo.
+  let escala;
+  if(z>=14) escala=.40;       // vista de comunidad / lugar poblado
+  else if(z>=12) escala=.62;  // transición municipio → comunidad
+  else if(z>=10) escala=.85;  // vista municipal
+  else escala=1;               // vista departamental
+  const weightBase=activo?3.2:1.15;
+  const opacityBase=activo?.95:(sel?.48:.72);
+  const fillOpacityBase=activo?.10:(sel?.010:.004);
   return {
     color:activo?'#0B5F9E':'#6F8293',
-    weight:activo?3.2:1.15,
-    opacity:activo?.95:(sel?.48:.72),
+    weight:Math.max(activo?1.0:0.55, weightBase*escala),
+    opacity:Math.max(activo?.45:.25, opacityBase*escala),
     fillColor:activo?'#DCEAF5':'#FFFFFF',
-    fillOpacity:activo?.10:(sel?.010:.004),
+    fillOpacity:fillOpacityBase*escala,
     lineCap:'round', lineJoin:'round'
   };
+}
+
+function restilarLimitesPorZoom(){
+  if(!limitesLayer) return;
+  limitesLayer.setStyle(estiloLimite);
 }
 
 function actualizarLimitesMunicipales(){
@@ -1532,12 +1550,28 @@ function sincronizarConsultaConPunto(p){
     tl.disabled=false;
   }
   if(p.codigo) tl.value=p.codigo;
+  marcarSeleccionEnMapa(p);
+}
+
+// Resalta en el mapa el lugar poblado/comunidad actualmente seleccionado,
+// para que quede claramente identificado frente a los demás puntos. No altera
+// coordenadas ni geometrías: solo dibuja un anillo de resalte no interactivo.
+function marcarSeleccionEnMapa(p){
+  if(seleccionLayer && map){ map.removeLayer(seleccionLayer); seleccionLayer=null; }
+  if(!p || !map) return;
+  const lat=Number(p.lat), lon=Number(p.lon);
+  if(p.lat===null||p.lat===undefined||p.lat===''||p.lon===null||p.lon===undefined||p.lon===''||!Number.isFinite(lat)||!Number.isFinite(lon)) return;
+  seleccionLayer=L.circleMarker([lat,lon],{
+    radius:15, color:'#C0392B', weight:3, fillOpacity:0, opacity:.92,
+    interactive:false, dashArray:'3,3'
+  }).addTo(map);
 }
 
 function volverResumenMunicipal(){
   const tl=document.getElementById('t-lugar');
   if(tl) tl.value='';
   if(map) map.closePopup();
+  if(seleccionLayer && map){ map.removeLayer(seleccionLayer); seleccionLayer=null; }
   renderMapaYStats();
 }
 
@@ -2787,6 +2821,7 @@ async function iniciar(){
   leyendaMapa.addTo(map);
   // Ajusta únicamente la simbología al acercar/alejar, sin recalcular filtros ni extensión.
   map.on('zoomend', actualizarEstiloBasePorZoom);
+  map.on('zoomend', restilarLimitesPorZoom);
   await cargarLimitesMunicipales();
   await cargarBaseTerritorial();
 
@@ -2925,6 +2960,6 @@ function renderPanorama(){
 
 iniciar().then(()=>{ try{ agregarBotonesCSV(); }catch(e){ console.warn(e); } });
 </script>
-<script src="inteligencia.js?v=7"></script>
+<script src="inteligencia.js?v=8"></script>
 </body>
 </html>
