@@ -430,31 +430,140 @@ function abrirComparador(base){
 }
 
 /* =====================================================================
-   ACTORES: directorio con búsqueda
+   ORGANIZACIONES: directorio territorial (tabla / tarjetas), filtros,
+   orden, paginación de 10, CSV completo y ficha con mapa (Fase 2 · Etapa 1)
+   Solo presenta lo reportado; no suma rangos ni infiere alianzas.
    ===================================================================== */
+const DIR_POR_PAG=10;
+const DIR_ORDENES=[['nombre','Nombre (A–Z)'],['tipo','Tipo de organización'],['programas','Número de programas'],['municipios','Municipios con presencia'],['sectores','Sectores'],['contrapartes','Instituciones declaradas']];
+function dirEstado(){ return ST.dir=ST.dir||{q:'',tipo:'',muni:'',sector:'',orden:'nombre',asc:true,pag:1,vista:null}; }
+function dirInfo(){
+  if(ST._dirInfo&&ST._dirInfoP===P) return ST._dirInfo;
+  const orgs=uniq(P.map(p=>p.organizacion)).sort(cmp);
+  ST._dirInfoP=P;
+  return ST._dirInfo=orgs.map(o=>{
+    const ps=P.filter(p=>p.organizacion===o);
+    return {o,ps,tipo:ps[0].tipo_actor||'',
+      munis:uniq(ps.flatMap(munisTodos)).sort(cmp), sect:uniq(ps.flatMap(p=>p.sector||[])).sort(cmp),
+      contra:uniq(ps.flatMap(contrapartesDe)).sort(cmp),
+      contraTxt:uniq(ps.map(p=>(p.contraparte_gubernamental||'').trim())),
+      rg:distRangos(ps),
+      texto:sinAcento([o,ps[0].tipo_actor,ps.map(p=>nombreProg(p)+' '+(p.contraparte_gubernamental||'')).join(' ')].join(' '))};
+  });
+}
+function dirFiltrar(){
+  const E=dirEstado(), q=sinAcento(E.q).trim();
+  const f=dirInfo().filter(i=>(!E.tipo||i.tipo===E.tipo)&&(!E.muni||i.munis.includes(E.muni))&&(!E.sector||i.sect.includes(E.sector))&&(!q||i.texto.includes(q)||sinAcento(i.munis.join(' ')+' '+i.sect.join(' ')+' '+i.contra.join(' ')).includes(q)));
+  const val={nombre:i=>i.o,tipo:i=>i.tipo,programas:i=>i.ps.length,municipios:i=>i.munis.length,sectores:i=>i.sect.length,contrapartes:i=>i.contra.length}[E.orden]||(i=>i.o);
+  f.sort((a,b)=>{ const x=val(a), y=val(b); const r=(typeof x==='number'&&typeof y==='number')?(x-y):cmp(x,y); return (E.asc?r:-r)||cmp(a.o,b.o); });
+  return f;
+}
+const limitarChips=(arr,n,clase,vacio)=>{ if(!arr.length) return `<span class="int-empty">${vacio||'Sin dato'}</span>`; const v=arr.slice(0,n).map(x=>`<span class="int-tag ${clase||''}">${esc(x)}</span>`).join(''); return v+(arr.length>n?`<span class="int-masn" title="${esc(arr.slice(n).join(', '))}">+${arr.length-n} más</span>`:''); };
+function rangosLineas(i){
+  const l=i.rg.filas.filter(f=>f.n>0).map(f=>`<div class="int-rg"><span>${esc(f.etq)}</span><b>${f.n} ${plural(f.n,'programa','programas')}</b></div>`);
+  if(i.rg.sin) l.push(`<div class="int-rg"><span>Sin dato</span><b>${i.rg.sin} ${plural(i.rg.sin,'programa','programas')}</b></div>`);
+  return l.join('')||'<span class="int-empty">Sin dato</span>';
+}
+function dirFilaCsv(i){
+  return [i.o,i.tipo,i.ps.length,i.munis.join('; '),i.sect.join('; '),i.contra.join('; '),i.contraTxt.filter(Boolean).join('; '),
+    i.ps.map(p=>`${nombreProg(p)}: ${p.monto_rango||'Sin dato'}`).join('; '),
+    Object.entries(cuenta(i.ps,p=>p.estado_programa||'sin estado')).map(([k,n])=>`${k}: ${n}`).join('; ')];
+}
 function renderDirectorio(){
   const sec=$('#view-instituciones'); if(!sec) return;
+  const E=dirEstado(); const todos=dirInfo();
+  if(E.vista===null) E.vista=(window.innerWidth<760)?'tarjetas':'tabla';
   let box=$('#int-dir'); if(!box){ box=document.createElement('div'); box.id='int-dir'; const ref=$('.int-help',sec)||sec.querySelector('.section-sub')||sec.firstElementChild; ref.after(box); }
-  const orgs=uniq(P.map(p=>p.organizacion)).sort(cmp);
-  const tipos=uniq(P.map(p=>p.tipo_actor)).sort(cmp);
-  const q=sinAcento(ST.q||''), tp=ST.tipo||'';
-  const info=o=>{ const ps=P.filter(p=>p.organizacion===o); return {o,ps,tipo:ps[0].tipo_actor||'',munis:uniq(ps.flatMap(munisTodos)).sort(cmp),sect:uniq(ps.flatMap(p=>p.sector||[])),contra:uniq(ps.flatMap(contrapartesDe)),rg:distRangos(ps)}; };
-  const lista_=orgs.map(info).filter(i=>(!tp||i.tipo===tp)&&(!q||sinAcento([i.o,i.tipo,i.munis.join(' '),i.sect.join(' '),i.contra.join(' '),i.ps.map(p=>nombreProg(p)+' '+p.contraparte_gubernamental).join(' ')].join(' ')).includes(q)));
   if(!box.dataset.init){
     box.dataset.init='1';
-    box.innerHTML=`<div class="int-card"><div class="int-eyebrow">Directorio de actores</div>
-     <div class="int-search"><input id="int-q" type="search" placeholder="Buscar por organización, programa, municipio, sector o contraparte" aria-label="Buscar actores"><select id="int-tipo" aria-label="Tipo de actor"><option value="">Todos los tipos</option>${tipos.map(t=>`<option>${esc(t)}</option>`).join('')}</select><button type="button" class="int-btn ghost" id="int-limpiar">Limpiar</button><button type="button" class="int-btn" id="int-csv">Descargar CSV</button></div>
-     <div id="int-dir-n" class="int-note"></div><div id="int-dir-grid" class="int-grid"></div></div>`;
-    $('#int-q').oninput=e=>{ ST.q=e.target.value; renderDirectorio(); };
-    $('#int-tipo').onchange=e=>{ ST.tipo=e.target.value; renderDirectorio(); };
-    $('#int-limpiar').onclick=()=>{ ST.q='';ST.tipo=''; $('#int-q').value=''; $('#int-tipo').value=''; renderDirectorio(); };
-    $('#int-csv').onclick=()=>{ const f=ST.dirFilas||[]; csv('directorio_actores.csv',[['Organización','Tipo de actor','Programas','Municipios','Sectores','Contrapartes agrupadas','Programas por rango de inversión declarado'],...f.map(i=>[i.o,i.tipo,i.ps.length,i.munis.join('; '),i.sect.join('; '),i.contra.join('; '),textoDist(i.rg)])]); };
+    const tipos=uniq(P.map(p=>p.tipo_actor)).sort(cmp), munis=uniq(P.flatMap(munisTodos)).sort(cmp), sects=uniq(P.flatMap(p=>p.sector||[])).sort(cmp);
+    const op=(arr,t)=>`<option value="">${t}</option>`+arr.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+    box.innerHTML=`<div class="int-card int-dircard"><div class="int-eyebrow">Directorio de organizaciones</div>
+     <div class="int-search"><input id="int-q" type="search" placeholder="Buscar organización, programa o contraparte" aria-label="Buscar organizaciones">
+      <select id="int-f-muni" aria-label="Filtrar por municipio">${op(munis,'Municipio: todos')}</select>
+      <select id="int-f-sector" aria-label="Filtrar por sector">${op(sects,'Sector: todos')}</select>
+      <select id="int-tipo" aria-label="Filtrar por tipo de organización">${op(tipos,'Tipo: todos')}</select>
+      <button type="button" class="int-btn ghost" id="int-limpiar">Limpiar filtros</button></div>
+     <div class="int-dirbar">
+      <div class="int-vista" role="group" aria-label="Forma de visualización"><button type="button" id="int-v-tabla">Tabla</button><button type="button" id="int-v-tarjetas">Tarjetas</button></div>
+      <label class="int-orden">Ordenar por <select id="int-orden" aria-label="Ordenar por">${DIR_ORDENES.map(([k,t])=>`<option value="${k}">${t}</option>`).join('')}</select></label>
+      <button type="button" class="int-btn ghost" id="int-asc" aria-label="Invertir el orden"></button>
+      <button type="button" class="int-btn" id="int-csv">Descargar CSV</button></div>
+     <div id="int-dir-n" class="int-note" aria-live="polite"></div>
+     <div id="int-dir-cuerpo"></div><div id="int-dir-pag"></div>
+     <p class="int-note">Se muestra lo que las organizaciones reportaron: ${etq('rep')} Que una organización no aparezca en un municipio no significa que no trabaje allí. Las instituciones listadas son <b>contrapartes declaradas</b> (texto libre), no alianzas ni coordinación verificadas. Los rangos de inversión se cuentan por programa y no se suman. El CSV incluye todas las organizaciones que cumplen los filtros, no solo las de la página visible.</p></div>`;
+    const re=()=>{ E.pag=1; renderDirectorio(); };
+    $('#int-q').oninput=e=>{ E.q=e.target.value; re(); };
+    $('#int-f-muni').onchange=e=>{ E.muni=e.target.value; re(); };
+    $('#int-f-sector').onchange=e=>{ E.sector=e.target.value; re(); };
+    $('#int-tipo').onchange=e=>{ E.tipo=e.target.value; re(); };
+    $('#int-limpiar').onclick=()=>{ Object.assign(E,{q:'',tipo:'',muni:'',sector:'',pag:1}); ['int-q','int-f-muni','int-f-sector','int-tipo'].forEach(id=>$('#'+id).value=''); renderDirectorio(); };
+    $('#int-v-tabla').onclick=()=>{ E.vista='tabla'; renderDirectorio(); };
+    $('#int-v-tarjetas').onclick=()=>{ E.vista='tarjetas'; renderDirectorio(); };
+    $('#int-orden').onchange=e=>{ E.orden=e.target.value; E.asc=(E.orden==='nombre'||E.orden==='tipo'); re(); };
+    $('#int-asc').onclick=()=>{ E.asc=!E.asc; re(); };
+    $('#int-csv').onclick=()=>{ const f=dirFiltrar(); csv('directorio_actores.csv',[['Organización','Tipo de actor','Programas','Municipios con presencia registrada','Sectores','Instituciones declaradas como contraparte (agrupadas)','Contraparte (texto original)','Rango de inversión declarado por programa','Estado de los programas'],...f.map(dirFilaCsv)]); };
+    box.addEventListener('click',e=>{
+      const b=e.target.closest('[data-org]'); if(b){ abrirFichaOrganizacion(b.dataset.org); return; }
+      const s=e.target.closest('[data-sort]'); if(s){ const k=s.dataset.sort; if(E.orden===k) E.asc=!E.asc; else { E.orden=k; E.asc=(k==='nombre'||k==='tipo'); } E.pag=1; renderDirectorio(); return; }
+      const g=e.target.closest('[data-pag]'); if(g){ const v=g.dataset.pag; E.pag=v==='prev'?E.pag-1:v==='next'?E.pag+1:+v; renderDirectorio(); const t=$('#int-dir-n'); if(t&&t.scrollIntoView) t.scrollIntoView({block:'nearest'}); }
+    });
   }
-  ST.dirFilas=lista_;
-  $('#int-dir-n').textContent=`${lista_.length} de ${orgs.length} organizaciones`;
-  $('#int-dir-grid').innerHTML=lista_.length?lista_.map(i=>`<article class="int-orgcard" data-go="org:${esc(i.o)}"><h5>${esc(i.o)}</h5><div>${tag(i.tipo||'Tipo no indicado')}</div><p><b>${i.ps.length}</b> ${plural(i.ps.length,'programa','programas')} · <b>${i.munis.length}</b> ${plural(i.munis.length,'municipio','municipios')}</p><small>${esc(i.sect.slice(0,3).join(' · ')||'Sin sectores')}${i.sect.length>3?` · +${i.sect.length-3}`:''}</small></article>`).join(''):'<div class="int-empty">Ninguna organización coincide con la búsqueda. Pruebe con otra palabra o limpie los filtros.</div>';
-  enlazar($('#int-dir-grid'));
+  // sincronizar controles con el estado
+  $('#int-q').value=E.q; $('#int-f-muni').value=E.muni; $('#int-f-sector').value=E.sector; $('#int-tipo').value=E.tipo; $('#int-orden').value=E.orden;
+  $('#int-asc').textContent=E.asc?'↑ Ascendente':'↓ Descendente';
+  $('#int-v-tabla').setAttribute('aria-pressed',String(E.vista==='tabla')); $('#int-v-tarjetas').setAttribute('aria-pressed',String(E.vista==='tarjetas'));
+  const f=dirFiltrar(); ST.dirFilas=f;
+  const pags=Math.max(1,Math.ceil(f.length/DIR_POR_PAG)); E.pag=Math.min(Math.max(1,E.pag),pags);
+  const ini=(E.pag-1)*DIR_POR_PAG, pagina=f.slice(ini,ini+DIR_POR_PAG);
+  $('#int-dir-n').textContent=f.length?`${f.length} de ${todos.length} organizaciones · mostrando ${ini+1}–${ini+pagina.length}`:`0 de ${todos.length} organizaciones`;
+  const ordenFlecha=k=>E.orden===k?(E.asc?' ▲':' ▼'):'';
+  const th=(k,t,sub)=>`<th scope="col" aria-sort="${E.orden===k?(E.asc?'ascending':'descending'):'none'}"><button type="button" class="int-th" data-sort="${k}">${t}${ordenFlecha(k)}</button>${sub?`<small>${sub}</small>`:''}</th>`;
+  let cuerpo;
+  if(!f.length){
+    cuerpo=`<div class="int-vacio"><b>Ninguna organización coincide con los filtros.</b><p>Pruebe con otro municipio o sector, o quite los filtros. Recuerde que aquí solo aparece lo que las organizaciones reportaron.</p></div>`;
+  }else if(E.vista==='tabla'){
+    cuerpo=`<div class="int-tbl-wrap"><table class="int-tbl int-dirtbl"><thead><tr>${th('nombre','Organización')}${th('tipo','Tipo')}${th('programas','Programas')}${th('municipios','Municipios con presencia registrada')}${th('sectores','Sectores')}${th('contrapartes','Instituciones con las que declara coordinar','declarado por la organización')}<th scope="col">Rango de inversión por programa<small>no se suman</small></th></tr></thead><tbody>${pagina.map(i=>`<tr>
+      <td><button type="button" class="int-orglink" data-org="${esc(i.o)}">${esc(i.o)}</button></td>
+      <td>${tag(i.tipo||'Tipo no indicado')}</td><td class="num">${i.ps.length}</td>
+      <td>${limitarChips(i.munis,3,'muni','Sin municipio registrado')}</td><td>${limitarChips(i.sect,2)}</td><td>${limitarChips(i.contra,3,'alt','No declara contraparte')}</td><td>${rangosLineas(i)}</td></tr>`).join('')}</tbody></table></div>`;
+  }else{
+    cuerpo=`<div class="int-ogrid">${pagina.map(i=>`<article class="int-ocard"><div class="int-ocard-h"><h5>${esc(i.o)}</h5>${tag(i.tipo||'Tipo no indicado')}</div>
+      <div class="int-ocard-k"><div><b>${i.ps.length}</b><span>${plural(i.ps.length,'programa','programas')}</span></div><div><b>${i.munis.length}</b><span>${plural(i.munis.length,'municipio','municipios')}</span></div><div><b>${i.sect.length}</b><span>${plural(i.sect.length,'sector','sectores')}</span></div></div>
+      <h6>Municipios con presencia registrada</h6><div>${limitarChips(i.munis,4,'muni','Sin municipio registrado')}</div>
+      <h6>Sectores</h6><div>${limitarChips(i.sect,3)}</div>
+      <h6>Instituciones con las que declara coordinar</h6><div>${limitarChips(i.contra,3,'alt','No declara contraparte')}</div>
+      <h6>Rango de inversión por programa</h6><div>${rangosLineas(i)}</div>
+      <button type="button" class="int-btn" data-org="${esc(i.o)}">Ver ficha de la organización</button></article>`).join('')}</div>`;
+  }
+  $('#int-dir-cuerpo').innerHTML=cuerpo;
+  $('#int-dir-pag').innerHTML=pags>1?`<div class="int-pager" role="navigation" aria-label="Paginación del directorio"><button type="button" data-pag="prev" ${E.pag<=1?'disabled':''}>‹ Anterior</button>${Array.from({length:pags},(_,k)=>`<button type="button" data-pag="${k+1}" ${k+1===E.pag?'aria-current="page" class="on"':''}>${k+1}</button>`).join('')}<button type="button" data-pag="next" ${E.pag>=pags?'disabled':''}>Siguiente ›</button><span>Página ${E.pag} de ${pags}</span></div>`:'';
 }
+/* Ficha de organización: primero lo esencial; después mapa, perfil y detalle (bloque original del visor) */
+function resumenFichaOrg(nombre){
+  const box=$('#int-ficha-resumen'); if(!box) return;
+  const ps=P.filter(p=>p.organizacion===nombre); if(!ps.length){ box.innerHTML=''; return; }
+  const munis=uniq(ps.flatMap(munisTodos)).sort(cmp); const lug=new Set(); ps.forEach(p=>lugaresDe(p).forEach(c=>lug.add(c.k)));
+  const sect=uniq(ps.flatMap(p=>p.sector||[])).sort(cmp), contra=uniq(ps.flatMap(contrapartesDe)).sort(cmp);
+  box.innerHTML=`<div class="int-card int-ficha-top"><h3>${esc(nombre)}</h3><div>${tag(ps[0].tipo_actor||'Tipo no indicado')}${ps[0].pais_origen?tag(ps[0].pais_origen):''}</div>
+   <p class="int-lead">Reporta <b>${ps.length}</b> ${plural(ps.length,'programa','programas')}, con presencia registrada en <b>${munis.length}</b> ${plural(munis.length,'municipio','municipios')} y atención registrada en <b>${lug.size}</b> ${plural(lug.size,'lugar poblado','lugares poblados')}. Esto es lo que la organización reportó: no mide cobertura total.</p>
+   <div class="int-ficha-cols">
+    <section><h4 class="int-h4">Programas, estado y rango de inversión</h4>${ps.map(p=>`<div class="int-prog"><b>${esc(nombreProg(p))}</b><div>${tag(p.estado_programa||'sin estado',p.estado_programa==='Próximo a finalizar'?'warn':'ok')}${tag(p.monto_rango||'Inversión sin dato')}</div></div>`).join('')}<p class="int-note">Cada rango es un intervalo declarado por programa; no se suman.</p></section>
+    <section><h4 class="int-h4">Con quién declara coordinar</h4><div>${contra.length?contra.map(c=>`<span class="int-tag alt">${esc(c)}</span>`).join(''):'<span class="int-empty">No declara contraparte.</span>'}</div><p class="int-note">${etq('rep')} Contraparte declarada en texto libre; no equivale a una alianza ni a una coordinación verificada.</p>
+     <h4 class="int-h4">Sectores de trabajo</h4><div>${sect.map(s=>tag(s)).join('')||'<span class="int-empty">Sin dato</span>'}</div></section></div>
+   <button type="button" class="int-btn ghost" id="int-ficha-mas">Más detalle: población declarada, espacios, lugares</button></div>`;
+  $('#int-ficha-mas').onclick=()=>fichaOrg(nombre);
+}
+function abrirFichaOrganizacion(nombre){
+  const f=$('#int-ficha-org'), d=$('#int-dir'); if(!f||!d) return;
+  const sel=$('#f-organizacion-panel'); if(sel){ sel.value=nombre; if(!sel.dataset.intRes){ sel.dataset.intRes='1'; sel.addEventListener('change',()=>resumenFichaOrg(sel.value)); } }
+  d.hidden=true; f.hidden=false; resumenFichaOrg(nombre);
+  try{ renderOrganizacion(); }catch(e){ console.error(e); }
+  setTimeout(()=>{ try{ if(orgMap) orgMap.invalidateSize(); renderOrganizacion(); }catch(e){} },120);
+  const v=$('#int-volver'); if(v&&!v.dataset.bound){ v.dataset.bound='1'; v.onclick=irDirectorio; }
+  window.scrollTo({top:0,behavior:'auto'});
+}
+function irDirectorio(){ const f=$('#int-ficha-org'), d=$('#int-dir'); if(f) f.hidden=true; if(d) d.hidden=false; }
 function csv(nombre,filas){
   const t=filas.map(r=>r.map(x=>`"${String(x==null?'':x).replace(/"/g,'""')}"`).join(',')).join('\r\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['﻿'+t],{type:'text/csv;charset=utf-8'})); a.download=nombre; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},400);
@@ -1190,7 +1299,7 @@ function renderVista(id){
     if(id==='mapa') pintarPanel();
     if(id==='panorama'){ renderConsultas(); renderTablaMunicipios(); renderHallazgos(); renderPanoramaV3(); }
     if(id==='municipio') renderMuniExtra();
-    if(id==='instituciones') renderDirectorio();
+    if(id==='instituciones'){ irDirectorio(); renderDirectorio(); }
     if(id==='articulacion'){ renderArtExtra(); plegar('articulacion','int-art','Detalle técnico: filtros, matrices y tabla original de articulación',false); }
     if(id==='brechas'){ renderOportunidades(); plegar('brechas','int-oport','Cobertura territorial por lugar poblado y matriz sector × municipio',true); }
     if(id==='poblacion-accion') renderPobExtra();

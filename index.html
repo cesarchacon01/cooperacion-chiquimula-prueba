@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="visor-version" content="fase2-e0">
+<meta name="visor-version" content="fase2-e1">
 <title>Mapeo de Actores de Cooperación — SEGEPLAN Chiquimula</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -396,7 +396,7 @@ table tbody tr:hover td{ background:#F4F1E6; }
 @media (max-width:620px){ .cov-row{ grid-template-columns:104px 1fr 78px; gap:8px; } main{ padding:18px 14px 60px; } }
 @media print{ nav{ position:static; } }
 </style>
-<link rel="stylesheet" href="tema.css?v=5">
+<link rel="stylesheet" href="tema.css?v=7">
 <style id="fix-capas">
 /* El icono del selector de mapa base venía de unpkg (images/layers.png); si no cargaba quedaba un cuadro blanco vacío.
    Se reemplaza por un SVG incrustado: el control (Claro / Relieve / Satélite / OpenStreetMap) funciona igual. */
@@ -651,9 +651,12 @@ table tbody tr:hover td{ background:#F4F1E6; }
 
   <!-- ===== VISTA: INSTITUCIONES / ORGANIZACIONES ===== -->
   <section class="view" id="view-instituciones">
-    <div class="section-title">Ficha ejecutiva por organización</div>
-    <div class="section-sub">Consulta la presencia territorial de cada actor de cooperación: dónde trabaja, mediante qué programas/proyectos, en qué sectores, con qué población y qué capacidades fortalece.</div>
-    <div class="org-toolbar"><label>ORGANIZACIÓN</label><select id="f-organizacion-panel"></select></div>
+    <div class="section-title">Organizaciones</div>
+    <div class="section-sub">Quién trabaja en Chiquimula, en qué municipios y sectores, y con qué instituciones declara coordinar. Elija una organización para ver su ficha y su mapa de presencia.</div>
+    <div id="int-ficha-org" hidden>
+    <div class="int-ficha-bar"><button type="button" id="int-volver" class="int-btn ghost">← Volver al directorio</button></div>
+    <div id="int-ficha-resumen"></div>
+    <div class="org-toolbar"><label>CAMBIAR DE ORGANIZACIÓN</label><select id="f-organizacion-panel"></select></div>
     <div class="stats" id="stats-organizacion"></div>
     <div class="org-layout">
       <div class="org-map-card">
@@ -671,6 +674,7 @@ table tbody tr:hover td{ background:#F4F1E6; }
     </div>
     <div class="card" style="margin-top:20px"><div class="side-title">Programas y proyectos de la organización</div><div style="overflow-x:auto"><table id="tabla-programas-organizacion"><thead><tr><th>PROGRAMA / PROYECTO</th><th>TIPO DE ATENCIÓN</th><th>ESTADO</th><th>SECTORES</th><th>MUNICIPIOS</th><th>PERÍODO</th><th>INVERSIÓN REPORTADA</th></tr></thead><tbody></tbody></table></div></div>
     <div class="card" style="margin-top:20px"><div class="side-title">Cobertura comunitaria registrada</div><div class="section-sub" id="sub-cobertura-organizacion"></div><div style="overflow-x:auto"><table id="tabla-comunidades-organizacion"><thead><tr><th>MUNICIPIO</th><th>LUGAR POBLADO</th><th>PROGRAMA / PROYECTO</th><th>POBLACIÓN META</th><th>ACCIÓN / CAPACIDAD</th></tr></thead><tbody></tbody></table></div></div>
+      </div>
   </section>
 
 
@@ -2305,12 +2309,13 @@ function renderOrganizacion(){
 
   initOrgMap(); orgCommunityLayer.clearLayers(); orgInstitutionalLayer.clearLayers();
   const bounds=[];
-  lugares.forEach(c=>{ if(Number.isFinite(Number(c.lat))&&Number.isFinite(Number(c.lon))){ const ll=[Number(c.lat),Number(c.lon)]; bounds.push(ll); const mk=L.circleMarker(ll,{radius:7.5,color:'#FFFFFF',fillColor:'#003058',fillOpacity:.96,weight:2.2}); mk.bindPopup(`<b>${c.lugar_poblado}</b><br>${c.municipio}<br><span style="color:#5B6672">Presencia comunitaria registrada</span>`); mk.addTo(orgCommunityLayer); }});
+  lugares.forEach(c=>{ if(c.lat!==null&&c.lat!==undefined&&c.lat!==''&&c.lon!==null&&c.lon!==undefined&&c.lon!==''&&Number.isFinite(Number(c.lat))&&Number.isFinite(Number(c.lon))){ const ll=[Number(c.lat),Number(c.lon)]; bounds.push(ll); const mk=L.circleMarker(ll,{radius:7.5,color:'#FFFFFF',fillColor:'#003058',fillOpacity:.96,weight:2.2}); mk.bindPopup(`<b>${c.lugar_poblado}</b><br>${c.municipio}<br><span style="color:#5B6672">Presencia comunitaria registrada</span>`); mk.addTo(orgCommunityLayer); }});
   // Para municipios con presencia institucional sin punto comunitario, usamos el centro promedio de los lugares georreferenciados del municipio solo como referencia cartográfica.
   [...munInst].forEach(m=>{ const pts=basePlaces.filter(x=>x.municipio===m&&Number.isFinite(Number(x.lat))&&Number.isFinite(Number(x.lon))); if(!pts.length)return; const lat=pts.reduce((a,x)=>a+Number(x.lat),0)/pts.length, lon=pts.reduce((a,x)=>a+Number(x.lon),0)/pts.length; const ll=[lat,lon]; bounds.push(ll); const mk=L.circleMarker(ll,{radius:8.5,color:'#B97824',fillColor:'#F1C47C',fillOpacity:.76,weight:2.2,dashArray:'4 3'}); mk.bindPopup(`<b>${m}</b><br>Presencia institucional / municipal reportada<br><span style="color:#5B6672">Marcador de referencia municipal; no representa una comunidad específica.</span>`); mk.addTo(orgInstitutionalLayer); });
   orgMap.invalidateSize(); // medir el contenedor antes de encuadrar
   if(bounds.length) orgMap.fitBounds(bounds,{padding:[30,30],maxZoom:12}); else orgMap.setView([14.75,-89.45],9);
-  document.getElementById('submap-organizacion').textContent=`${org}: ${lugares.size} lugares con presencia comunitaria; ${munInst.size} municipios con presencia institucional/municipal reportada.`;
+  const sinCoord=[...lugares.values()].filter(c=>c.lat===null||c.lat===undefined||c.lat===''||c.lon===null||c.lon===undefined||c.lon==='').length;
+  document.getElementById('submap-organizacion').textContent=`${org}: ${lugares.size} lugares con presencia comunitaria; ${munInst.size} municipios con presencia institucional/municipal reportada.`+(sinCoord?` ${sinCoord} ${sinCoord===1?'lugar no tiene':'lugares no tienen'} coordenadas registradas: no ${sinCoord===1?'aparece':'aparecen'} como punto en el mapa, pero sí en las tablas.`:'');
   setTimeout(()=>orgMap.invalidateSize(),50);
 }
 
@@ -2890,6 +2895,6 @@ function renderPanorama(){
 
 iniciar().then(()=>{ try{ agregarBotonesCSV(); }catch(e){ console.warn(e); } });
 </script>
-<script src="inteligencia.js?v=4"></script>
+<script src="inteligencia.js?v=6"></script>
 </body>
 </html>
