@@ -841,15 +841,23 @@ function cuerpoRedEgo(cuerpo,nodos,aristas,sel){
 
 // Mini-grafo de una sola organización: ella misma + solo sus vínculos directos (no la red
 // completa), para que "seleccionar una organización" sea el punto de partida de la lectura.
+// Etapa 3.2: los nodos de destino (contraparte/espacio) son navegables -> llevan a su ficha
+// completa en la Vista 2. El nodo de la propia organización (izquierda) no lo es: solo
+// representa el punto de partida, así que no lleva affordance de botón interactivo.
 function dibujarEgoRed(n,rel,nodos){
   const host=$('#int-red-mini'); if(!host) return;
   const destinos=rel.map(a=>nodos.find(x=>x.id===a.destino)).filter(Boolean);
   host.innerHTML=`<h5 class="int-h5">Mapa de sus vínculos directos</h5>
+    <p class="int-note int-red-hint">Seleccione una institución o espacio para consultar su ficha completa en la Vista 2 · Espacios y contrapartes.</p>
     <div class="int-red-wrap int-red-wrap-mini">
       <svg class="int-red-svg" id="int-red-mini-svg" aria-hidden="true"></svg>
-      <div class="int-red-col"><button type="button" class="int-red-nodo on" style="--c:${COLOR_TIPO.organizacion}" data-id="${esc(n.id)}"><span class="int-red-ico" aria-hidden="true">${ICONO_TIPO.organizacion}</span><span class="int-red-lbl">${esc(n.etiqueta)}</span></button></div>
-      <div class="int-red-col">${destinos.map(d=>`<button type="button" class="int-red-nodo" style="--c:${COLOR_TIPO[d.tipo]}" data-id="${esc(d.id)}" title="${esc(NOMBRE_TIPO[d.tipo])}"><span class="int-red-ico" aria-hidden="true">${ICONO_TIPO[d.tipo]}</span><span class="int-red-lbl">${esc(d.etiqueta)}</span></button>`).join('')}</div>
+      <div class="int-red-col"><button type="button" class="int-red-nodo on int-red-nodo-self" tabindex="-1" aria-hidden="true" style="--c:${COLOR_TIPO.organizacion}" data-id="${esc(n.id)}"><span class="int-red-ico" aria-hidden="true">${ICONO_TIPO.organizacion}</span><span class="int-red-lbl">${esc(n.etiqueta)}</span></button></div>
+      <div class="int-red-col">${destinos.map(d=>`<button type="button" class="int-red-nodo int-red-nodo-nav" style="--c:${COLOR_TIPO[d.tipo]}" data-id="${esc(d.id)}" title="${esc(NOMBRE_TIPO[d.tipo])} · Seleccionar para consultar detalles" aria-label="${esc(d.etiqueta)} — Seleccionar para consultar detalles en Espacios y contrapartes"><span class="int-red-ico" aria-hidden="true">${ICONO_TIPO[d.tipo]}</span><span class="int-red-lbl">${esc(d.etiqueta)}</span><span class="int-red-nav-ico" aria-hidden="true">→</span></button>`).join('')}</div>
     </div>`;
+  $$('.int-red-nodo-nav',host).forEach(b=>{
+    const d=destinos.find(x=>x.id===b.dataset.id);
+    if(d) b.onclick=()=>navegarDesdeRedANivel2(d);
+  });
   requestAnimationFrame(()=>{
     const svg=$('#int-red-mini-svg'); const wrap=svg&&svg.closest('.int-red-wrap'); if(!svg||!wrap) return;
     const r0=wrap.getBoundingClientRect(); if(!r0.width||!r0.height) return;
@@ -862,6 +870,38 @@ function dibujarEgoRed(n,rel,nodos){
       html+=`<line x1="${(ro.right-r0.left).toFixed(1)}" y1="${(ro.top+ro.height/2-r0.top).toFixed(1)}" x2="${(rd.left-r0.left).toFixed(1)}" y2="${(rd.top+rd.height/2-r0.top).toFixed(1)}" class="on"/>`;
     });
     svg.innerHTML=html;
+  });
+}
+
+// Etapa 3.2: conecta un nodo de destino del mapa de vínculos directos (Vista 1) con su ficha
+// ya existente en la Vista 2, sin duplicar datos ni crear fichas nuevas. Traduce el tipo del
+// nodo a la subvista correcta ("Contrapartes declaradas" o "Espacios compartidos") y a la
+// misma clave que usa renderArtExtra() para sus chips -> selecciona esa ficha y desplaza la
+// pantalla hasta su encabezado.
+function navegarDesdeRedANivel2(d){
+  if(!d || d.tipo==='organizacion') return;
+  const modo = d.tipo==='espacio' ? 'espacio' : 'contra';
+  // Las contrapartes "sin clasificar" se agrupan en la Vista 2 bajo una sola ficha ("Sin
+  // clasificar"): el nodo de la red usa el texto original, pero la clave de selección debe
+  // ser la del grupo, igual que ya hace renderArtExtra()/contrapartesDe().
+  const clave = d.tipo==='contraparte-sin-clasificar' ? 'Sin clasificar' : d.etiqueta;
+  ST.coordTab='esp';
+  ST.artModo=modo;
+  ST.artSel=clave;
+  renderArtExtra();
+  aplicarTabCoordinacion();
+  requestAnimationFrame(()=>{
+    const det=$('#int-art-det');
+    const ficha=det && det.querySelector('.int-detail');
+    if(ficha){
+      ficha.scrollIntoView({behavior:'smooth',block:'start'});
+    }else if(det){
+      // El elemento del diagrama no tiene una ficha correspondiente con los datos actuales
+      // (no debería ocurrir, ya que el nodo se construyó desde los mismos registros): se
+      // informa en vez de fabricar una ficha.
+      det.innerHTML='<div class="int-empty">No se encontró información adicional para este elemento con los datos actuales.</div>';
+      det.scrollIntoView({behavior:'smooth',block:'start'});
+    }
   });
 }
 
@@ -1858,7 +1898,7 @@ function estilos(){
   .int-orgcard{border:1px solid #D5DEE6;border-radius:12px;padding:14px;cursor:pointer;background:#fff;transition:.15s}.int-orgcard:hover,.int-orgcard:focus-visible{border-color:#22678A;box-shadow:0 4px 14px rgba(25,113,168,.15);outline:none}.int-orgcard h5{margin:0 0 6px;font-size:14px;line-height:1.3;color:#183652}.int-orgcard p{margin:8px 0 4px;font-size:13px}.int-orgcard small{color:#5B6675}
   .int-search{display:flex;flex-wrap:wrap;gap:8px}.int-search input{flex:1 1 280px;min-width:0;border:1px solid #CBD5E1;border-radius:8px;padding:9px 12px;font:inherit;font-size:14px}.int-search select{border:1px solid #CBD5E1;border-radius:8px;padding:9px;font:inherit;font-size:14px}
   .int-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.int-tabs button{border:1px solid #CBD5E1;background:#fff;border-radius:8px;padding:8px 14px;font:inherit;font-size:13px;cursor:pointer}.int-tabs button.on{background:#183652;color:#fff;border-color:#183652}
-  .int-detail{background:#F8FAFC;border-radius:12px;padding:16px;margin-top:14px}
+  .int-detail{background:#F8FAFC;border-radius:12px;padding:16px;margin-top:14px;scroll-margin-top:66px}
   .int-tbl-wrap{overflow-x:auto}.int-tbl{width:100%;border-collapse:collapse;font-size:13px}.int-tbl th,.int-tbl td{padding:8px 10px;border-bottom:1px solid #D5DEE6;text-align:left;vertical-align:top}.int-tbl thead th{background:#F1F5F9;font-size:12px;color:#334155}.int-cmp tbody th{background:#F8FAFC;width:30%;font-weight:600}
   .int-cmp-sel{display:flex;flex-wrap:wrap;gap:6px 14px;margin:10px 0}.int-chk{font-size:13px;display:flex;gap:6px;align-items:center}
   .int-help{margin:10px 0;background:#F4F9FD;border:1px solid #D4E6F4;border-radius:10px;padding:8px 14px}.int-help summary{cursor:pointer;font-weight:600;font-size:13px;color:#22678A}.int-help-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px;margin-top:10px}.int-help h5{margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#334155}.int-help p{margin:0;font-size:13px;line-height:1.5;color:#334155}.int-help .ok h5{color:#17602B}.int-help .no h5{color:#9A3412}
@@ -1898,9 +1938,16 @@ function estilos(){
   .int-red-nodo .int-red-ico{color:var(--c,#334155);font-size:13px;flex:0 0 auto}
   .int-red-nodo .int-red-lbl{flex:1;overflow-wrap:anywhere}
   .int-red-nodo small{color:#6B7280;font-size:11px;white-space:nowrap}
-  .int-red-nodo:hover,.int-red-nodo:focus-visible{background:#F8FBFE;outline:none}
+  .int-red-nodo:hover{background:#F8FBFE}
+  .int-red-nodo:focus-visible{background:#F8FBFE;outline:2px solid var(--gold,#22678A)!important;outline-offset:2px!important}
   .int-red-nodo.on{background:var(--c,#22678A);border-color:var(--c,#22678A);color:#fff}.int-red-nodo.on small{color:#E7F0F7}.int-red-nodo.on .int-red-ico{color:#fff}
   .int-red-nodo.dim{opacity:.35}
+  .int-red-nodo-self{cursor:default}
+  .int-red-nodo-self:hover{background:var(--c,#22678A)}
+  .int-red-nodo-nav{padding-right:10px}
+  .int-red-nodo-nav .int-red-nav-ico{flex:0 0 auto;color:#9FB4C6;font-size:13px;transition:transform .15s,color .15s}
+  .int-red-nodo-nav:hover .int-red-nav-ico,.int-red-nodo-nav:focus-visible .int-red-nav-ico{color:var(--gold,#22678A);transform:translateX(2px)}
+  .int-red-hint{margin:2px 0 4px;color:#5B6675}
   @media(max-width:760px){.int-red-wrap{grid-template-columns:1fr;gap:28px 0}.int-red-svg{display:none}}
   @media(max-width:640px){.int-big{font-size:15px}.int-card{padding:14px}.int-kpi b{font-size:19px}.int-dl{grid-template-columns:1fr}.int-bar{grid-template-columns:1fr 1.4fr 26px}.int-nav-extra{margin-left:0}}
   @media print{body.int-printing > *:not(#int-drawer):not(#int-veil){display:none!important}body.int-printing #int-drawer{position:static;width:auto;box-shadow:none;transform:none}body.int-printing .int-dr-bar{display:none}body.int-printing #int-veil{display:none}}
