@@ -655,6 +655,20 @@ function csv(nombre,filas){
 /* =====================================================================
    ARTICULACIÓN: contrapartes / espacios / estructuras
    ===================================================================== */
+// Resumen ejecutivo dinámico (nunca texto fijo): se arma a partir de los conteos reales de la
+// selección actual y nunca afirma coordinación comprobada, solo señala la coincidencia y que
+// hace falta verificarla. "modo" distingue si la selección es una contraparte, un espacio o una
+// estructura fortalecida, para usar el verbo correcto.
+function resumenEjecutivoEspacio(modo,etiqueta,nOrgs,nProgs,nMunis){
+  const org_=plural(nOrgs,'organización','organizaciones'), prog_=plural(nProgs,'programa','programas'), mun_=plural(nMunis,'municipio','municipios');
+  if(modo==='espacio'){
+    return `${nOrgs} ${org_} reportan participar en <b>${esc(etiqueta)}</b>. ${nProgs===1?'Su':'Sus'} ${nProgs} ${prog_} ${nProgs===1?'tiene':'tienen'} presencia declarada en ${nMunis} ${mun_}. ${nOrgs>=2?'Esta coincidencia podría facilitar el intercambio de información y la identificación de acciones complementarias, previa verificación de los vínculos y territorios correspondientes.':'Por ahora solo una organización lo reporta, así que no hay coincidencia que explorar todavía.'}`;
+  }
+  if(modo==='estr'){
+    return `${nOrgs} ${org_} ${nOrgs===1?'declara':'declaran'} fortalecer a <b>${esc(etiqueta)}</b>, a través de ${nProgs} ${prog_} con presencia declarada en ${nMunis} ${mun_}.`;
+  }
+  return `${nOrgs} ${org_} ${nOrgs===1?'declara':'declaran'} a <b>${esc(etiqueta)}</b> como contraparte. ${nProgs===1?'Su':'Sus'} ${nProgs} ${prog_} ${nProgs===1?'tiene':'tienen'} presencia declarada en ${nMunis} ${mun_}. ${nOrgs>=2?'Compartir esta contraparte podría ser un punto de partida para un espacio de diálogo entre ellas, previa verificación de los vínculos y territorios correspondientes.':'Por ahora solo una organización la reporta.'}`;
+}
 function renderArtExtra(){
   const sec=$('#view-articulacion'); if(!sec) return;
   let box=$('#int-art'); if(!box){ box=document.createElement('div'); box.id='int-art'; const ref=$('.int-help',sec)||sec.querySelector('.section-sub')||sec.firstElementChild; ref.after(box); }
@@ -670,7 +684,7 @@ function renderArtExtra(){
   const items=Object.entries(dist).map(([k,s])=>[k,s.size]).sort((a,b)=>b[1]-a[1]||cmp(a[0],b[0]));
   const nDecl=P.filter(p=>!contrapartesDetalle(p).ninguna).length, nEsp=P.filter(p=>(p.espacios_coordinacion||[]).some(e=>e!=='No participa')).length;
   const nSinCl=P.filter(p=>contrapartesDetalle(p).sinClasificar.length).length;
-  box.innerHTML=`<div class="int-card"><div class="int-eyebrow">Vista B · Exploración por contraparte, espacio y estructura</div>
+  box.innerHTML=`<div class="int-card"><div class="int-eyebrow">Vista 2 · Espacios y contrapartes</div>
     <div class="int-capas"><div><b>${nDecl}</b> de ${P.length} programas<br><span>declaran una contraparte</span><em>Capa 1 · Declarado</em></div><div><b>${nEsp}</b> de ${P.length} programas<br><span>participan en algún espacio</span><em>Capa 2 · Espacio compartido</em></div><div><b>0</b> de ${P.length} programas<br><span>con vínculo documentado</span><em>Capa 3 · Sin evidencia en el formulario actual</em></div></div>
     <p class="int-note">El formulario actual solo recoge lo que la organización declara. Un vínculo "documentado" requeriría un convenio, acta o actividad conjunta (fecha y referencia) que hoy no se pregunta. ${nSinCl?`<b>${nSinCl}</b> programas escribieron contrapartes que no se pudieron clasificar; se muestran con su texto original.`:''}</p>
     <div class="int-tabs" role="tablist">${Object.entries(fuentes).map(([k,v])=>`<button type="button" role="tab" class="${k===modo?'on':''}" data-m="${k}">${v.etq}</button>`).join('')}</div>
@@ -683,12 +697,17 @@ function renderArtExtra(){
   if(ST.artSel && dist[ST.artSel]){
     const ps=P.filter(p=>f.match(p,ST.artSel));
     const orgs=uniq(ps.map(p=>p.organizacion)).sort(cmp), munis=uniq(ps.flatMap(munisTodos)).sort(cmp);
+    const sectores=uniq(ps.flatMap(p=>p.sector||[])).sort(cmp);
+    const resumen=resumenEjecutivoEspacio(modo,ST.artSel,orgs.length,ps.length,munis.length);
     $('#int-art-det',box).innerHTML=`<div class="int-detail"><h4 class="int-h4" style="margin-top:0">${esc(ST.artSel)}</h4>
+      <p class="int-op-destacado-txt">${resumen}</p>
       <div class="int-kpis">${kpi(orgs.length,plural(orgs.length,'organización','organizaciones'))}${kpi(ps.length,plural(ps.length,'programa','programas'))}${kpi(munis.length,plural(munis.length,'municipio','municipios'))}</div>
-      <h5 class="int-h5">Organizaciones</h5><div>${orgs.map(chipOrg).join('')}</div>
+      <h5 class="int-h5">Organizaciones participantes</h5><div>${orgs.map(chipOrg).join('')}</div>
+      <h5 class="int-h5">Sectores de intervención reportados</h5><div>${sectores.length?sectores.map(s=>`<span class="int-tag">${esc(s)}</span>`).join(''):'<span class="int-empty">Sin sectores reportados.</span>'}</div>
       <h5 class="int-h5">Territorios donde esos programas tienen presencia registrada</h5><div>${munis.map(chipMuni).join('')||'—'}</div>
-      <h5 class="int-h5">Programas</h5>${tablaProgs(ps)}
-      ${modo==='contra'?`<h5 class="int-h5">Texto original que escribió cada organización</h5><ul class="int-ul">${ps.map(p=>`<li><b>${esc(p.organizacion)}</b>: “${esc(p.contraparte_gubernamental)}”</li>`).join('')}</ul>`:''}
+      <details class="int-acc"><summary>Programas asociados (${ps.length})</summary><div class="int-acc-body">${tablaProgs(ps)}</div></details>
+      ${modo==='contra'?`<details class="int-acc"><summary>Texto original que escribió cada organización</summary><div class="int-acc-body"><ul class="int-ul">${ps.map(p=>`<li><b>${esc(p.organizacion)}</b>: “${esc(p.contraparte_gubernamental)}”</li>`).join('')}</ul></div></details>`:''}
+      <p class="int-note warn">Consideración metodológica: la presencia municipal de estos programas es su cobertura general; no demuestra que ${modo==='espacio'?'este espacio institucional opere':'esta contraparte actúe'} específicamente en cada uno de esos municipios.</p>
     </div>`;
     enlazar($('#int-art-det',box));
   } else $('#int-art-det',box).innerHTML=`<div class="int-empty">Seleccione una institución o espacio para ver qué organizaciones lo reportan, mediante qué programas y en qué territorios.</div>`;
@@ -719,35 +738,17 @@ function renderRedCoordinacion(){
   const {nodos,aristas}=modeloCoordinacion();
   const orgs=nodos.filter(n=>n.tipo==='organizacion').sort((a,b)=>cmp(a.etiqueta,b.etiqueta));
   const destinos=nodos.filter(n=>n.tipo!=='organizacion').sort((a,b)=>cmp(a.etiqueta,b.etiqueta));
-  const sel=ST.redSel||null;
-
-  const gradoOrg=id=>aristas.filter(a=>a.origen===id).length;
-  const gradoDestino=id=>aristas.filter(a=>a.destino===id).length;
-  const activo=id=>{
-    if(!sel) return true;
-    if(sel.tipo==='organizacion') return id===sel.id || aristas.some(a=>a.origen===sel.id&&a.destino===id);
-    return id===sel.id || aristas.some(a=>a.destino===sel.id&&a.origen===id);
-  };
-
-  function nodoBtn(n,col){
-    const act=activo(n.id);
-    const deg=col==='org'?gradoOrg(n.id):gradoDestino(n.id);
-    return `<button type="button" class="int-red-nodo ${sel&&sel.id===n.id?'on':''} ${act?'':'dim'}" data-id="${esc(n.id)}" data-tipo="${n.tipo}" style="--c:${COLOR_TIPO[n.tipo]}" title="${esc(NOMBRE_TIPO[n.tipo])}">
-      <span class="int-red-ico" aria-hidden="true">${ICONO_TIPO[n.tipo]}</span>
-      <span class="int-red-lbl">${esc(n.etiqueta)}</span>
-      <small>${deg} ${plural(deg,'vínculo declarado','vínculos declarados')}</small>
-    </button>`;
-  }
 
   if(!nodos.length || !aristas.length){
-    box.innerHTML=`<div class="int-card"><div class="int-eyebrow">Vista A · Red institucional</div>
+    box.innerHTML=`<div class="int-card"><div class="int-eyebrow">Vista 1 · Red institucional</div>
       <p class="int-empty">Ningún programa registra contraparte o espacio de coordinación utilizable, así que no hay vínculos para representar. Esto no significa ausencia de coordinación real, solo que el formulario no la recogió.</p></div>`;
     return;
   }
 
   // Indicadores de la red: todos deducidos de nodos/aristas, nunca una métrica de
   // centralidad o influencia. El número de vínculos de un nodo se llama explícitamente
-  // "vínculos declarados" en toda la interfaz para no sugerir poder o liderazgo institucional.
+  // "vínculos declarados" en toda la interfaz. El tamaño de un nodo nunca representa
+  // influencia institucional: solo el texto junto al nodo indica el número de vínculos.
   const totalOrgs=orgs.length;
   const orgsConContraparte=uniq(aristas.filter(a=>a.tipoDestino==='contraparte').map(a=>a.origen)).length;
   const contrapartesDistintas=destinos.filter(n=>n.tipo!=='espacio').length;
@@ -764,10 +765,127 @@ function renderRedCoordinacion(){
     kpi(orgsSinInfo,'organizaciones sin ninguna contraparte ni espacio declarado'),
   ].join('');
 
+  const modo=ST.redVistaCompleta?'completa':'resumen';
+  const sel=ST.redSel||null;
+
   box.innerHTML=`<div class="int-card">
-    <div class="int-eyebrow">Vista A · Red institucional</div>
-    <p class="int-note">Cada línea representa un vínculo <b>declarado</b> por una organización en el formulario; no es un convenio firmado ni una coordinación verificada. Esta red <b>nunca</b> conecta dos organizaciones entre sí: si comparten una contraparte o un espacio, selecciónelo para verlas agrupadas. Fuente: autorreporte de la organización (formulario Kobo).</p>
+    <div class="int-eyebrow">Vista 1 · Red institucional</div>
+    <p class="int-note">Cada línea representa un vínculo <b>declarado</b> por una organización en el formulario; no es un convenio firmado ni una coordinación verificada. Esta red <b>nunca</b> conecta dos organizaciones entre sí: si comparten una contraparte o un espacio, selecciónelas para verlas agrupadas. Fuente: autorreporte de la organización (formulario Kobo).</p>
     <div class="int-kpis">${kpisRed}</div>
+    <div class="int-red-buscar">
+      <label for="int-red-sel-org"><b>Buscar organización</b></label>
+      <select id="int-red-sel-org"><option value="">— Seleccionar organización —</option>${orgs.map(n=>`<option value="${esc(n.id)}" ${sel&&sel.tipo==='organizacion'&&sel.id===n.id?'selected':''}>${esc(n.etiqueta)}</option>`).join('')}</select>
+      <button type="button" class="int-link" id="int-red-ver-completa">${modo==='completa'?'Ver resumen por organización':'Ver la red completa →'}</button>
+      ${sel||modo==='completa'?`<button type="button" class="int-link" id="int-red-reset">Restablecer vista</button>`:''}
+    </div>
+    <div id="int-red-cuerpo"></div>
+  </div>`;
+
+  const selOrg=$('#int-red-sel-org',box);
+  selOrg.onchange=()=>{ ST.redSel=selOrg.value?{tipo:'organizacion',id:selOrg.value}:null; ST.redVistaCompleta=false; renderRedCoordinacion(); };
+  $('#int-red-ver-completa',box).onclick=()=>{ ST.redVistaCompleta=!ST.redVistaCompleta; renderRedCoordinacion(); };
+  const btnReset=$('#int-red-reset',box);
+  if(btnReset) btnReset.onclick=()=>{ ST.redSel=null; ST.redVistaCompleta=false; renderRedCoordinacion(); };
+
+  const cuerpo=$('#int-red-cuerpo',box);
+  if(modo==='completa'){
+    cuerpoRedCompleta(cuerpo,nodos,orgs,destinos,aristas,sel);
+  }else if(sel){
+    cuerpoRedEgo(cuerpo,nodos,aristas,sel);
+  }else{
+    cuerpo.innerHTML=`<p class="int-note">Seleccione una organización arriba para ver, en un solo panel, sus contrapartes declaradas, sus espacios de coordinación, sus programas asociados y la información que todavía falta verificar. También puede explorar la red completa con el enlace de la derecha.</p>`;
+  }
+  enlazar(box);
+}
+
+// Vista 1, modo resumen: panel enfocado en UNA organización (el punto de partida pedido),
+// con un mini-grafo (la organización + solo sus vínculos directos) en vez de la red completa.
+function cuerpoRedEgo(cuerpo,nodos,aristas,sel){
+  const n=nodos.find(x=>x.id===sel.id);
+  if(!n){ cuerpo.innerHTML=`<div class="int-empty">No se encontró esa organización.</div>`; return; }
+  const rel=aristas.filter(a=>a.origen===sel.id);
+  const contrDirectas=rel.filter(a=>a.tipoDestino==='contraparte');
+  const espDirectos=rel.filter(a=>a.tipoDestino==='espacio');
+  const nombradas=contrDirectas.filter(a=>{ const d=nodos.find(x=>x.id===a.destino); return d&&d.tipo!=='contraparte-categoria'; });
+  const categorias=contrDirectas.filter(a=>{ const d=nodos.find(x=>x.id===a.destino); return d&&d.tipo==='contraparte-categoria'; });
+  const progsOrg=P.filter(p=>p.organizacion===n.etiqueta);
+  const territorios=uniq(progsOrg.flatMap(munisTodos)).sort(cmp);
+  const sinContraparte=progsOrg.filter(p=>contrapartesDetalle(p).ninguna).length;
+  const sinEspacio=progsOrg.filter(p=>!(p.espacios_coordinacion||[]).some(e=>e&&e!=='No participa')).length;
+  const pend=[];
+  if(sinContraparte) pend.push(`${sinContraparte} ${plural(sinContraparte,'programa','programas')} no declara contraparte institucional.`);
+  if(sinEspacio) pend.push(`${sinEspacio} ${plural(sinEspacio,'programa','programas')} no declara participación en ningún espacio de coordinación.`);
+
+  cuerpo.innerHTML=`<div class="int-detail">
+    <h4 class="int-h4" style="margin-top:0">${esc(n.etiqueta)}</h4>
+    <div class="int-kpis">${kpi(contrDirectas.length,plural(contrDirectas.length,'contraparte declarada','contrapartes declaradas'))}${kpi(espDirectos.length,plural(espDirectos.length,'espacio declarado','espacios declarados'))}${kpi(progsOrg.length,plural(progsOrg.length,'programa','programas'))}</div>
+    <div class="int-two">
+      <div><h5 class="int-h5">Contrapartes específicas (institución nombrada o texto propio)</h5>
+        ${nombradas.length?nombradas.map(a=>`<span class="int-tag">${esc(a.contraparteOEspacio)}</span>`).join(''):'<span class="int-empty">Ninguna declarada.</span>'}</div>
+      <div><h5 class="int-h5">Categorías institucionales generales</h5>
+        ${categorias.length?categorias.map(a=>`<span class="int-tag ok">${esc(a.contraparteOEspacio)}</span>`).join(''):'<span class="int-empty">Ninguna declarada.</span>'}</div>
+    </div>
+    <h5 class="int-h5">Espacios de coordinación declarados</h5>
+    ${espDirectos.length?espDirectos.map(a=>`<span class="int-tag">${esc(a.contraparteOEspacio)}</span>`).join(''):'<span class="int-empty">No declara participación en ningún espacio.</span>'}
+    <h5 class="int-h5">Programas asociados</h5>
+    ${tablaProgs(progsOrg)}
+    <h5 class="int-h5">Territorios con presencia de sus programas</h5>
+    <p class="int-note">Es la cobertura general de sus programas, no la ubicación propia de cada contraparte o espacio (el formulario no la registra).</p>
+    ${territorios.length?territorios.map(chipMuni).join(''):'<span class="int-empty">Sin municipios con cobertura registrada.</span>'}
+    <h5 class="int-h5">Información que falta verificar</h5>
+    ${pend.length?`<ul class="int-ul">${pend.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:'<span class="int-empty">No se detectaron vacíos de este tipo para esta organización.</span>'}
+    <div class="int-red-mini" id="int-red-mini"></div>
+  </div>`;
+  requestAnimationFrame(()=>dibujarEgoRed(n,rel,nodos));
+}
+
+// Mini-grafo de una sola organización: ella misma + solo sus vínculos directos (no la red
+// completa), para que "seleccionar una organización" sea el punto de partida de la lectura.
+function dibujarEgoRed(n,rel,nodos){
+  const host=$('#int-red-mini'); if(!host) return;
+  const destinos=rel.map(a=>nodos.find(x=>x.id===a.destino)).filter(Boolean);
+  host.innerHTML=`<h5 class="int-h5">Mapa de sus vínculos directos</h5>
+    <div class="int-red-wrap int-red-wrap-mini">
+      <svg class="int-red-svg" id="int-red-mini-svg" aria-hidden="true"></svg>
+      <div class="int-red-col"><button type="button" class="int-red-nodo on" style="--c:${COLOR_TIPO.organizacion}" data-id="${esc(n.id)}"><span class="int-red-ico" aria-hidden="true">${ICONO_TIPO.organizacion}</span><span class="int-red-lbl">${esc(n.etiqueta)}</span></button></div>
+      <div class="int-red-col">${destinos.map(d=>`<button type="button" class="int-red-nodo" style="--c:${COLOR_TIPO[d.tipo]}" data-id="${esc(d.id)}" title="${esc(NOMBRE_TIPO[d.tipo])}"><span class="int-red-ico" aria-hidden="true">${ICONO_TIPO[d.tipo]}</span><span class="int-red-lbl">${esc(d.etiqueta)}</span></button>`).join('')}</div>
+    </div>`;
+  requestAnimationFrame(()=>{
+    const svg=$('#int-red-mini-svg'); const wrap=svg&&svg.closest('.int-red-wrap'); if(!svg||!wrap) return;
+    const r0=wrap.getBoundingClientRect(); if(!r0.width||!r0.height) return;
+    svg.setAttribute('width',r0.width); svg.setAttribute('height',r0.height); svg.setAttribute('viewBox',`0 0 ${r0.width} ${r0.height}`);
+    let html='';
+    const bo=document.querySelector(`#int-red-mini .int-red-nodo[data-id="${cssEsc(n.id)}"]`);
+    if(bo) destinos.forEach(d=>{
+      const bd=document.querySelector(`#int-red-mini .int-red-nodo[data-id="${cssEsc(d.id)}"]`); if(!bd) return;
+      const ro=bo.getBoundingClientRect(), rd=bd.getBoundingClientRect();
+      html+=`<line x1="${(ro.right-r0.left).toFixed(1)}" y1="${(ro.top+ro.height/2-r0.top).toFixed(1)}" x2="${(rd.left-r0.left).toFixed(1)}" y2="${(rd.top+rd.height/2-r0.top).toFixed(1)}" class="on"/>`;
+    });
+    svg.innerHTML=html;
+  });
+}
+
+// Vista 1, modo "ver la red completa": el grafo bipartito denso de toda la base, conservado
+// como alternativa para quien quiera explorarla entera (y para consultar "qué organizaciones
+// comparten esta contraparte/espacio", seleccionando un nodo de destino).
+function cuerpoRedCompleta(cuerpo,nodos,orgs,destinos,aristas,sel){
+  const gradoOrg=id=>aristas.filter(a=>a.origen===id).length;
+  const gradoDestino=id=>aristas.filter(a=>a.destino===id).length;
+  const activo=id=>{
+    if(!sel) return true;
+    if(sel.tipo==='organizacion') return id===sel.id || aristas.some(a=>a.origen===sel.id&&a.destino===id);
+    return id===sel.id || aristas.some(a=>a.destino===sel.id&&a.origen===id);
+  };
+  function nodoBtn(n,col){
+    const act=activo(n.id);
+    const deg=col==='org'?gradoOrg(n.id):gradoDestino(n.id);
+    return `<button type="button" class="int-red-nodo ${sel&&sel.id===n.id?'on':''} ${act?'':'dim'}" data-id="${esc(n.id)}" data-tipo="${n.tipo}" style="--c:${COLOR_TIPO[n.tipo]}" title="${esc(NOMBRE_TIPO[n.tipo])}">
+      <span class="int-red-ico" aria-hidden="true">${ICONO_TIPO[n.tipo]}</span>
+      <span class="int-red-lbl">${esc(n.etiqueta)}</span>
+      <small>${deg} ${plural(deg,'vínculo declarado','vínculos declarados')}</small>
+    </button>`;
+  }
+  cuerpo.innerHTML=`
     <div class="int-red-leyenda">${Object.keys(COLOR_TIPO).map(t=>`<span><i style="color:${COLOR_TIPO[t]}">${ICONO_TIPO[t]}</i> ${esc(NOMBRE_TIPO[t])}</span>`).join('')}</div>
     <div class="int-red-wrap">
       <svg class="int-red-svg" id="int-red-svg" aria-hidden="true"></svg>
@@ -775,22 +893,22 @@ function renderRedCoordinacion(){
       <div class="int-red-col" id="int-red-col-dest">${destinos.map(n=>nodoBtn(n,'dest')).join('')}</div>
     </div>
     <div id="int-red-det"></div>
-    <p class="int-note"><button type="button" class="int-link" id="int-red-tabla">Ver esta misma información como tabla (alternativa accesible) ↓</button></p>
-  </div>`;
+    <p class="int-note"><button type="button" class="int-link" id="int-red-tabla">Ver esta misma información como tabla (alternativa accesible) ↓</button></p>`;
 
-  $$('.int-red-nodo',box).forEach(b=>b.onclick=()=>{
+  $$('.int-red-nodo',cuerpo).forEach(b=>b.onclick=()=>{
     const id=b.dataset.id, tipo=b.dataset.tipo;
     if(sel && sel.id===id) ST.redSel=null;
     else ST.redSel={tipo:tipo==='organizacion'?'organizacion':'destino', id};
     renderRedCoordinacion();
   });
-  const btnTabla=$('#int-red-tabla',box);
+  const btnTabla=$('#int-red-tabla',cuerpo);
   if(btnTabla) btnTabla.onclick=()=>{
+    ST.coordTab='esp'; aplicarTabCoordinacion();
     plegar('articulacion','int-art','Detalle técnico: filtros, matrices y tabla original de articulación',true);
     const d=$('#tabla-art-detalle'); if(d){ const det=d.closest('details.int-fold'); if(det) det.open=true; d.scrollIntoView({behavior:'smooth'}); }
   };
 
-  const detBox=$('#int-red-det',box);
+  const detBox=$('#int-red-det',cuerpo);
   if(!sel){
     detBox.innerHTML=`<div class="int-empty">Seleccione una organización, institución o espacio para ver el detalle de sus vínculos declarados.</div>`;
   }else{
@@ -804,7 +922,7 @@ function renderRedCoordinacion(){
       <p class="int-note warn">Vínculo declarado por la organización; no implica coordinación verificada ni ubicación comprobada de la relación. Los municipios listados son la cobertura general del programa, no una ubicación específica del vínculo.</p>
       </div>`;
   }
-  enlazar(box);
+  enlazar(cuerpo);
   requestAnimationFrame(()=>dibujarLineasRed(aristas));
 }
 
@@ -828,7 +946,144 @@ function dibujarLineasRed(aristas){
 }
 if(!window.__intRedResize){
   window.__intRedResize=true;
-  window.addEventListener('resize',()=>{ try{ if($('#int-red')) dibujarLineasRed(modeloCoordinacion().aristas); }catch(e){} });
+  window.addEventListener('resize',()=>{ try{
+    if(ST.redVistaCompleta && $('#int-red-svg')) dibujarLineasRed(modeloCoordinacion().aristas);
+    if(!ST.redVistaCompleta && ST.redSel && $('#int-red-mini-svg')){
+      const {nodos,aristas}=modeloCoordinacion();
+      const n=nodos.find(x=>x.id===ST.redSel.id); if(n) dibujarEgoRed(n,aristas.filter(a=>a.origen===ST.redSel.id),nodos);
+    }
+  }catch(e){} });
+}
+
+/* =====================================================================
+   PESTAÑAS DEL MÓDULO COORDINACIÓN (Etapa 3.1)
+   Unifica las Vistas 1/2/3 bajo pestañas visibles arriba, en vez de tres tarjetas
+   apiladas que obligan a desplazarse por toda la página. No reordena el DOM (para no
+   interferir con plegar(), que ya movió la tabla/matrices técnicas a un <details>):
+   solo alterna qué bloque es visible.
+   ===================================================================== */
+function renderCoordinacionTabs(){
+  const sec=$('#view-articulacion'); if(!sec) return;
+  if($('#int-coord-tabs')) return;
+  const tabs=document.createElement('div'); tabs.id='int-coord-tabs'; tabs.className='int-coord-tabs'; tabs.setAttribute('role','tablist');
+  tabs.innerHTML=`
+    <button type="button" role="tab" data-tab="red">1 · Red institucional</button>
+    <button type="button" role="tab" data-tab="esp">2 · Espacios y contrapartes</button>
+    <button type="button" role="tab" data-tab="op">3 · Oportunidades de articulación</button>`;
+  const ref=$('.int-help',sec)||sec.querySelector('.section-sub')||sec.firstElementChild;
+  ref.after(tabs);
+  $$('button',tabs).forEach(b=>b.onclick=()=>{ ST.coordTab=b.dataset.tab; aplicarTabCoordinacion(); });
+}
+function aplicarTabCoordinacion(){
+  const sec=$('#view-articulacion'); if(!sec) return;
+  const activa=ST.coordTab||'red';
+  $$('#int-coord-tabs button',sec).forEach(b=>b.classList.toggle('on',b.dataset.tab===activa));
+  const red=$('#int-red'); if(red) red.style.display = activa==='red' ? '' : 'none';
+  const art=$('#int-art'); if(art) art.style.display = activa==='esp' ? '' : 'none';
+  const fold=sec.querySelector(':scope > details.int-fold'); if(fold) fold.style.display = activa==='esp' ? '' : 'none';
+  const op=$('#int-coord-op'); if(op) op.style.display = activa==='op' ? '' : 'none';
+  if(activa==='red'){
+    requestAnimationFrame(()=>{ try{
+      if(ST.redVistaCompleta) dibujarLineasRed(modeloCoordinacion().aristas);
+      else if(ST.redSel){ const {nodos,aristas}=modeloCoordinacion(); const n=nodos.find(x=>x.id===ST.redSel.id); if(n) dibujarEgoRed(n,aristas.filter(a=>a.origen===ST.redSel.id),nodos); }
+    }catch(e){} });
+  }
+}
+
+/* =====================================================================
+   VISTA 3 · OPORTUNIDADES DE ARTICULACIÓN (dentro de Coordinación, Etapa 3.1)
+   Subconjunto de 5 categorías específicamente de coordinación institucional (no de
+   cobertura territorial general, que sigue viviendo en la pestaña "Oportunidades de
+   articulación" del menú, sin tocar). Cada categoría se presenta como una tarjeta con
+   6 campos fijos: Hallazgo, Actores involucrados, Territorio, Posible oportunidad,
+   Acción sugerida y Precaución metodológica. Reutiliza exactamente los mismos criterios
+   de conteo ya documentados en la Etapa 3 (o1/o2/o4/o5 de oportunidades()); la única
+   categoría nueva es "espacio institucional compartido", construida con el mismo
+   criterio que "contraparte compartida" mas sobre espacios_coordinacion.
+   ===================================================================== */
+function oportunidadesArticulacion(){
+  const out=[];
+
+  // A. Contraparte compartida (mismo criterio que o4 de oportunidades(): >=2 organizaciones
+  // que mencionan la misma contraparte clasificada).
+  const cc={}; P.forEach(p=>contrapartesDe(p).forEach(c=>{ (cc[c]=cc[c]||new Set()).add(p.organizacion); }));
+  const c2=Object.entries(cc).filter(([,s])=>s.size>=2).sort((a,b)=>b[1].size-a[1].size||cmp(a[0],b[0]));
+  out.push({id:'ca1',titulo:'Contraparte compartida',n:c2.length,
+    items:c2.map(([c,s])=>{ const progs=P.filter(p=>contrapartesDe(p).includes(c)); return {label:c,orgs:[...s].sort(cmp),munis:uniq(progs.flatMap(munisTodos)),notaTerritorio:'cobertura general de los programas de esas organizaciones, no del vínculo con esta contraparte'}; }),
+    oportunidad:'Una misma institución aliada de varias organizaciones puede ser un punto natural para convocarlas. Compartir contraparte no significa que ya trabajen juntas.',
+    accion:'Explorar con esa contraparte si estaría dispuesta a facilitar un espacio de diálogo entre las organizaciones que la reportan.',
+    precaucion:'No asumir que estas organizaciones ya coordinan entre sí, ni que la contraparte las reconoce o reconoce la relación de la misma manera a todas.'});
+
+  // B. Espacio institucional compartido (mismo criterio, sobre espacios_coordinacion,
+  // excluyendo "No participa").
+  const ee={}; P.forEach(p=>uniq((p.espacios_coordinacion||[]).filter(e=>e&&e!=='No participa')).forEach(e=>{ (ee[e]=ee[e]||new Set()).add(p.organizacion); }));
+  const e2=Object.entries(ee).filter(([,s])=>s.size>=2).sort((a,b)=>b[1].size-a[1].size||cmp(a[0],b[0]));
+  out.push({id:'ca2',titulo:'Espacio institucional compartido',n:e2.length,
+    items:e2.map(([e,s])=>{ const progs=P.filter(p=>(p.espacios_coordinacion||[]).includes(e)); return {label:e,orgs:[...s].sort(cmp),munis:uniq(progs.flatMap(munisTodos)),notaTerritorio:'cobertura general de los programas de esas organizaciones, no del espacio mismo'}; }),
+    oportunidad:'Varias organizaciones que ya participan en el mismo espacio (mesa, comisión o comité) tienen, en principio, un canal existente para conversar.',
+    accion:'Proponer un punto de agenda específico sobre estas organizaciones en la próxima sesión de ese espacio.',
+    precaucion:'Declarar participación en un espacio no implica asistencia regular ni coordinación efectiva dentro de él; conviene verificarlo antes de asumir que ya se conocen.'});
+
+  // C. Coincidencia sectorial y municipal (mismo criterio que o1).
+  const munisDep=DATA.municipios||[];
+  const msArr=[]; munisDep.forEach(m=>{ const ps=programasEnMunicipio(m); const por={}; ps.forEach(p=>(p.sector||[]).forEach(s=>{ (por[s]=por[s]||{orgs:new Set(),ps:[]}); por[s].orgs.add(p.organizacion); por[s].ps.push(p); }));
+    Object.entries(por).forEach(([s,v])=>{ if(v.orgs.size>=2) msArr.push({m,s,orgs:[...v.orgs],ps:v.ps}); }); });
+  msArr.sort((a,b)=>b.orgs.length-a.orgs.length||cmp(a.m+a.s,b.m+b.s));
+  out.push({id:'ca3',titulo:'Coincidencia sectorial y municipal',n:msArr.length,
+    items:msArr.map(x=>({label:`${x.s} en ${x.m}`,orgs:x.orgs,munis:[x.m]})),
+    oportunidad:'Cuando varias organizaciones trabajan el mismo sector en el mismo municipio, conversar puede ayudar a complementar acciones. No es, por sí sola, evidencia de duplicidad: pueden atender comunidades o poblaciones distintas.',
+    accion:'Intercambiar planes de trabajo entre esas organizaciones para identificar complementariedad antes de cualquier otra conclusión.',
+    precaucion:'No presentar esta coincidencia como duplicidad de esfuerzos: el formulario no registra si atienden a las mismas comunidades o poblaciones dentro del municipio.'});
+
+  // D. Coincidencia comunitaria (mismo criterio que o2: lugares poblados con 2+ programas).
+  const lg=new Map(); P.forEach(p=>lugaresDe(p).forEach(c=>{ if(!lg.has(c.k)) lg.set(c.k,{c,ps:[],orgs:new Set()}); lg.get(c.k).ps.push(p); lg.get(c.k).orgs.add(p.organizacion); }));
+  const l2=[...lg.values()].filter(x=>x.ps.length>=2).sort((a,b)=>b.ps.length-a.ps.length||cmp(a.c.lugar_poblado,b.c.lugar_poblado));
+  out.push({id:'ca4',titulo:'Coincidencia comunitaria',n:l2.length,
+    items:l2.map(x=>({label:`${x.c.lugar_poblado} (${x.c.municipio})`,orgs:[...x.orgs],munis:[x.c.municipio]})),
+    oportunidad:'Si varios programas llegan al mismo lugar poblado, vale la pena que esos actores se conozcan y sepan qué hace cada quien.',
+    accion:'Compartir esta lista con los enlaces comunitarios del lugar para verificar si ya se conocen entre sí.',
+    precaucion:'No asumir que atienden a las mismas familias o grupos dentro del lugar poblado: pueden ser segmentos de población distintos.'});
+
+  // E. Programas próximos a finalizar (mismo criterio que o5).
+  const pc=P.filter(porCerrar).sort((a,b)=>(fechaFin(a)||new Date(9e12))-(fechaFin(b)||new Date(9e12)));
+  out.push({id:'ca5',titulo:`Programas que finalizan en los próximos ${MESES_CIERRE} meses`,n:pc.length,
+    items:pc.map(p=>({label:`${nombreProg(p)} · ${p.organizacion}`,orgs:[p.organizacion],munis:munisTodos(p)})),
+    oportunidad:'Cuando un programa de coordinación activa está por terminar, conviene prever quién da continuidad a lo avanzado en esos territorios.',
+    accion:'Promover una conversación sobre capacidades, resultados y procesos que podrían requerir seguimiento antes del cierre.',
+    precaucion:'No asumir compromisos de continuidad ni necesidades de seguimiento que el formulario no haya declarado.'});
+
+  return out;
+}
+function renderOportunidadesArticulacion(){
+  const sec=$('#view-articulacion'); if(!sec) return;
+  let box=$('#int-coord-op');
+  if(!box){ box=document.createElement('div'); box.id='int-coord-op'; const ref=$('.int-help',sec)||sec.querySelector('.section-sub')||sec.firstElementChild; ref.after(box); }
+  const cats=oportunidadesArticulacion();
+  box.innerHTML=`<div class="int-card">
+    <div class="int-eyebrow">Vista 3 · Oportunidades de articulación</div>
+    <p class="int-note warn">Situaciones detectadas en los registros que podrían merecer diálogo o verificación. Ninguna de estas tarjetas afirma que ya existe coordinación, duplicidad o una brecha confirmada: son puntos de partida, no conclusiones.</p>
+    <div class="int-oport-grid">${cats.map(c=>tarjetaOportunidadArticulacion(c)).join('')}</div>
+  </div>`;
+  $$('.int-op-acc',box).forEach(d=>{}); // los <details> no necesitan listeners adicionales
+  enlazar(box);
+}
+function tarjetaOportunidadArticulacion(c){
+  if(!c.n) return `<section class="int-op vacia"><div class="int-op-h"><h4>${esc(c.titulo)}</h4><b>0</b></div><div class="int-empty">No se detectaron casos con los registros actuales.</div></section>`;
+  const actores=uniq(c.items.flatMap(i=>i.orgs)).sort(cmp);
+  const territorio=uniq(c.items.flatMap(i=>i.munis||[])).sort(cmp);
+  const notaTerritorio=c.items[0]&&c.items[0].notaTerritorio;
+  const destacado=c.items[0];
+  return `<section class="int-op"><div class="int-op-h"><h4>${esc(c.titulo)}</h4><b>${c.n}</b></div>
+    <dl class="int-op-4">
+      <dt>Hallazgo</dt><dd>${c.n} ${plural(c.n,'caso detectado','casos detectados')} en los registros actuales. Ejemplo: <b>${esc(destacado.label)}</b> (${destacado.orgs.length} ${plural(destacado.orgs.length,'organización','organizaciones')}).</dd>
+      <dt>Actores involucrados</dt><dd class="int-op-chipline">${actores.slice(0,4).map(chipOrg).join('')}${actores.length>4?` <small>+${actores.length-4} más (ver abajo)</small>`:''}</dd>
+      <dt>Territorio</dt><dd class="int-op-chipline">${territorio.length?territorio.slice(0,4).map(chipMuni).join('')+(territorio.length>4?` <small>+${territorio.length-4} más</small>`:''):'<span class="int-empty">No determinado por el formulario.</span>'}${notaTerritorio?`<br><small>(${esc(notaTerritorio)})</small>`:''}</dd>
+      <dt>Posible oportunidad</dt><dd>${esc(c.oportunidad)}</dd>
+      <dt>Acción sugerida</dt><dd>${esc(c.accion)}</dd>
+      <dt>Precaución</dt><dd>${esc(c.precaucion)}</dd>
+    </dl>
+    <details class="int-acc int-op-acc"><summary>Ver los ${c.n} ${plural(c.n,'caso','casos')} detectados</summary><div class="int-acc-body"><ul class="int-ul">${c.items.map(i=>`<li><div><b>${esc(i.label)}</b></div><div class="int-sub2"><small class="int-orgs">${i.orgs.map(esc).join(' · ')}</small></div></li>`).join('')}</ul></div></details>
+  </section>`;
 }
 
 /* =====================================================================
@@ -1622,6 +1877,18 @@ function estilos(){
   .int-oport{background:#EEF6FC;border-radius:8px;padding:10px 12px;font-size:13px}
   .int-sub{margin-bottom:6px}.int-orgs{color:#5B6675;line-height:1.5}
   .int-op-4{display:grid;grid-template-columns:max-content 1fr;gap:3px 12px;font-size:12.5px;margin:8px 0 10px}.int-op-4 dt{color:#5B6675;font-weight:600;white-space:nowrap}.int-op-4 dd{margin:0 0 4px;color:#334155}
+  .int-coord-tabs{display:flex;flex-wrap:wrap;gap:4px;background:#F1F5F9;border-radius:12px;padding:4px;margin:14px 0}
+  .int-coord-tabs button{font:inherit;font-size:13px;font-weight:600;border:0;background:transparent;color:#334155;border-radius:9px;padding:9px 14px;cursor:pointer}
+  .int-coord-tabs button.on{background:#fff;color:#183652;box-shadow:0 1px 3px rgba(0,32,64,.12)}
+  .int-coord-tabs button:hover{color:#183652}
+  .int-red-buscar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:10px 0 16px;font-size:13px}
+  .int-red-buscar label{color:#334155}
+  .int-red-buscar select{font:inherit;font-size:13px;padding:7px 10px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;color:#183652;min-width:240px}
+  .int-op-destacado-txt{background:#EEF6FC;border-radius:8px;padding:10px 12px;font-size:13.5px;color:#183652;line-height:1.5;margin:4px 0 12px}
+  .int-red-wrap-mini{grid-template-columns:1fr 1fr;min-height:40px;margin-top:8px}
+  .int-red-wrap-mini .int-red-nodo{font-size:12.5px;padding:6px 10px}
+  .int-op-chipline{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+  .int-oport-grid:has(.int-op-4){grid-template-columns:repeat(auto-fit,minmax(360px,1fr))}
   .int-red-leyenda{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:#334155;margin:4px 0 14px}.int-red-leyenda i{font-style:normal;margin-right:4px}
   .int-red-wrap{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:0 48px;min-height:60px}
   .int-red-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
@@ -1650,7 +1917,7 @@ function renderVista(id){
     if(id==='panorama'){ renderConsultas(); renderTablaMunicipios(); renderHallazgos(); renderPanoramaV3(); }
     if(id==='municipio') renderMuniExtra();
     if(id==='instituciones'){ irDirectorio(); renderDirectorio(); }
-    if(id==='articulacion'){ renderArtExtra(); renderRedCoordinacion(); plegar('articulacion','int-art','Detalle técnico: filtros, matrices y tabla original de articulación',false); }
+    if(id==='articulacion'){ renderArtExtra(); renderOportunidadesArticulacion(); renderRedCoordinacion(); plegar('articulacion','int-art','Detalle técnico: filtros, matrices y tabla original de articulación',false); renderCoordinacionTabs(); aplicarTabCoordinacion(); }
     if(id==='brechas'){ renderOportunidades(); plegar('brechas','int-oport','Cobertura territorial por lugar poblado y matriz sector × municipio',true); }
     if(id==='poblacion-accion') renderPobExtra();
   }catch(e){ console.error('inteligencia.js:',id,e); }
