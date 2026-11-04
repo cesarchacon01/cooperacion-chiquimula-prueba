@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="visor-version" content="fase2-e3-2">
+<meta name="visor-version" content="fase2-e4">
 <title>Mapeo de Actores de Cooperación — SEGEPLAN Chiquimula</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -340,6 +340,44 @@ table tbody tr:hover td{ background:#F4F1E6; }
 .barra-track{ height:9px; border-radius:6px; background:#ECE7DA; }
 .barra-fill{ border-radius:6px; background:linear-gradient(90deg,var(--navy),#1F5A8C); }
 
+/* ===== Vista Inversión (Fase 2 · Etapa 4) ===== */
+#view-inversion .inv-tabs{ display:flex; flex-wrap:wrap; gap:6px; margin:14px 0 0; }
+#view-inversion .inv-tabs button{ border:1px solid #D9D3C4; background:#fff; color:var(--navy); border-radius:9px; padding:9px 15px; font:inherit; font-size:13px; font-weight:600; cursor:pointer; }
+#view-inversion .inv-tabs button.on{ background:var(--navy); color:#fff; border-color:var(--navy); }
+#view-inversion .inv-tabs button:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+#view-inversion .inv-aviso{ font-size:13.5px; line-height:1.55; background:#F4F9FD; border:1px solid #BCD9EE; border-radius:10px; padding:10px 14px; margin:14px 0; color:#183652; }
+#view-inversion .inv-filtros-activos{ font-size:12.5px; color:#5B6672; }
+#view-inversion .inv-filtros-activos b{ color:var(--navy); }
+#view-inversion .inv-bar-row{ display:grid; grid-template-columns:minmax(150px,1.3fr) 2fr 34px; gap:10px; align-items:center; margin:7px 0; }
+#view-inversion button.inv-bar-row{ all:unset; display:grid; grid-template-columns:minmax(150px,1.3fr) 2fr 34px; gap:10px; align-items:center; margin:7px 0; width:100%; cursor:pointer; border-radius:7px; padding:3px 6px; font:inherit; font-size:13px; color:#183652; }
+#view-inversion button.inv-bar-row:hover{ background:#F4F1E6; }
+#view-inversion button.inv-bar-row:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+#view-inversion .inv-bar-track{ height:10px; border-radius:6px; background:#ECE7DA; overflow:hidden; }
+#view-inversion .inv-bar-fill{ display:block; height:10px; border-radius:6px; background:var(--navy); }
+#view-inversion .inv-bar-row b{ text-align:right; font-weight:700; }
+#view-inversion .inv-vista[hidden]{ display:none; }
+#view-inversion .inv-detalle-org{ margin-top:16px; }
+#view-inversion .inv-chip{ display:inline-block; background:#EEF2F7; color:#334155; border-radius:6px; padding:3px 9px; margin:2px 4px 2px 0; font-size:12px; }
+#view-inversion tr.inv-ficha-fila td{ background:#FBFAF6; padding:14px 16px; }
+#view-inversion .inv-ficha-fila .inv-ficha-nota{ font-size:12.5px; color:#5B6672; margin-top:8px; line-height:1.5; }
+#view-inversion .inv-fila-btn{ background:none; border:1px solid #D9D3C4; border-radius:6px; width:26px; height:26px; cursor:pointer; font-size:13px; line-height:1; color:var(--navy); }
+#view-inversion .inv-fila-btn:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+#view-inversion tr.inv-org-fila:focus-visible{ outline:2px solid var(--gold); outline-offset:-2px; }
+#view-inversion tr.inv-org-fila:hover td{ background:#F4F1E6; }
+#view-inversion th.inv-th-ord{ cursor:pointer; user-select:none; }
+#view-inversion th.inv-th-ord:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+#view-inversion th.inv-th-ord[data-ord]::after{ content:" " attr(data-ord); opacity:.6; }
+#view-inversion .inv-buscar{ display:flex; gap:8px; margin:10px 0; flex-wrap:wrap; }
+#view-inversion .inv-buscar input{ flex:1 1 260px; min-width:0; border:1px solid #D9D3C4; border-radius:8px; padding:9px 12px; font:inherit; font-size:14px; }
+#view-inversion details.inv-fold{ margin:18px 0; border:1px solid #E9E4D8; border-radius:14px; background:#fff; }
+#view-inversion details.inv-fold>summary{ cursor:pointer; padding:13px 18px; font-weight:700; color:var(--navy); font-size:14.5px; }
+#view-inversion details.inv-fold>summary:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+#view-inversion .inv-fold-body{ padding:0 18px 16px; }
+@media(max-width:640px){
+  #view-inversion .inv-bar-row,#view-inversion button.inv-bar-row{ grid-template-columns:1fr; gap:4px; }
+  #view-inversion .inv-bar-row b{ text-align:left; }
+}
+
 /* ===== Vista Panorama ===== */
 #view-panorama{ max-width:1400px; margin:0 auto; }
 .pan-hero{ background:radial-gradient(1200px 380px at 85% -20%,rgba(223,178,111,.30),transparent 60%),linear-gradient(135deg,#002040 0%,#003058 55%,#0B4A7C 100%); color:#fff; border-radius:22px; padding:34px 38px 30px; box-shadow:var(--shadow-md); position:relative; overflow:hidden; }
@@ -549,63 +587,107 @@ table tbody tr:hover td{ background:#F4F1E6; }
     </div>
   </section>
 
-  <!-- ===== VISTA: INVERSIÓN ===== -->
+  <!-- ===== VISTA: INVERSIÓN (Fase 2 · Etapa 4) ===== -->
   <section class="view" id="view-inversion">
     <div class="section-title">Inversión reportada de la cooperación</div>
-    <div class="section-sub">Consulta de los montos o rangos de inversión tal como fueron reportados por cada programa/proyecto. Los rangos no se suman ni se promedian: cada programa declara un intervalo, no un monto. La inversión se mantiene asociada al programa/proyecto y no se distribuye entre los municipios donde tiene presencia.</div>
+    <div class="section-sub">Rango de inversión declarado por cada programa/proyecto, tal como fue reportado en el formulario. Los rangos no se suman ni se promedian, y la inversión se mantiene asociada al programa, no al municipio o sector donde tiene presencia.</div>
+
+    <div class="inv-tabs" id="inv-tabs" role="tablist">
+      <button type="button" role="tab" data-tab="panorama">1 · Panorama financiero</button>
+      <button type="button" role="tab" data-tab="org">2 · Comparación por organización</button>
+      <button type="button" role="tab" data-tab="territorio">3 · Lectura territorial y sectorial</button>
+      <button type="button" role="tab" data-tab="explorador">4 · Explorador de programas</button>
+    </div>
 
     <div class="filters" style="margin-top:14px;">
       <span class="filter-label">FILTROS</span>
       <select id="inv-organizacion"><option value="">Organización: todas</option></select>
       <select id="inv-municipio"><option value="">Municipio: todos</option></select>
+      <select id="inv-sector"><option value="">Sector: todos</option></select>
+      <select id="inv-rango"><option value="">Rango: todos</option></select>
       <select id="inv-estado"><option value="">Estado: todos</option></select>
       <button class="clear-btn" id="inv-limpiar">Limpiar filtros</button>
     </div>
+    <div class="inv-filtros-activos" id="inv-filtros-activos" aria-live="polite"></div>
 
-    <div class="stats" id="stats-inversion"></div>
-
-    <div class="layout">
+    <!-- Vista 1 · Panorama financiero -->
+    <div class="inv-vista" id="inv-v-panorama">
+      <div class="stats" id="inv-p1-kpis"></div>
+      <div class="inv-aviso"><b>Los gráficos muestran cuántos programas se encuentran en cada categoría de inversión, no cuánto dinero se ha invertido.</b></div>
       <div class="card">
-        <div class="side-title">Programas / proyectos e inversión reportada</div>
-        <div class="side-sub">Se conserva el dato original reportado. Un rango no se convierte en una cifra estimada.</div>
+        <div class="side-title">Programas por rango de inversión declarado</div>
+        <div class="side-sub">Cada barra es un conteo de programas, no una suma de montos. Seleccione una categoría para ver sus programas en el Explorador.</div>
+        <div id="inv-p1-barras"></div>
+      </div>
+    </div>
+
+    <!-- Vista 2 · Comparación por organización -->
+    <div class="inv-vista" id="inv-v-org" hidden>
+      <div class="card">
+        <div class="side-title">Comparación por organización</div>
+        <div class="side-sub">Número de programas y distribución por rango declarados por cada organización. El orden es alfabético: no se ordena por una supuesta inversión total.</div>
         <div style="overflow-x:auto">
-          <table id="tabla-inversion-programas">
-            <thead><tr><th>ORGANIZACIÓN</th><th>PROGRAMA / PROYECTO</th><th>INVERSIÓN REPORTADA</th><th>ESTADO</th><th>MUNICIPIOS</th><th>SECTORES</th></tr></thead>
+          <table id="tabla-inv-organizaciones">
+            <thead><tr><th>ORGANIZACIÓN</th><th>PROGRAMAS</th><th>CON INFORMACIÓN FINANCIERA</th><th>DISTRIBUCIÓN POR RANGO</th><th>SIN DATO</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
       </div>
-      <div class="card">
-        <div class="side-title">Lectura territorial</div>
-        <div class="side-sub">Programas/proyectos con presencia registrada por municipio y situación del dato de inversión. Los montos se reportan a nivel de programa/proyecto y no se asignan monetariamente a cada municipio.</div>
-        <div id="inv-territorial"></div>
+      <div class="card inv-detalle-org" id="inv-org-detalle-card" hidden>
+        <div class="side-title" id="inv-org-detalle-titulo">Detalle de la organización</div>
+        <div id="inv-org-detalle-cuerpo"></div>
       </div>
     </div>
 
-    <div class="layout" style="margin-top:16px;">
+    <!-- Vista 3 · Lectura territorial y sectorial -->
+    <div class="inv-vista" id="inv-v-territorio" hidden>
       <div class="card">
-        <div class="side-title">Cobertura del dato de inversión</div>
-        <div class="side-sub">Permite identificar qué registros cuentan con información financiera y cuáles requieren completar el dato.</div>
-        <div id="inv-calidad"></div>
-      </div>
-      <div class="card">
-        <div class="side-title">Criterio de interpretación</div>
-        <div class="side-sub">Cada programa declara un rango, no un monto. Los rangos no se suman: no equivalen a presupuesto municipal, recursos disponibles ni ejecución.</div>
-        <div class="inst-row"><span>Monto o rango reportado</span><span>Se muestra literalmente</span></div>
-        <div class="inst-row"><span>Rangos</span><span>Se muestran por programa; no se suman ni se promedian</span></div>
-        <div class="inst-row"><span>Lectura por municipio</span><span>Muestra presencia de proyectos, no montos territoriales</span></div>
-        <div class="inst-row"><span>Varios municipios/sectores</span><span>El presupuesto del proyecto no se distribuye entre territorios</span></div>
-        <div class="inst-row"><span>Sin dato financiero</span><span>No reportada</span></div>
+        <div class="side-title">Presencia de programas según rango de inversión, no inversión asignada al municipio</div>
+        <div class="side-sub">Un programa con presencia en varios municipios aparece una vez por cada municipio en esta matriz, pero se cuenta una sola vez en los indicadores generales de las demás vistas.</div>
+        <div style="overflow-x:auto">
+          <table id="tabla-inv-matriz">
+            <thead><tr></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
-  
-    <div class="card" style="margin-top:22px;" id="bloque-programas">
-    <div class="section-title">Listado de programas y proyectos</div>
-    <div style="overflow-x:auto"><table id="tabla-programas">
-      <thead><tr><th>ORGANIZACIÓN</th><th>PROGRAMA</th><th>SECTOR(ES)</th><th>ESTADO</th><th>VIGENCIA</th><th>MUNICIPIOS</th></tr></thead>
-      <tbody></tbody>
-    </table></div>
-  </div>
+
+    <!-- Vista 4 · Explorador de programas -->
+    <div class="inv-vista" id="inv-v-explorador" hidden>
+      <div class="card" id="bloque-programas">
+        <div class="side-title">Explorador de programas</div>
+        <div class="side-sub">Inversión reportada por cada programa/proyecto, visible directamente en el listado. La descarga CSV exporta exactamente los programas visibles tras aplicar filtros y búsqueda.</div>
+        <div class="inv-buscar">
+          <input type="search" id="inv-buscar" placeholder="Buscar por organización o programa…" aria-label="Buscar por organización o programa">
+        </div>
+        <div style="overflow-x:auto">
+          <table id="tabla-inv-explorador">
+            <thead><tr>
+              <th></th>
+              <th class="inv-th-ord" data-col="organizacion" tabindex="0" role="button">ORGANIZACIÓN</th>
+              <th class="inv-th-ord" data-col="programa" tabindex="0" role="button">PROGRAMA / PROYECTO</th>
+              <th class="inv-th-ord" data-col="inversion" tabindex="0" role="button">INVERSIÓN REPORTADA</th>
+              <th class="inv-th-ord" data-col="estado" tabindex="0" role="button">ESTADO</th>
+              <th>VIGENCIA</th><th>SECTORES</th><th>MUNICIPIOS</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <details class="inv-fold">
+      <summary>Metodología, cobertura del dato y criterio de interpretación</summary>
+      <div class="inv-fold-body">
+        <div class="inst-row"><span>Monto o rango reportado</span><span>Se muestra literalmente, tal como fue declarado</span></div>
+        <div class="inst-row"><span>Rangos</span><span>Se cuentan por programa; no se suman ni se promedian</span></div>
+        <div class="inst-row"><span>Lectura por municipio o sector</span><span>Muestra presencia de programas, no montos territoriales</span></div>
+        <div class="inst-row"><span>Varios municipios/sectores</span><span>El rango del programa no se distribuye entre territorios ni sectores</span></div>
+        <div class="inst-row"><span>«Prefiere no indicar» o sin dato</span><span>Se cuenta aparte; nunca se interpreta como inversión cero</span></div>
+        <div id="inv-calidad" style="margin-top:10px;"></div>
+      </div>
+    </details>
   </section>
 
   <!-- ===== VISTA: COBERTURA / BRECHAS ===== -->
@@ -832,6 +914,7 @@ function initNav(){
 // Vistas fusionadas: se mantienen los identificadores antiguos por compatibilidad.
 const VISTA_ALIAS={matriz:'brechas', programas:'inversion'};
 function mostrarVista(id){
+  const idOriginal = id;
   const ancla = id==='matriz' ? 'bloque-matriz' : (id==='programas' ? 'bloque-programas' : null);
   id = VISTA_ALIAS[id] || id;
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
@@ -839,7 +922,9 @@ function mostrarVista(id){
   document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active', b.dataset.view===id));
   if(id==='panorama'){ try{ renderPanorama(); }catch(e){ console.error(e); } }
   if(id==='mapa' && map){ setTimeout(()=>map.invalidateSize(), 50); }
-  if(id==='inversion'){ renderInversion(); renderProgramas(); }
+  // "programas" es el alias histórico de la antigua tabla general de programas, fusionada ahora
+  // en la Vista 4 · Explorador de programas (que ya muestra la inversión reportada en línea).
+  if(id==='inversion'){ if(idOriginal==='programas') invTab='explorador'; renderInversion(); }
   if(id==='brechas'){ renderBrechas(); renderMatriz(); }
   if(id==='instituciones'){ renderInstituciones(); setTimeout(()=>{ if(orgMap) orgMap.invalidateSize(); renderOrganizacion(); },80); }
   if(id==='articulacion') renderArticulacion();
@@ -2141,162 +2226,307 @@ function imprimirFichaMunicipal(){
   setTimeout(quitar,1500);
 }
 
-function renderInversion(){
-  const programas = DATA.programas || [];
-  const selOrg = document.getElementById('inv-organizacion');
-  const selMun = document.getElementById('inv-municipio');
-  const selEst = document.getElementById('inv-estado');
+/* =====================================================================
+   INVERSIÓN · Fase 2 · Etapa 4
+   Todo cálculo parte de monto_rango_codigo (la categoría cerrada que define
+   el formulario; ver INT.RANGOS en inteligencia.js) y nunca de texto libre:
+   la versión anterior extraía cifras de texto con expresiones regulares
+   (rangoNumerico/pareceRango), lo que podía sugerir que los montos eran
+   sumables. Eso se eliminó. El identificador de cada programa es su
+   posición en DATA.programas (igual que idProg() en inteligencia.js, que
+   usa el mismo arreglo): no existe en los datos ningún identificador Kobo
+   (_uuid/_id) persistente, y organización+nombre no se usa como clave
+   porque no hay garantía de que sea único frente a futuros envíos.
+   ===================================================================== */
+let invTab='panorama', invOrdCol='organizacion', invOrdAsc=true, invBuscar='';
+const invExpandidos = new Set();
+let invFiltradosActuales = [];
 
-  const municipiosPrograma = p => [...new Set([
+function municipiosPrograma(p){
+  return [...new Set([
     ...(p.comunidades||[]).map(c=>c.municipio),
     ...(p.municipios_cobertura_institucional||[])
   ].filter(Boolean))];
+}
+function periodoPrograma(p){ return (p.fecha_inicio||'No reportado')+' → '+(p.fecha_fin||'No reportada'); }
+function invRangos(){ return (window.INT && INT.RANGOS) || {}; }
+function invTieneRango(p){ return !!invRangos()[p.monto_rango_codigo]; }
+function invTextoRango(p){ return p.monto_rango || 'No reportada / prefiere no indicar'; }
+function invIdPrograma(p){ return (DATA.programas||[]).indexOf(p); }
 
-  const inversionPrograma = p => {
-    const candidatos = [
-      p.inversion_reportada, p.rango_inversion, p.inversion_rango,
-      p.monto_inversion, p.inversion, p.monto_rango
-    ];
-    const v = candidatos.find(x => x !== undefined && x !== null && String(x).trim() !== '');
-    return v === undefined ? '' : String(v).trim();
-  };
+function aplicarTabInversion(){
+  document.querySelectorAll('#inv-tabs button').forEach(b=>b.classList.toggle('on', b.dataset.tab===invTab));
+  ['panorama','org','territorio','explorador'].forEach(t=>{
+    const el=document.getElementById('inv-v-'+t);
+    if(el) el.hidden = (t!==invTab);
+  });
+}
+function irExploradorConRango(codigo){
+  invTab='explorador';
+  const selRango=document.getElementById('inv-rango');
+  if(selRango) selRango.value=codigo||'';
+  renderInversion();
+  aplicarTabInversion();
+  setTimeout(()=>document.getElementById('inv-v-explorador')?.scrollIntoView({behavior:'smooth',block:'start'}),80);
+}
+function invFiltrarPorTexto(progs){
+  const q=(invBuscar||'').trim().toLowerCase();
+  if(!q) return progs;
+  return progs.filter(p=>(String(p.organizacion||'')+' '+String(p.nombre_programa||'')).toLowerCase().includes(q));
+}
 
-  const esNoReportada = v => {
-    const x = String(v||'').trim().toLowerCase();
-    return !x || ['no reportada','no reportado','sin dato','n/a','na','—','-'].includes(x);
-  };
+function renderInversion(){
+  const programas = DATA.programas || [];
+  const RANGOS = invRangos();
 
-  const pareceRango = v => {
-    const x=String(v||'').toLowerCase();
-    return /(\ba\b|hasta|–|—| - |entre)/.test(x) && /\d/.test(x);
-  };
+  const selOrg = document.getElementById('inv-organizacion');
+  const selMun = document.getElementById('inv-municipio');
+  const selSec = document.getElementById('inv-sector');
+  const selRan = document.getElementById('inv-rango');
+  const selEst = document.getElementById('inv-estado');
 
-  const rangoNumerico = v => {
-    if(esNoReportada(v)) return null;
-    const s=String(v).trim();
-    // Extrae cifras monetarias conservando separadores de miles y decimales.
-    const nums=(s.match(/\d[\d.,]*/g)||[]).map(raw=>{
-      let x=raw.replace(/\s/g,'');
-      // En los datos del formulario se usa principalmente coma como miles.
-      if(x.includes(',') && x.includes('.')){
-        if(x.lastIndexOf('.')>x.lastIndexOf(',')) x=x.replace(/,/g,'');
-        else x=x.replace(/\./g,'').replace(',','.');
-      }else if(x.includes(',')){
-        const parts=x.split(',');
-        x=(parts.length>1 && parts[parts.length-1].length===3) ? parts.join('') : x.replace(',','.');
-      }else if((x.match(/\./g)||[]).length>1){
-        x=x.replace(/\./g,'');
-      }
-      const n=Number(x);
-      return Number.isFinite(n)?n:null;
-    }).filter(n=>n!==null);
-    if(!nums.length) return null;
-    if(nums.length===1) return {min:nums[0],max:nums[0]};
-    return {min:Math.min(nums[0],nums[1]),max:Math.max(nums[0],nums[1])};
-  };
-
-  const formatoQ = n => {
-    if(!Number.isFinite(n)) return '—';
-    if(n>=1000000){
-      const v=n/1000000;
-      return 'Q'+v.toLocaleString('es-GT',{minimumFractionDigits:v<10?1:0,maximumFractionDigits:2})+' M';
-    }
-    if(n>=1000){
-      const v=n/1000;
-      return 'Q'+v.toLocaleString('es-GT',{maximumFractionDigits:1})+' mil';
-    }
-    return 'Q'+n.toLocaleString('es-GT',{maximumFractionDigits:2});
-  };
-
-  const poblar = (sel, vals, etiqueta) => {
+  const poblar = (sel, vals) => {
     if(!sel || sel.dataset.ready==='1') return;
     [...new Set(vals.filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'es'))
       .forEach(v=>sel.add(new Option(v,v)));
     sel.dataset.ready='1';
-    sel.onchange=renderInversion;
+    sel.onchange=()=>renderInversion();
   };
-
-  poblar(selOrg, programas.map(p=>p.organizacion), 'Organización');
-  poblar(selMun, programas.flatMap(municipiosPrograma), 'Municipio');
-  poblar(selEst, programas.map(p=>p.estado_programa), 'Estado');
+  poblar(selOrg, programas.map(p=>p.organizacion));
+  poblar(selMun, programas.flatMap(municipiosPrograma));
+  poblar(selSec, programas.flatMap(p=>p.sector||[]));
+  poblar(selEst, programas.map(p=>p.estado_programa));
+  if(selRan && selRan.dataset.ready!=='1'){
+    // Se respetan exactamente las categorías del formulario (Ajuste 4.5): no se inventan rangos ni umbrales.
+    Object.entries(RANGOS).sort((a,b)=>a[1].ord-b[1].ord).forEach(([k,r])=>selRan.add(new Option(r.etq,k)));
+    selRan.add(new Option('Prefiere no indicar / sin dato','__sin_dato__'));
+    selRan.dataset.ready='1';
+    selRan.onchange=()=>renderInversion();
+  }
 
   const org = selOrg?.value || '';
   const mun = selMun?.value || '';
+  const sec = selSec?.value || '';
+  const ran = selRan?.value || '';
   const est = selEst?.value || '';
 
   const filtrados = programas.filter(p =>
     (!org || p.organizacion===org) &&
     (!est || p.estado_programa===est) &&
-    (!mun || municipiosPrograma(p).includes(mun))
+    (!mun || municipiosPrograma(p).includes(mun)) &&
+    (!sec || (p.sector||[]).includes(sec)) &&
+    (!ran || (ran==='__sin_dato__' ? !RANGOS[p.monto_rango_codigo] : p.monto_rango_codigo===ran))
   );
+  invFiltradosActuales = filtrados;
 
-  const conDato = filtrados.filter(p=>!esNoReportada(inversionPrograma(p)));
-  const sinDato = filtrados.filter(p=>esNoReportada(inversionPrograma(p)));
-  const conRango = conDato.filter(p=>pareceRango(inversionPrograma(p)));
-  const orgs = new Set(filtrados.map(p=>p.organizacion).filter(Boolean));
-  const munis = new Set(filtrados.flatMap(municipiosPrograma));
-
-  // v2 (AUD-02): los rangos no se suman; se muestra cuántos programas declaran rango y el más alto.
-  const ordR={}; (window.INT&&INT.RANGOS?Object.entries(INT.RANGOS):[]).forEach(([k,r])=>ordR[k]=r);
-  const conRangoDecl=filtrados.filter(p=>ordR[p.monto_rango_codigo]);
-  const altoR=conRangoDecl.reduce((m,p)=>(!m||ordR[p.monto_rango_codigo].ord>m.ord)?ordR[p.monto_rango_codigo]:m,null);
-  document.getElementById('stats-inversion').innerHTML = `
-    <div class="stat-card"><div class="label">Programas / proyectos</div><div class="value">${filtrados.length}</div><div class="small">${orgs.size} organización${orgs.size===1?'':'es'}</div></div>
-    <div class="stat-card"><div class="label">Rango más alto declarado</div><div class="value" style="font-size:22px">${altoR?altoR.etq:'Sin dato'}</div><div class="small">${conRangoDecl.length} de ${filtrados.length} programas declaran rango · los rangos no se suman</div></div>
-    <div class="stat-card"><div class="label">Cobertura del dato</div><div class="value">${conDato.length} / ${filtrados.length}</div><div class="small">${sinDato.length} sin inversión reportada</div></div>
-    <div class="stat-card"><div class="label">Municipios con presencia</div><div class="value">${munis.size}</div><div class="small">Sin distribución monetaria por municipio</div></div>
-  `;
-
-  const tbody=document.querySelector('#tabla-inversion-programas tbody');
-  tbody.innerHTML = filtrados.length ? filtrados.map(p=>{
-    const inv=inversionPrograma(p);
-    return `<tr>
-      <td><b>${escaparHtml(p.organizacion||'—')}</b></td>
-      <td>${escaparHtml(p.nombre_programa||'—')}</td>
-      <td><b>${escaparHtml(esNoReportada(inv)?'No reportada':inv)}</b></td>
-      <td>${escaparHtml(p.estado_programa||'—')}</td>
-      <td>${escaparHtml(municipiosPrograma(p).join(', ')||'—')}</td>
-      <td>${escaparHtml((p.sector||[]).join(', ')||'—')}</td>
-    </tr>`;
-  }).join('') : '<tr><td colspan="6" class="empty">No hay programas/proyectos que cumplan los filtros seleccionados.</td></tr>';
-
-  const porMuni={};
-  filtrados.forEach(p=>{
-    const tiene=!esNoReportada(inversionPrograma(p));
-    municipiosPrograma(p).forEach(m=>{
-      if(!porMuni[m]) porMuni[m]={programas:new Map(), con:0, sin:0};
-      const clave=(p.organizacion||'')+'|'+(p.nombre_programa||'');
-      porMuni[m].programas.set(clave,p);
-      if(tiene) porMuni[m].con++; else porMuni[m].sin++;
-    });
-  });
-  const territorial=Object.entries(porMuni).sort((a,b)=>b[1].programas.size-a[1].programas.size);
-  document.getElementById('inv-territorial').innerHTML = territorial.length ? territorial.map(([m,v])=>`
-    <div class="inst-row" style="align-items:flex-start">
-      <span><b>${escaparHtml(m)}</b><br><span class="small">${v.programas.size} programa${v.programas.size===1?'':'s'} con presencia</span></span>
-      <span style="text-align:right">${v.con} con inversión reportada · ${v.sin} sin dato<br><span class="small">Sin asignación monetaria municipal</span></span>
-    </div>`).join('')+'<div class="side-sub" style="margin-top:12px;">La inversión se reporta a nivel de programa/proyecto. La presencia en un municipio no permite determinar qué parte del presupuesto corresponde específicamente a ese territorio.</div>' :
-    '<div class="empty">Sin presencia territorial para esta consulta.</div>';
-
-  const pct = filtrados.length ? Math.round((conDato.length/filtrados.length)*100) : 0;
-  document.getElementById('inv-calidad').innerHTML = `
-    <div class="inst-row"><span>Registros con dato de inversión</span><span><b>${conDato.length} de ${filtrados.length}</b> (${pct}%)</span></div>
-    <div class="inst-row"><span>Registros con rango identificable</span><span>${conRango.length}</span></div>
-    <div class="inst-row"><span>Registros agregables numéricamente</span><span>${filtrados.filter(p=>rangoNumerico(inversionPrograma(p))).length}</span></div>
-    <div class="inst-row"><span>Registros sin dato de inversión</span><span>${sinDato.length}</span></div>
-    ${sinDato.length ? `<div class="side-sub" style="margin-top:12px;">Pendiente de completar: ${sinDato.map(p=>escaparHtml((p.organizacion||'—')+' · '+(p.nombre_programa||'—'))).join('; ')}</div>` : ''}
-  `;
+  // Ajuste 4.4: todos los indicadores/tablas/gráficos de las 4 vistas se derivan de "filtrados";
+  // limpiar filtros restaura la vista general porque org/mun/sec/ran/est vuelven a ''.
+  const activos=[];
+  if(org) activos.push('Organización: '+org);
+  if(mun) activos.push('Municipio: '+mun);
+  if(sec) activos.push('Sector: '+sec);
+  if(ran) activos.push('Rango: '+(ran==='__sin_dato__'?'Prefiere no indicar / sin dato':(RANGOS[ran]?RANGOS[ran].etq:ran)));
+  if(est) activos.push('Estado: '+est);
+  const cajaActivos=document.getElementById('inv-filtros-activos');
+  if(cajaActivos) cajaActivos.innerHTML = activos.length
+    ? `Filtros activos: ${activos.map(a=>`<b>${escaparHtml(a)}</b>`).join(' · ')} — ${filtrados.length} de ${programas.length} programas`
+    : `Sin filtros activos — ${programas.length} programas en total`;
 
   const limpiar=document.getElementById('inv-limpiar');
   if(limpiar && limpiar.dataset.ready!=='1'){
     limpiar.dataset.ready='1';
     limpiar.onclick=()=>{
-      if(selOrg) selOrg.value='';
-      if(selMun) selMun.value='';
-      if(selEst) selEst.value='';
+      [selOrg,selMun,selSec,selRan,selEst].forEach(s=>{ if(s) s.value=''; });
+      const buscar=document.getElementById('inv-buscar');
+      if(buscar) buscar.value='';
+      invBuscar='';
       renderInversion();
     };
   }
+
+  renderInvPanorama(filtrados, RANGOS);
+  renderInvOrganizaciones(filtrados);
+  renderInvMatriz(filtrados, RANGOS);
+  renderInvExplorador();
+
+  const tabs=document.getElementById('inv-tabs');
+  if(tabs && !tabs.dataset.ready){
+    tabs.dataset.ready='1';
+    tabs.querySelectorAll('button').forEach(b=>b.onclick=()=>{ invTab=b.dataset.tab; aplicarTabInversion(); });
+  }
+  aplicarTabInversion();
+
+  const buscar=document.getElementById('inv-buscar');
+  if(buscar && !buscar.dataset.ready){
+    buscar.dataset.ready='1';
+    buscar.value=invBuscar;
+    buscar.addEventListener('input',()=>{ invBuscar=buscar.value; renderInvExplorador(); });
+  }
+}
+
+/* ---------- Vista 1 · Panorama financiero ---------- */
+function renderInvPanorama(filtrados){
+  const orgs=new Set(filtrados.map(p=>p.organizacion).filter(Boolean));
+  const dr=(window.INT && INT.distRangos) ? INT.distRangos(filtrados) : {filas:[],sin:filtrados.length,con:0};
+  const kpis=document.getElementById('inv-p1-kpis');
+  if(kpis) kpis.innerHTML = `
+    <div class="stat-card"><div class="label">Programas / proyectos registrados</div><div class="value">${filtrados.length}</div></div>
+    <div class="stat-card"><div class="label">Organizaciones con programas registrados</div><div class="value">${orgs.size}</div></div>
+    <div class="stat-card"><div class="label">Programas con rango de inversión declarado</div><div class="value">${dr.con}</div></div>
+    <div class="stat-card"><div class="label">Programas sin información financiera utilizable</div><div class="value">${dr.sin}</div></div>
+  `;
+  const mx=Math.max(1,...dr.filas.map(f=>f.n),dr.sin);
+  const fila=(etq,n,codigo)=>`<button type="button" class="inv-bar-row" data-rango="${escaparHtml(codigo||'')}" title="Ver estos programas en el Explorador">
+      <span>${escaparHtml(etq)}</span>
+      <span class="inv-bar-track"><span class="inv-bar-fill" style="width:${(n/mx*100).toFixed(1)}%"></span></span>
+      <b>${n}</b>
+    </button>`;
+  const barras=document.getElementById('inv-p1-barras');
+  if(barras){
+    barras.innerHTML = (dr.filas.map(f=>fila(f.etq,f.n,f.k)).join('')) + fila('Prefiere no indicar / sin dato', dr.sin, '__sin_dato__');
+    barras.querySelectorAll('.inv-bar-row').forEach(b=>b.onclick=()=>irExploradorConRango(b.dataset.rango));
+  }
+}
+
+/* ---------- Vista 2 · Comparación por organización ---------- */
+function renderInvOrganizaciones(filtrados){
+  const porOrg=new Map();
+  filtrados.forEach(p=>{
+    const o=p.organizacion||'Sin organización declarada';
+    if(!porOrg.has(o)) porOrg.set(o,[]);
+    porOrg.get(o).push(p);
+  });
+  // Orden alfabético: no se ordena por una supuesta inversión total de la organización.
+  const filas=[...porOrg.entries()].sort((a,b)=>a[0].localeCompare(b[0],'es'));
+  const tbody=document.querySelector('#tabla-inv-organizaciones tbody');
+  if(!tbody) return;
+  tbody.innerHTML = filas.length ? filas.map(([org,ps])=>{
+    const dr=(window.INT && INT.distRangos) ? INT.distRangos(ps) : {filas:[],sin:ps.length,con:0};
+    const dist=dr.filas.filter(f=>f.n>0).map(f=>`${f.n} ${f.etq}`).join(' · ')||'—';
+    return `<tr data-org="${escaparHtml(org)}" class="inv-org-fila" style="cursor:pointer">
+      <td><b>${escaparHtml(org)}</b></td>
+      <td>${ps.length}</td>
+      <td>${dr.con} de ${ps.length}</td>
+      <td>${escaparHtml(dist)}</td>
+      <td>${dr.sin}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="5" class="empty">No hay organizaciones que cumplan los filtros seleccionados.</td></tr>';
+  tbody.querySelectorAll('tr.inv-org-fila').forEach(tr=>{
+    tr.tabIndex=0; tr.setAttribute('role','button');
+    const abrir=()=>mostrarDetalleOrgInversion(tr.dataset.org, porOrg.get(tr.dataset.org));
+    tr.onclick=abrir;
+    tr.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); abrir(); } });
+  });
+}
+function mostrarDetalleOrgInversion(org, ps){
+  const card=document.getElementById('inv-org-detalle-card');
+  const titulo=document.getElementById('inv-org-detalle-titulo');
+  const cuerpo=document.getElementById('inv-org-detalle-cuerpo');
+  if(!card||!cuerpo) return;
+  card.hidden=false;
+  if(titulo) titulo.textContent='Detalle de '+org;
+  const alto=(ps||[]).reduce((m,p)=>{
+    const r=invRangos()[p.monto_rango_codigo];
+    return (r && (!m || r.ord>m.ord)) ? r : m;
+  },null);
+  cuerpo.innerHTML = `
+    <p class="side-sub" style="margin:0 0 10px;">${alto ? `Rango más alto declarado por uno de sus programas: <b>${escaparHtml(alto.etq)}</b> (no es el presupuesto total de la organización).` : 'Ningún programa de esta organización declara un rango de inversión identificable.'}</p>
+    <div style="overflow-x:auto"><table><thead><tr><th>PROGRAMA</th><th>ESTADO</th><th>SECTORES</th><th>MUNICIPIOS</th><th>RANGO DECLARADO</th></tr></thead><tbody>
+    ${(ps||[]).map(p=>`<tr>
+      <td><b>${escaparHtml(p.nombre_programa||'—')}</b></td>
+      <td>${escaparHtml(p.estado_programa||'—')}</td>
+      <td>${escaparHtml((p.sector||[]).join(', ')||'—')}</td>
+      <td>${escaparHtml(municipiosPrograma(p).join(', ')||'—')}</td>
+      <td>${escaparHtml(invTextoRango(p))}</td>
+    </tr>`).join('')}
+    </tbody></table></div>`;
+}
+
+/* ---------- Vista 3 · Lectura territorial y sectorial ---------- */
+function renderInvMatriz(filtrados, RANGOS){
+  const cols=Object.entries(RANGOS).sort((a,b)=>a[1].ord-b[1].ord);
+  const porMuni=new Map();
+  filtrados.forEach(p=>{
+    const codigo = RANGOS[p.monto_rango_codigo] ? p.monto_rango_codigo : '__sin_dato__';
+    municipiosPrograma(p).forEach(m=>{
+      if(!porMuni.has(m)) porMuni.set(m, {});
+      const e=porMuni.get(m);
+      e[codigo]=(e[codigo]||0)+1;
+    });
+  });
+  const municipios=[...porMuni.keys()].sort((a,b)=>a.localeCompare(b,'es'));
+  const thead=document.querySelector('#tabla-inv-matriz thead tr');
+  const tbody=document.querySelector('#tabla-inv-matriz tbody');
+  if(!thead||!tbody) return;
+  thead.innerHTML = `<th>MUNICIPIO</th>${cols.map(([,r])=>`<th>${escaparHtml(r.etq)}</th>`).join('')}<th>Prefiere no indicar / sin dato</th><th>Programas con presencia</th>`;
+  // "Programas con presencia" es la suma de las columnas de ESTE municipio: cada programa aporta
+  // exactamente una vez (tiene un solo monto_rango_codigo), así que no hay doble conteo. Esta cifra
+  // nunca se usa para calcular los indicadores generales de las otras vistas (regla 9).
+  tbody.innerHTML = municipios.length ? municipios.map(m=>{
+    const e=porMuni.get(m);
+    const total=cols.reduce((s,[k])=>s+(e[k]||0),0)+(e['__sin_dato__']||0);
+    return `<tr><td><b>${escaparHtml(m)}</b></td>${cols.map(([k])=>`<td>${e[k]||0}</td>`).join('')}<td>${e['__sin_dato__']||0}</td><td>${total}</td></tr>`;
+  }).join('') : `<tr><td colspan="${cols.length+3}" class="empty">No hay presencia territorial que cumpla los filtros seleccionados.</td></tr>`;
+}
+
+/* ---------- Vista 4 · Explorador de programas ---------- */
+function renderInvExplorador(){
+  const campo = { organizacion:p=>p.organizacion||'', programa:p=>p.nombre_programa||'', inversion:p=>p.monto_rango||'', estado:p=>p.estado_programa||'' };
+  const base = invFiltrarPorTexto(invFiltradosActuales);
+  const ordenados = base.slice().sort((a,b)=>{
+    const f=campo[invOrdCol]||campo.organizacion;
+    const r=String(f(a)).localeCompare(String(f(b)),'es');
+    return invOrdAsc?r:-r;
+  });
+  const tbody=document.querySelector('#tabla-inv-explorador tbody');
+  if(tbody){
+    tbody.innerHTML = ordenados.length ? ordenados.map(p=>{
+      const id=invIdPrograma(p);
+      const abierto=invExpandidos.has(id);
+      const fila=`<tr class="inv-fila-prog" data-id="${id}">
+        <td><button type="button" class="inv-fila-btn" data-id="${id}" aria-expanded="${abierto}" aria-label="Ver ficha del programa">${abierto?'−':'+'}</button></td>
+        <td>${escaparHtml(p.organizacion||'—')}</td>
+        <td>${escaparHtml(p.nombre_programa||'—')}</td>
+        <td><b>${escaparHtml(invTextoRango(p))}</b></td>
+        <td>${escaparHtml(p.estado_programa||'—')}</td>
+        <td>${escaparHtml(periodoPrograma(p))}</td>
+        <td>${escaparHtml((p.sector||[]).join(', ')||'—')}</td>
+        <td>${escaparHtml(municipiosPrograma(p).join(', ')||'—')}</td>
+      </tr>`;
+      const ficha = abierto ? `<tr class="inv-ficha-fila" data-id="${id}"><td colspan="8">${fichaProgramaInv(p)}</td></tr>` : '';
+      return fila+ficha;
+    }).join('') : '<tr><td colspan="8" class="empty">No hay programas/proyectos que cumplan los filtros o la búsqueda.</td></tr>';
+    tbody.querySelectorAll('.inv-fila-btn').forEach(b=>{
+      b.onclick=()=>{
+        const id=+b.dataset.id;
+        if(invExpandidos.has(id)) invExpandidos.delete(id); else invExpandidos.add(id);
+        renderInvExplorador();
+      };
+    });
+  }
+  document.querySelectorAll('#tabla-inv-explorador th.inv-th-ord').forEach(th=>{
+    // El indicador de orden se dibuja con CSS (::after + data-ord), nunca como texto dentro del
+    // <th>, para que no se filtre al CSV descargado (que lee el texto visible de la tabla).
+    if(th.dataset.col===invOrdCol) th.dataset.ord = invOrdAsc?'▲':'▼'; else delete th.dataset.ord;
+    if(th.dataset.bound) return; th.dataset.bound='1';
+    const activar=()=>{
+      const col=th.dataset.col;
+      if(invOrdCol===col) invOrdAsc=!invOrdAsc; else { invOrdCol=col; invOrdAsc=true; }
+      renderInvExplorador();
+    };
+    th.onclick=activar;
+    th.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); activar(); } });
+  });
+}
+function fichaProgramaInv(p){
+  const sinRango = !invTieneRango(p);
+  return `
+    <div><b>Valor financiero original declarado:</b> ${escaparHtml(invTextoRango(p))}</div>
+    <div class="inv-ficha-nota">Este valor es un rango declarado por el programa en el formulario, no un monto ejecutado ni un presupuesto disponible. No se suma ni se promedia con el de otros programas, y no se distribuye entre los municipios o sectores donde el programa tiene presencia.${sinRango ? ' Este registro no declara un rango numérico identificable (seleccionó "Prefiere no indicar" o no respondió); no se interpreta como inversión cero.' : ''}</div>
+    <div style="margin-top:8px;"><b>Organización:</b> ${escaparHtml(p.organizacion||'—')} · <b>Estado:</b> ${escaparHtml(p.estado_programa||'—')} · <b>Vigencia:</b> ${escaparHtml(periodoPrograma(p))}</div>
+    <div style="margin-top:4px;"><b>Sectores:</b> ${(p.sector||[]).map(s=>`<span class="inv-chip">${escaparHtml(s)}</span>`).join('')||'—'}</div>
+    <div style="margin-top:4px;"><b>Municipios con presencia:</b> ${municipiosPrograma(p).map(m=>`<span class="inv-chip">${escaparHtml(m)}</span>`).join('')||'—'}</div>
+  `;
 }
 
 let orgMap=null, orgCommunityLayer=null, orgInstitutionalLayer=null, orgBoundaryLayer=null;
@@ -2725,23 +2955,6 @@ function renderPoblacionAccion(){
   setTimeout(()=>paMap.invalidateSize(),50);
 }
 
-function renderProgramas(){
-  const tb = document.querySelector('#tabla-programas tbody');
-  tb.innerHTML = DATA.programas.map(p=>{
-    const munis = new Set((p.comunidades||[]).map(c=>c.municipio).filter(Boolean).concat(p.municipios_cobertura_institucional||[]));
-    const munisTxt = [...munis].slice(0,3).join(', ') + (munis.size>3 ? ' +'+(munis.size-3) : '');
-    const estadoClase = p.estado_programa==='Finalizado' ? 'tag' : (p.estado_programa==='Próximo a finalizar' ? 'tag warn' : 'tag');
-    return `<tr>
-      <td>${esc(p.organizacion)}</td>
-      <td>${esc(p.nombre_programa)}</td>
-      <td>${esc((p.sector||[]).join(', '))||'—'}</td>
-      <td><span class="${estadoClase}">${esc(p.estado_programa)||'—'}</span></td>
-      <td>${(p.fecha_inicio||'').slice(0,4)}–${(p.fecha_fin||'').slice(0,4)||'?'}</td>
-      <td>${esc(munisTxt)||'—'}</td>
-    </tr>`;
-  }).join('') || '<tr><td colspan="6" class="empty">Todavía no hay programas registrados.</td></tr>';
-}
-
 async function cargarBaseTerritorial(){
   try{
     const [rc,rx]=await Promise.all([fetch('catalogo_xlsform.json'),fetch('coordenadas_lugares.json')]);
@@ -2860,7 +3073,7 @@ async function iniciar(){
   poblarSelects();
   poblarSelectorMunicipio();
   renderMapaYStats();
-  [renderInversion,renderMatriz,renderBrechas,renderInstituciones,renderArticulacion,renderPoblacionAccion,renderProgramas].forEach(fn=>{
+  [renderInversion,renderMatriz,renderBrechas,renderInstituciones,renderArticulacion,renderPoblacionAccion].forEach(fn=>{
     try{ fn(); }catch(err){ console.error('Error al inicializar vista', fn.name, err); }
   });
   // La vista inicial es el Panorama; el mapa se dimensionó mientras estaba visible.
@@ -2869,7 +3082,10 @@ async function iniciar(){
 }
 
 function exportarTablaCSV(tabla){
-  const filas=[...tabla.querySelectorAll('tr')].map(tr=>[...tr.children].map(td=>{
+  // Las fichas expandibles del Explorador de programas (Vista 4 de Inversión) insertan una fila
+  // "inv-ficha-fila" oculta bajo el programa; se excluye aquí para que el CSV descargado coincida
+  // exactamente con los programas visibles tras los filtros, nunca con una fila extra de texto de ficha.
+  const filas=[...tabla.querySelectorAll('tr')].filter(tr=>!tr.classList.contains('inv-ficha-fila')).map(tr=>[...tr.children].map(td=>{
     const t=(td.innerText||'').replace(/\s+/g,' ').trim().replace(/"/g,'""');
     return `"${t}"`;
   }).join(','));
