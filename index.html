@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="visor-version" content="fase2-e4">
+<meta name="visor-version" content="fase2-e4-1">
 <title>Mapeo de Actores de Cooperación — SEGEPLAN Chiquimula</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -664,7 +664,7 @@ table tbody tr:hover td{ background:#F4F1E6; }
         <div style="overflow-x:auto">
           <table id="tabla-inv-explorador">
             <thead><tr>
-              <th></th>
+              <th class="inv-th-toggle"></th>
               <th class="inv-th-ord" data-col="organizacion" tabindex="0" role="button">ORGANIZACIÓN</th>
               <th class="inv-th-ord" data-col="programa" tabindex="0" role="button">PROGRAMA / PROYECTO</th>
               <th class="inv-th-ord" data-col="inversion" tabindex="0" role="button">INVERSIÓN REPORTADA</th>
@@ -3105,6 +3105,54 @@ function agregarBotonesCSV(){
   });
 }
 
+/* =====================================================================
+   Etapa 4.1 — Compatibilidad de exportaciones CSV con Excel, solo para Inversión.
+   exportarTablaCSV()/agregarBotonesCSV() (arriba) NO se modifican y siguen sirviendo, sin ningún
+   cambio, al resto de secciones (Panorama, Organizaciones, Coordinación, Oportunidades de
+   articulación, Ficha municipal, Población y sectores).
+   Motivo del ajuste: en Windows con configuración regional de Guatemala (es-GT), Excel usa por
+   defecto punto y coma como separador de columnas al abrir un .csv con doble clic (la coma es el
+   separador decimal de esa configuración regional). Un CSV separado por comas, aunque esté bien
+   formado, se abre con todo en una sola columna. La solución estándar es declarar el separador en
+   la primera línea del archivo ("sep=;") y usar realmente punto y coma como delimitador.
+   ===================================================================== */
+function filaCSVExcel(tr){
+  return [...tr.children]
+    // La columna de alternar ficha (th.inv-th-toggle en el encabezado; el botón +/− en cada fila
+    // del Explorador) es un control visual, no un dato declarado, así que se excluye igual que ya
+    // se excluye la flecha de orden (::after) del encabezado — ningún campo real pierde su columna.
+    .filter(td=>!td.classList.contains('inv-th-toggle') && !td.querySelector('.inv-fila-btn'))
+    .map(td=>{
+      // Se colapsa cualquier salto de línea/espacio a uno solo antes de citar el campo, así que
+      // nunca hay un salto de línea real dentro de un campo (regla: sin saltos de línea embebidos).
+      const t=(td.innerText||'').replace(/\s+/g,' ').trim().replace(/"/g,'""');
+      return `"${t}"`; // las comillas dobles cubren también cualquier ';' o ',' interno del campo
+    }).join(';');
+}
+function exportarTablaCSVExcel(tabla){
+  const filas=[...tabla.querySelectorAll('tr')]
+    .filter(tr=>!tr.classList.contains('inv-ficha-fila')) // nunca incluir la fila de ficha expandida
+    .map(filaCSVExcel);
+  const contenido='sep=;\r\n'+filas.join('\r\n');
+  const blob=new Blob(['﻿'+contenido],{type:'text/csv;charset=utf-8'}); // BOM UTF-8: conserva tildes/eñes/Q
+  const vista=tabla.closest('.view');
+  const nombre=(tabla.id||'tabla')+(vista?'_'+vista.id.replace('view-',''):'')+'.csv';
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=nombre;
+  document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500);
+}
+function agregarBotonCSVExcel(tabla){
+  if(!tabla || tabla.dataset.csv) return;
+  tabla.dataset.csv='1'; // así agregarBotonesCSV() no vuelve a adjuntarle su botón genérico
+  const b=document.createElement('button'); b.type='button'; b.className='csv-btn'; b.textContent='Descargar CSV';
+  b.onclick=()=>exportarTablaCSVExcel(tabla);
+  const cont=tabla.parentElement.style.overflowX==='auto'?tabla.parentElement:tabla;
+  cont.parentElement.insertBefore(b,cont);
+}
+function prepararCSVExcelInversion(){
+  ['tabla-inv-organizaciones','tabla-inv-matriz','tabla-inv-explorador']
+    .forEach(id=>agregarBotonCSVExcel(document.getElementById(id)));
+}
+
 
 // ===== Panorama: resumen ejecutivo =====
 function renderPanorama(){
@@ -3206,7 +3254,10 @@ function renderPanorama(){
   document.querySelectorAll('#pan-explore .exp-card').forEach(b=>b.onclick=()=>{ mostrarVista(b.dataset.v); window.scrollTo({top:0,behavior:'smooth'}); });
 }
 
-iniciar().then(()=>{ try{ agregarBotonesCSV(); }catch(e){ console.warn(e); } });
+iniciar().then(()=>{
+  try{ prepararCSVExcelInversion(); }catch(e){ console.warn(e); } // Etapa 4.1: antes del genérico, para que éste no duplique botón
+  try{ agregarBotonesCSV(); }catch(e){ console.warn(e); }
+});
 </script>
 <script src="inteligencia.js?v=11"></script>
 </body>
