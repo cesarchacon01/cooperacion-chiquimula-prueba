@@ -82,6 +82,89 @@ function contrapartesDetalle(p){
 }
 function contrapartesDe(p){ const d=contrapartesDetalle(p); const o=[...d.canon]; if(d.sinClasificar.length) o.push('Sin clasificar'); return o; }
 
+/* Categorías institucionales genéricas: agrupan un tipo de actor (no una institución con
+   nombre propio). El resto de CONTRAPARTES son instituciones específicas e identificables
+   (ministerios, secretarías). Esta distinción es solo de presentación (forma/color del nodo
+   en la red); no cambia cómo se cuenta ni se clasifica la contraparte. */
+const CATEGORIAS_GENERICAS = new Set([
+  'Municipalidades','Universidades / Academia','Banca / financiera',
+  'Sector privado','Justicia (OJ, MP, PGN)','MSPAS / Salud pública'
+]);
+
+/* ---------- Modelo de red de coordinación (Etapa 3) ----------
+   Construye nodos y aristas EXCLUSIVAMENTE a partir de los campos ya auditados:
+   contraparte_gubernamental y espacios_coordinacion (se excluye 'No participa', que es una
+   respuesta negativa, no un espacio real). No se crea nunca una arista organización-organización:
+   dos organizaciones que mencionan la misma contraparte o espacio se descubren al seleccionar
+   ese nodo (resaltado), nunca mediante una línea que sugiera coordinación verificada entre ellas.
+   El territorio de cada arista es, como máximo, la cobertura general del programa
+   (municipiosProgramaArticulacion, ya usado por la tabla de articulación existente); nunca se
+   territorializa la relación misma porque el formulario no registra dónde ocurre cada vínculo. */
+function modeloCoordinacion(){
+  const nodos=new Map();
+  const aristas=new Map();
+  const FUENTE='Autorreporte de la organización (formulario Kobo)';
+
+  function nodo(id,tipo,etiqueta){
+    if(!nodos.has(id)) nodos.set(id,{id,tipo,etiqueta,organizaciones:new Set()});
+    return nodos.get(id);
+  }
+  function arista(orgId,destId,orgLabel,destLabel,tipoDestino,p,extra){
+    const k=orgId+'|'+destId;
+    if(!aristas.has(k)){
+      aristas.set(k,{
+        id:k, origen:orgId, destino:destId,
+        organizacion:orgLabel, contraparteOEspacio:destLabel, tipoDestino,
+        programas:[], municipios:new Set(), sectores:new Set(), fuente:FUENTE,
+        advertencia:'Vínculo declarado por la organización; no implica coordinación verificada ni ubicación comprobada de la relación.'
+      });
+    }
+    const a=aristas.get(k);
+    a.programas.push(nombreProg(p));
+    (extra.municipios||[]).forEach(m=>a.municipios.add(m));
+    (extra.sectores||[]).forEach(s=>a.sectores.add(s));
+    return a;
+  }
+
+  P.forEach(p=>{
+    const orgLabel=p.organizacion||'—'; const orgId='org:'+orgLabel;
+    nodo(orgId,'organizacion',orgLabel).organizaciones.add(orgLabel);
+    const municipios=municipiosProgramaArticulacion(p);
+    const sectores=(p.sector||[]).filter(Boolean);
+
+    const det=contrapartesDetalle(p);
+    det.canon.forEach(c=>{
+      const destId='ctr:'+c;
+      const n=nodo(destId, CATEGORIAS_GENERICAS.has(c)?'contraparte-categoria':'contraparte-nombrada', c);
+      n.organizaciones.add(orgLabel);
+      arista(orgId,destId,orgLabel,c,'contraparte',p,{municipios,sectores});
+    });
+    det.sinClasificar.forEach(f=>{
+      const key=sinAcento(f).replace(/[.,;]+$/,'').trim(); if(!key) return;
+      const destId='ctrsc:'+key;
+      const n=nodo(destId,'contraparte-sin-clasificar',f);
+      n.organizaciones.add(orgLabel);
+      arista(orgId,destId,orgLabel,f,'contraparte',p,{municipios,sectores});
+    });
+    (p.espacios_coordinacion||[]).filter(e=>e&&e!=='No participa').forEach(esp=>{
+      const destId='esp:'+esp;
+      const n=nodo(destId,'espacio',esp);
+      n.organizaciones.add(orgLabel);
+      arista(orgId,destId,orgLabel,esp,'espacio',p,{municipios,sectores});
+    });
+  });
+
+  return {
+    nodos:[...nodos.values()].map(n=>({...n,organizaciones:[...n.organizaciones].sort(cmp)})),
+    aristas:[...aristas.values()].map(a=>({
+      ...a,
+      programas:uniq(a.programas),
+      municipios:[...a.municipios].sort(cmp),
+      sectores:[...a.sectores].sort(cmp)
+    }))
+  };
+}
+
 /* ---------- Inversión: solo rangos ---------- */
 const RANGOS = { // límites del rango tal como lo define el formulario
   'menos_500k':{etq:'Menos de Q500,000', lo:0,       hi:500000, ord:1},
@@ -587,7 +670,7 @@ function renderArtExtra(){
   const items=Object.entries(dist).map(([k,s])=>[k,s.size]).sort((a,b)=>b[1]-a[1]||cmp(a[0],b[0]));
   const nDecl=P.filter(p=>!contrapartesDetalle(p).ninguna).length, nEsp=P.filter(p=>(p.espacios_coordinacion||[]).some(e=>e!=='No participa')).length;
   const nSinCl=P.filter(p=>contrapartesDetalle(p).sinClasificar.length).length;
-  box.innerHTML=`<div class="int-card"><div class="int-eyebrow">¿Con quién se articulan?</div>
+  box.innerHTML=`<div class="int-card"><div class="int-eyebrow">Vista B · Exploración por contraparte, espacio y estructura</div>
     <div class="int-capas"><div><b>${nDecl}</b> de ${P.length} programas<br><span>declaran una contraparte</span><em>Capa 1 · Declarado</em></div><div><b>${nEsp}</b> de ${P.length} programas<br><span>participan en algún espacio</span><em>Capa 2 · Espacio compartido</em></div><div><b>0</b> de ${P.length} programas<br><span>con vínculo documentado</span><em>Capa 3 · Sin evidencia en el formulario actual</em></div></div>
     <p class="int-note">El formulario actual solo recoge lo que la organización declara. Un vínculo "documentado" requeriría un convenio, acta o actividad conjunta (fecha y referencia) que hoy no se pregunta. ${nSinCl?`<b>${nSinCl}</b> programas escribieron contrapartes que no se pudieron clasificar; se muestran con su texto original.`:''}</p>
     <div class="int-tabs" role="tablist">${Object.entries(fuentes).map(([k,v])=>`<button type="button" role="tab" class="${k===modo?'on':''}" data-m="${k}">${v.etq}</button>`).join('')}</div>
@@ -614,6 +697,141 @@ function renderArtExtra(){
 function seleccionarContra(k){ ST.artModo='contra'; ST.artSel=k; renderArtExtra(); $('#int-art')?.scrollIntoView({behavior:'smooth'}); }
 
 /* =====================================================================
+   VISTA A · RED INSTITUCIONAL (Etapa 3)
+   Grafo bipartito en SVG+HTML, sin librerías externas (ver justificación en
+   la entrega: el proyecto ya es 100% JS plano + Leaflet, y la escala de
+   datos —~11 organizaciones, ~30 contrapartes, ~10 espacios— no requiere
+   un motor de físicas). Nunca dibuja una línea organización-organización.
+   ===================================================================== */
+const COLOR_TIPO={organizacion:'#183652','contraparte-nombrada':'#22678A','contraparte-categoria':'#5B8DA6','contraparte-sin-clasificar':'#8A8A8A',espacio:'#2F855A'};
+const ICONO_TIPO={organizacion:'●','contraparte-nombrada':'■','contraparte-categoria':'▬','contraparte-sin-clasificar':'◇',espacio:'▲'};
+const NOMBRE_TIPO={organizacion:'Organización','contraparte-nombrada':'Institución nombrada','contraparte-categoria':'Categoría institucional','contraparte-sin-clasificar':'Contraparte sin clasificar',espacio:'Espacio de coordinación'};
+function cssEsc(s){ return String(s).replace(/["\\]/g,'\\$&'); }
+
+function renderRedCoordinacion(){
+  const sec=$('#view-articulacion'); if(!sec) return;
+  let box=$('#int-red');
+  if(!box){
+    box=document.createElement('div'); box.id='int-red';
+    const ref=$('.int-help',sec)||sec.querySelector('.section-sub')||sec.firstElementChild;
+    ref.after(box);
+  }
+  const {nodos,aristas}=modeloCoordinacion();
+  const orgs=nodos.filter(n=>n.tipo==='organizacion').sort((a,b)=>cmp(a.etiqueta,b.etiqueta));
+  const destinos=nodos.filter(n=>n.tipo!=='organizacion').sort((a,b)=>cmp(a.etiqueta,b.etiqueta));
+  const sel=ST.redSel||null;
+
+  const gradoOrg=id=>aristas.filter(a=>a.origen===id).length;
+  const gradoDestino=id=>aristas.filter(a=>a.destino===id).length;
+  const activo=id=>{
+    if(!sel) return true;
+    if(sel.tipo==='organizacion') return id===sel.id || aristas.some(a=>a.origen===sel.id&&a.destino===id);
+    return id===sel.id || aristas.some(a=>a.destino===sel.id&&a.origen===id);
+  };
+
+  function nodoBtn(n,col){
+    const act=activo(n.id);
+    const deg=col==='org'?gradoOrg(n.id):gradoDestino(n.id);
+    return `<button type="button" class="int-red-nodo ${sel&&sel.id===n.id?'on':''} ${act?'':'dim'}" data-id="${esc(n.id)}" data-tipo="${n.tipo}" style="--c:${COLOR_TIPO[n.tipo]}" title="${esc(NOMBRE_TIPO[n.tipo])}">
+      <span class="int-red-ico" aria-hidden="true">${ICONO_TIPO[n.tipo]}</span>
+      <span class="int-red-lbl">${esc(n.etiqueta)}</span>
+      <small>${deg} ${plural(deg,'vínculo declarado','vínculos declarados')}</small>
+    </button>`;
+  }
+
+  if(!nodos.length || !aristas.length){
+    box.innerHTML=`<div class="int-card"><div class="int-eyebrow">Vista A · Red institucional</div>
+      <p class="int-empty">Ningún programa registra contraparte o espacio de coordinación utilizable, así que no hay vínculos para representar. Esto no significa ausencia de coordinación real, solo que el formulario no la recogió.</p></div>`;
+    return;
+  }
+
+  // Indicadores de la red: todos deducidos de nodos/aristas, nunca una métrica de
+  // centralidad o influencia. El número de vínculos de un nodo se llama explícitamente
+  // "vínculos declarados" en toda la interfaz para no sugerir poder o liderazgo institucional.
+  const totalOrgs=orgs.length;
+  const orgsConContraparte=uniq(aristas.filter(a=>a.tipoDestino==='contraparte').map(a=>a.origen)).length;
+  const contrapartesDistintas=destinos.filter(n=>n.tipo!=='espacio').length;
+  const categoriasReportadas=destinos.filter(n=>n.tipo==='contraparte-categoria').length;
+  const relacionesUnicas=aristas.length;
+  const contrapartesCompartidas=destinos.filter(n=>n.tipo!=='espacio'&&n.organizaciones.length>=2).length;
+  const orgsSinInfo=totalOrgs-uniq(aristas.map(a=>a.origen)).length;
+  const kpisRed=[
+    kpi(`${orgsConContraparte} de ${totalOrgs}`,'organizaciones con al menos 1 contraparte declarada'),
+    kpi(contrapartesDistintas,'contrapartes distintas mencionadas (nombradas + categorías + sin clasificar)'),
+    kpi(categoriasReportadas,'categorías institucionales genéricas reportadas'),
+    kpi(relacionesUnicas,'vínculos declarados organización–contraparte/espacio (únicos)'),
+    kpi(contrapartesCompartidas,'contrapartes mencionadas por 2 o más organizaciones'),
+    kpi(orgsSinInfo,'organizaciones sin ninguna contraparte ni espacio declarado'),
+  ].join('');
+
+  box.innerHTML=`<div class="int-card">
+    <div class="int-eyebrow">Vista A · Red institucional</div>
+    <p class="int-note">Cada línea representa un vínculo <b>declarado</b> por una organización en el formulario; no es un convenio firmado ni una coordinación verificada. Esta red <b>nunca</b> conecta dos organizaciones entre sí: si comparten una contraparte o un espacio, selecciónelo para verlas agrupadas. Fuente: autorreporte de la organización (formulario Kobo).</p>
+    <div class="int-kpis">${kpisRed}</div>
+    <div class="int-red-leyenda">${Object.keys(COLOR_TIPO).map(t=>`<span><i style="color:${COLOR_TIPO[t]}">${ICONO_TIPO[t]}</i> ${esc(NOMBRE_TIPO[t])}</span>`).join('')}</div>
+    <div class="int-red-wrap">
+      <svg class="int-red-svg" id="int-red-svg" aria-hidden="true"></svg>
+      <div class="int-red-col" id="int-red-col-org">${orgs.map(n=>nodoBtn(n,'org')).join('')}</div>
+      <div class="int-red-col" id="int-red-col-dest">${destinos.map(n=>nodoBtn(n,'dest')).join('')}</div>
+    </div>
+    <div id="int-red-det"></div>
+    <p class="int-note"><button type="button" class="int-link" id="int-red-tabla">Ver esta misma información como tabla (alternativa accesible) ↓</button></p>
+  </div>`;
+
+  $$('.int-red-nodo',box).forEach(b=>b.onclick=()=>{
+    const id=b.dataset.id, tipo=b.dataset.tipo;
+    if(sel && sel.id===id) ST.redSel=null;
+    else ST.redSel={tipo:tipo==='organizacion'?'organizacion':'destino', id};
+    renderRedCoordinacion();
+  });
+  const btnTabla=$('#int-red-tabla',box);
+  if(btnTabla) btnTabla.onclick=()=>{
+    plegar('articulacion','int-art','Detalle técnico: filtros, matrices y tabla original de articulación',true);
+    const d=$('#tabla-art-detalle'); if(d){ const det=d.closest('details.int-fold'); if(det) det.open=true; d.scrollIntoView({behavior:'smooth'}); }
+  };
+
+  const detBox=$('#int-red-det',box);
+  if(!sel){
+    detBox.innerHTML=`<div class="int-empty">Seleccione una organización, institución o espacio para ver el detalle de sus vínculos declarados.</div>`;
+  }else{
+    const n=nodos.find(x=>x.id===sel.id);
+    const rel=sel.tipo==='organizacion'?aristas.filter(a=>a.origen===sel.id):aristas.filter(a=>a.destino===sel.id);
+    detBox.innerHTML=`<div class="int-detail"><h4 class="int-h4" style="margin-top:0">${esc(n?n.etiqueta:sel.id)} <small>· ${esc(NOMBRE_TIPO[n?n.tipo:''] || '')}</small></h4>
+      <div class="int-kpis">${kpi(rel.length,plural(rel.length,'vínculo declarado','vínculos declarados'))}</div>
+      <div class="int-tbl-wrap"><table class="int-tbl"><thead><tr><th>${sel.tipo==='organizacion'?'Contraparte / espacio':'Organización'}</th><th>Tipo</th><th>Programa(s)</th><th>Municipios con presencia general del programa</th></tr></thead><tbody>
+      ${rel.map(a=>`<tr><td>${sel.tipo==='organizacion'?esc(a.contraparteOEspacio):chipOrg(a.organizacion)}</td><td>${a.tipoDestino==='espacio'?'Espacio':'Contraparte'}</td><td>${esc(a.programas.join('; '))}</td><td>${a.municipios.length?a.municipios.map(chipMuni).join(''):'—'}</td></tr>`).join('')}
+      </tbody></table></div>
+      <p class="int-note warn">Vínculo declarado por la organización; no implica coordinación verificada ni ubicación comprobada de la relación. Los municipios listados son la cobertura general del programa, no una ubicación específica del vínculo.</p>
+      </div>`;
+  }
+  enlazar(box);
+  requestAnimationFrame(()=>dibujarLineasRed(aristas));
+}
+
+function dibujarLineasRed(aristas){
+  const svg=$('#int-red-svg'); const wrap=svg&&svg.closest('.int-red-wrap'); if(!svg||!wrap) return;
+  const r0=wrap.getBoundingClientRect();
+  if(!r0.width||!r0.height) return;
+  svg.setAttribute('width',r0.width); svg.setAttribute('height',r0.height);
+  svg.setAttribute('viewBox',`0 0 ${r0.width} ${r0.height}`);
+  const sel=ST.redSel;
+  let html='';
+  aristas.forEach(a=>{
+    const bo=document.querySelector(`.int-red-nodo[data-id="${cssEsc(a.origen)}"]`), bd=document.querySelector(`.int-red-nodo[data-id="${cssEsc(a.destino)}"]`);
+    if(!bo||!bd) return;
+    const ro=bo.getBoundingClientRect(), rd=bd.getBoundingClientRect();
+    const x1=ro.right-r0.left, y1=ro.top+ro.height/2-r0.top, x2=rd.left-r0.left, y2=rd.top+rd.height/2-r0.top;
+    const act=!sel || (sel.tipo==='organizacion'&&a.origen===sel.id) || (sel.tipo==='destino'&&a.destino===sel.id);
+    html+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="${act?'on':'dim'}"/>`;
+  });
+  svg.innerHTML=html;
+}
+if(!window.__intRedResize){
+  window.__intRedResize=true;
+  window.addEventListener('resize',()=>{ try{ if($('#int-red')) dibujarLineasRed(modeloCoordinacion().aristas); }catch(e){} });
+}
+
+/* =====================================================================
    OPORTUNIDADES de articulación (vista "brechas")
    ===================================================================== */
 function oportunidades(munisSel){
@@ -626,12 +844,16 @@ function oportunidades(munisSel){
   ms.sort((a,b)=>b.orgs.length-a.orgs.length||cmp(a.m+a.s,b.m+b.s));
   out.push({id:'o1',icono:'',n:ms.length,titulo:'Mismo sector, varias organizaciones en un municipio',
     porque:'Cuando varias organizaciones trabajan el mismo tema en un municipio, conversar puede ayudar a complementar acciones. No indica duplicidad: pueden atender comunidades o poblaciones distintas.',
+    falta:'Si realmente atienden las mismas comunidades o poblaciones, o si ya existe algún tipo de contacto entre ellas.',
+    accion:'Convocar un intercambio breve entre las organizaciones del sector en el municipio para mapear a quién atiende cada una antes de asumir solapamiento.',
     items:ms.map(x=>({txt:`<b>${esc(x.s)}</b> en <span class="int-lnk" data-go="muni:${esc(x.m)}">${esc(x.m)}</span>: ${x.orgs.length} organizaciones`,sub:`<small class="int-orgs">${x.orgs.map(esc).join(' · ')}</small>`}))});
   // 2. Lugares con >=2 programas
   const lg=new Map(); P.forEach(p=>lugaresDe(p).forEach(c=>{ if(munisSel&&!munisSel.includes(c.municipio)) return; if(!lg.has(c.k)) lg.set(c.k,{c,ps:[],orgs:new Set()}); lg.get(c.k).ps.push(p); lg.get(c.k).orgs.add(p.organizacion); }));
   const l2=[...lg.values()].filter(x=>x.ps.length>=2).sort((a,b)=>b.ps.length-a.ps.length||cmp(a.c.lugar_poblado,b.c.lugar_poblado));
   out.push({id:'o2',icono:'',n:l2.length,titulo:'Lugares poblados con varias intervenciones registradas',
     porque:'Si varios programas llegan al mismo lugar, vale la pena que los actores se conozcan y sepan qué hace cada quien. Puede ser complementariedad.',
+    falta:'Si las intervenciones llegan a las mismas familias/grupos dentro del lugar poblado o a segmentos distintos de la población.',
+    accion:'Compartir esta lista con los enlaces comunitarios del lugar para verificar si ya se conocen entre sí.',
     items:l2.map(x=>({txt:`<span class="int-lnk" data-go="lugar:${esc(x.c.k)}">${esc(x.c.lugar_poblado)}</span>, ${esc(x.c.municipio)}: ${x.ps.length} programas de ${x.orgs.size} ${plural(x.orgs.size,'organización','organizaciones')}`,sub:`<small class="int-orgs">${uniq(x.ps.map(p=>p.organizacion)).map(esc).join(' · ')}</small>`}))});
   // 3. Sectores con menor presencia
   const sectores=Object.keys(DATA.matriz_sector_municipio||{});
@@ -639,11 +861,15 @@ function oportunidades(munisSel){
     const m=munisSel[0]; const ausentes=sectores.filter(s=>!programasEnMunicipio(m).some(p=>(p.sector||[]).includes(s))).sort(cmp);
     out.push({id:'o3',icono:'',n:ausentes.length,titulo:`Sectores sin registros en ${m}`,
       porque:'Son temas que aparecen en otros municipios pero no tienen programas registrados aquí. Puede que no se trabajen o que aún no se hayan reportado; conviene verificarlo antes de concluir.',
+      falta:'Si realmente no hay cooperación en ese sector en el municipio, o si existe pero no fue reportada al formulario.',
+      accion:'Consultar directamente con la municipalidad o las organizaciones presentes si conocen cooperación no reportada en estos sectores.',
       items:ausentes.map(s=>({txt:esc(s),sub:''}))});
   } else {
   const sm=sectores.map(s=>{ const mm=munis.filter(m=>programasEnMunicipio(m).some(p=>(p.sector||[]).includes(s))); return {s,mm,n:P.filter(p=>(p.sector||[]).includes(s)).length}; }).sort((a,b)=>a.mm.length-b.mm.length||a.n-b.n);
   out.push({id:'o3',icono:'',n:Math.min(5,sm.length),titulo:'Sectores con menor presencia registrada',
     porque:'Son los temas con menos municipios con registros. Puede deberse a que hay poca cooperación o a que todavía no se ha reportado; conviene verificarlo antes de concluir.',
+    falta:'Si la baja presencia es real o solo refleja que la ubicación municipal del programa no quedó registrada.',
+    accion:'Priorizar la verificación de estos sectores antes de usarlos como evidencia de brecha territorial en algún informe.',
     items:sm.slice(0,5).map(x=>({txt:`<b>${esc(x.s)}</b>: registrado en ${x.mm.length} de ${munis.length} municipios (${x.n} ${plural(x.n,'programa','programas')})`,
       sub:x.mm.length?x.mm.map(chipMuni).join(''):(x.n>0
         ?`<span class="int-empty">Sin municipios con ubicación declarada para este sector. Puede existir información sectorial de ${x.n} ${plural(x.n,'programa','programas')} sin una ubicación municipal registrada; esto no significa ausencia de cooperación, sino un dato pendiente de precisar.</span>`
@@ -654,11 +880,15 @@ function oportunidades(munisSel){
   const c2=Object.entries(cc).filter(([,s])=>s.size>=2).sort((a,b)=>b[1].size-a[1].size);
   out.push({id:'o4',icono:'',n:c2.length,titulo:'Organizaciones que reportan una misma contraparte',
     porque:'Una institución aliada de varias organizaciones puede ser un punto natural para convocar. Compartir contraparte no significa que ya trabajen juntas.',
+    falta:'Si esa contraparte conoce o reconoce a todas las organizaciones que la mencionan, y si existe algún contacto previo entre ellas a través de esa institución.',
+    accion:'Explorar con la institución aliada si estaría dispuesta a convocar o facilitar un espacio de diálogo entre las organizaciones que la reportan.',
     items:c2.map(([c,s])=>({txt:`<span class="int-lnk" data-go="contra:${esc(c)}">${esc(c)}</span>: ${s.size} organizaciones`,sub:`<small class="int-orgs">${[...s].sort(cmp).map(esc).join(' · ')}</small>`}))});
   // 5. Programas que finalizan pronto
   const pc=PS.filter(porCerrar).sort((a,b)=>(fechaFin(a)||new Date(9e12))-(fechaFin(b)||new Date(9e12)));
   out.push({id:'o5',icono:'',n:pc.length,titulo:`Programas que finalizan en los próximos ${MESES_CIERRE} meses`,
     porque:'Cuando un programa termina, conviene prever quién da continuidad a lo avanzado en esos territorios.',
+    falta:'Si ya existe un plan de cierre o de transición hacia otra organización o hacia la municipalidad.',
+    accion:'Incluir estos programas en la agenda de la mesa de cooperación o del espacio de coordinación correspondiente antes de su cierre.',
     items:pc.map(p=>({txt:`<span class="int-lnk" data-go="prog:${idProg(p)}">${esc(nombreProg(p))}</span> · ${esc(p.organizacion)}`,sub:`${tag('Fin: '+(p.fecha_fin||'por definir'),'warn')}${munisTodos(p).map(chipMuni).join('')}`}))});
   // 6. Información por completar
   const falt=[];
@@ -677,7 +907,10 @@ function oportunidades(munisSel){
   const vacios=munis.filter(m=>!programasEnMunicipio(m).length);
   if(vacios.length) falt.push({txt:`<b>${vacios.length}</b> ${plural(vacios.length,'municipio sin registros','municipios sin registros')}`,sub:vacios.map(chipMuni).join('')});
   out.push({id:'o6',icono:'',n:falt.length,titulo:'Información por completar o verificar',
-    porque:'Completar estos datos mejora la calidad del mapeo y evita conclusiones apresuradas.',items:falt});
+    porque:'Completar estos datos mejora la calidad del mapeo y evita conclusiones apresuradas.',
+    falta:'El dato puntual que falta ya se indica en cada fila.',
+    accion:'Solicitar a la organización correspondiente que complete o corrija el registro en una próxima actualización del formulario.',
+    items:falt});
   return out;
 }
 function renderOportunidades(){
@@ -688,7 +921,13 @@ function renderOportunidades(){
   ops.forEach(o=>registrarLista(o.id,o.titulo,()=>`<p class="int-note">${esc(o.porque)}</p><ul class="int-ul">${o.items.map(i=>`<li><div>${i.txt}</div><div class="int-sub2">${i.sub||''}</div></li>`).join('')}</ul>`));
   box.innerHTML=`<div class="int-card"><div class="int-eyebrow">Oportunidades de análisis y coordinación</div>
    <p class="int-note warn">Situaciones detectadas automáticamente en los registros. No son duplicidades, brechas ni problemas confirmados: son motivos para conversar y verificar.</p>
-   <div class="int-oport-grid">${ops.map(o=>`<section class="int-op ${o.n?'':'vacia'}"><div class="int-op-h"><span aria-hidden="true">${o.icono}</span><h4>${esc(o.titulo)}</h4><b>${o.n}</b></div><p class="int-why">${esc(o.porque)}</p>
+   <div class="int-oport-grid">${ops.map(o=>`<section class="int-op ${o.n?'':'vacia'}"><div class="int-op-h"><span aria-hidden="true">${o.icono}</span><h4>${esc(o.titulo)}</h4><b>${o.n}</b></div>
+     <dl class="int-op-4">
+       <dt>Qué se observó</dt><dd>${o.n} ${plural(o.n,'caso','casos')} detectados en los registros actuales.</dd>
+       <dt>Por qué podría ser relevante</dt><dd>${esc(o.porque)}</dd>
+       ${o.falta?`<dt>Qué falta verificar</dt><dd>${esc(o.falta)}</dd>`:''}
+       ${o.accion?`<dt>Posible acción</dt><dd>${esc(o.accion)}</dd>`:''}
+     </dl>
      ${o.n?`<div class="int-op-destacado"><div>${o.items[0].txt}</div>${o.items[0].sub?`<div class="int-sub2">${o.items[0].sub}</div>`:''}</div>
       <details class="int-acc"><summary>Ver los primeros ${Math.min(6,o.items.length)} de ${o.items.length}</summary><div class="int-acc-body"><ul class="int-ul">${o.items.slice(1,6).map(i=>`<li><div>${i.txt}</div><div class="int-sub2">${i.sub||''}</div></li>`).join('')||'<li class="int-empty">No hay registros adicionales.</li>'}</ul></div></details>
       ${o.items.length>1?`<button type="button" class="int-link" data-go="lista:${o.id}">Ver todos (${o.items.length}) →</button>`:''}`:'<div class="int-empty">No se detectaron casos con los registros actuales.</div>'}</section>`).join('')}</div></div>`;
@@ -1382,6 +1621,20 @@ function estilos(){
   .int-dl{display:grid;grid-template-columns:minmax(120px,1fr) 2fr;gap:6px 14px;font-size:13px}.int-dl dt{color:#5B6675}.int-dl dd{margin:0}
   .int-oport{background:#EEF6FC;border-radius:8px;padding:10px 12px;font-size:13px}
   .int-sub{margin-bottom:6px}.int-orgs{color:#5B6675;line-height:1.5}
+  .int-op-4{display:grid;grid-template-columns:max-content 1fr;gap:3px 12px;font-size:12.5px;margin:8px 0 10px}.int-op-4 dt{color:#5B6675;font-weight:600;white-space:nowrap}.int-op-4 dd{margin:0 0 4px;color:#334155}
+  .int-red-leyenda{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:#334155;margin:4px 0 14px}.int-red-leyenda i{font-style:normal;margin-right:4px}
+  .int-red-wrap{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:0 48px;min-height:60px}
+  .int-red-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+  .int-red-svg line{stroke:#9FB4C6;stroke-width:1.4;transition:stroke .15s,stroke-width .15s}.int-red-svg line.dim{stroke:#E2E8F0}.int-red-svg line.on{stroke:#22678A;stroke-width:2}
+  .int-red-col{position:relative;z-index:1;display:flex;flex-direction:column;gap:7px}
+  .int-red-nodo{display:flex;align-items:baseline;gap:7px;text-align:left;border:1.5px solid var(--c,#CBD5E1);background:#fff;border-radius:10px;padding:7px 12px;font:inherit;font-size:13px;cursor:pointer;color:#183652;transition:.15s}
+  .int-red-nodo .int-red-ico{color:var(--c,#334155);font-size:13px;flex:0 0 auto}
+  .int-red-nodo .int-red-lbl{flex:1;overflow-wrap:anywhere}
+  .int-red-nodo small{color:#6B7280;font-size:11px;white-space:nowrap}
+  .int-red-nodo:hover,.int-red-nodo:focus-visible{background:#F8FBFE;outline:none}
+  .int-red-nodo.on{background:var(--c,#22678A);border-color:var(--c,#22678A);color:#fff}.int-red-nodo.on small{color:#E7F0F7}.int-red-nodo.on .int-red-ico{color:#fff}
+  .int-red-nodo.dim{opacity:.35}
+  @media(max-width:760px){.int-red-wrap{grid-template-columns:1fr;gap:28px 0}.int-red-svg{display:none}}
   @media(max-width:640px){.int-big{font-size:15px}.int-card{padding:14px}.int-kpi b{font-size:19px}.int-dl{grid-template-columns:1fr}.int-bar{grid-template-columns:1fr 1.4fr 26px}.int-nav-extra{margin-left:0}}
   @media print{body.int-printing > *:not(#int-drawer):not(#int-veil){display:none!important}body.int-printing #int-drawer{position:static;width:auto;box-shadow:none;transform:none}body.int-printing .int-dr-bar{display:none}body.int-printing #int-veil{display:none}}
   `;
@@ -1397,12 +1650,19 @@ function renderVista(id){
     if(id==='panorama'){ renderConsultas(); renderTablaMunicipios(); renderHallazgos(); renderPanoramaV3(); }
     if(id==='municipio') renderMuniExtra();
     if(id==='instituciones'){ irDirectorio(); renderDirectorio(); }
-    if(id==='articulacion'){ renderArtExtra(); plegar('articulacion','int-art','Detalle técnico: filtros, matrices y tabla original de articulación',false); }
+    if(id==='articulacion'){ renderArtExtra(); renderRedCoordinacion(); plegar('articulacion','int-art','Detalle técnico: filtros, matrices y tabla original de articulación',false); }
     if(id==='brechas'){ renderOportunidades(); plegar('brechas','int-oport','Cobertura territorial por lugar poblado y matriz sector × municipio',true); }
     if(id==='poblacion-accion') renderPobExtra();
   }catch(e){ console.error('inteligencia.js:',id,e); }
 }
-window.INT={RANGOS,resumenPoblacion,distRangos,registrosPoblacion};
+window.INT={
+  RANGOS,resumenPoblacion,distRangos,registrosPoblacion,
+  // Utilidades de contraparte reutilizadas por el módulo de Coordinación (Etapa 3) para no
+  // duplicar el criterio de normalización ya validado en Fases anteriores.
+  sinAcento,SIN_CONTRAPARTE,CONTRAPARTES,fragmentosContraparte,contrapartesDetalle,contrapartesDe,
+  CATEGORIAS_GENERICAS,
+  modeloCoordinacion
+};
 window.initInteligencia=function(){
   if(typeof DATA==='undefined'||!DATA) return;
   P=DATA.programas||[];

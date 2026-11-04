@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="visor-version" content="fase2-e2-ajustes">
+<meta name="visor-version" content="fase2-e3">
 <title>Mapeo de Actores de Cooperación — SEGEPLAN Chiquimula</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -734,8 +734,9 @@ table tbody tr:hover td{ background:#F4F1E6; }
     <div class="card">
       <div class="section-title">Detalle de articulación reportada</div>
       <div class="section-sub">La relación territorial se deriva de la cobertura comunitaria e institucional/municipal reportada por cada programa/proyecto.</div>
+      <p class="int-note" style="font-size:12px;color:#5B6675;margin:0 0 10px;">Relación declarada por la organización, no coordinación verificada. "Municipios relacionados" es la cobertura general del programa, no una ubicación comprobada del vínculo mismo.</p>
       <table id="tabla-art-detalle">
-        <thead><tr><th>CONTRAPARTE / ALIADO</th><th>ESPACIO</th><th>ORGANIZACIÓN</th><th>PROGRAMA / PROYECTO</th><th>MUNICIPIOS RELACIONADOS</th><th>SECTOR</th></tr></thead>
+        <thead><tr><th>CONTRAPARTE / ALIADO</th><th>TIPO</th><th>ESPACIO</th><th>ORGANIZACIÓN</th><th>PROGRAMA / PROYECTO</th><th>MUNICIPIOS RELACIONADOS</th><th>SECTOR</th><th>FUENTE</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
@@ -2396,8 +2397,18 @@ function municipiosProgramaArticulacion(p){
 function registrosArticulacion(){
   const filas=[];
   (DATA.programas||[]).forEach(p=>{
-    const espacios=[...new Set((p.espacios_coordinacion||[]).filter(Boolean))];
-    const contraparte=(p.contraparte_gubernamental||'').trim();
+    // "No participa" es una respuesta válida del formulario, pero significa justamente lo
+    // contrario de un espacio de coordinación: no se trata como tal, para no sugerir que la
+    // organización coordina en un espacio llamado "No participa". Lo mismo con una contraparte
+    // declarada como "no"/"ninguna"/"-" (se reutiliza la misma regla que ya usa el visor en
+    // contrapartesDetalle(), definida en inteligencia.js, para no duplicar el criterio).
+    const espacios=[...new Set((p.espacios_coordinacion||[]).filter(e=>e&&e!=='No participa'))];
+    let contraparte=(p.contraparte_gubernamental||'').trim();
+    try{
+      const INT=window.INT;
+      const t=INT.sinAcento(contraparte).replace(/[.,;]+$/,'').trim();
+      if(!t||INT.SIN_CONTRAPARTE.test(t)) contraparte='';
+    }catch(_){}
     const municipios=municipiosProgramaArticulacion(p);
     const base={
       contraparte,
@@ -2469,7 +2480,8 @@ function renderArticulacion(){
     <div class="coverage-kpi"><div class="klabel">Contrapartes / aliados</div><div class="kvalue">${contrapartes.length}</div><div class="ksub">¿Con quién se articula?</div></div>
     <div class="coverage-kpi"><div class="klabel">Espacios de coordinación</div><div class="kvalue">${espacios.length}</div><div class="ksub">¿Dónde coordina?</div></div>
     <div class="coverage-kpi"><div class="klabel">Programas / proyectos</div><div class="kvalue">${progs.length}</div><div class="ksub">Con articulación reportada</div></div>
-    <div class="coverage-kpi"><div class="klabel">Municipios relacionados</div><div class="kvalue">${munis.length}</div><div class="ksub">Cobertura de los proyectos</div></div>`;
+    <div class="coverage-kpi"><div class="klabel">Municipios relacionados</div><div class="kvalue">${munis.length}</div><div class="ksub">Cobertura de los proyectos</div></div>`
+    + (muni?`<p class="int-note warn" style="margin-top:10px;">El filtro de municipio muestra programas con <b>presencia general reportada</b> en ${escaparHtml(muni)}. No significa que la contraparte o el espacio de coordinación esté ubicado o vinculado específicamente en ese municipio: el formulario no registra una ubicación propia para cada vínculo, solo la cobertura general del programa.</p>`:'');
 
   const resumen=new Map();
   filas.forEach(x=>{
@@ -2541,8 +2553,28 @@ function renderArticulacion(){
 
   document.querySelector('#tabla-art-detalle tbody').innerHTML=filas
     .sort((a,b)=>(a.contraparte||'').localeCompare(b.contraparte||'','es')||(a.espacio||'').localeCompare(b.espacio||'','es')||a.organizacion.localeCompare(b.organizacion,'es'))
-    .map(x=>`<tr><td><b>${escaparHtml(x.contraparte||'No reportada')}</b></td><td>${escaparHtml(x.espacio||'No reportado')}</td><td>${escaparHtml(x.organizacion)}</td><td>${escaparHtml(x.programa)}</td><td>${escaparHtml(x.municipios.join(', ')||'—')}</td><td>${escaparHtml(x.sectores.join(', ')||'—')}</td></tr>`)
-    .join('') || '<tr><td colspan="6" class="empty">No hay vinculaciones reportadas para esta consulta.</td></tr>';
+    .map(x=>`<tr><td><b>${escaparHtml(x.contraparte||'No reportada')}</b></td><td>${escaparHtml(tipoContraparte(x.contraparte))}</td><td>${escaparHtml(x.espacio||'No reportado')}</td><td>${escaparHtml(x.organizacion)}</td><td>${escaparHtml(x.programa)}</td><td>${escaparHtml(x.municipios.join(', ')||'—')}</td><td>${escaparHtml(x.sectores.join(', ')||'—')}</td><td>${escaparHtml(FUENTE_COORDINACION)}</td></tr>`)
+    .join('') || '<tr><td colspan="8" class="empty">No hay vinculaciones reportadas para esta consulta.</td></tr>';
+}
+
+// "Reportado por la organización en el formulario Kobo": el campo fuente_dato existe en el
+// catálogo del XLSForm pero no aparece registrado en ningún programa de data.json (auditoría
+// previa a esta etapa), así que se usa esta etiqueta global en vez de inventar una fuente por fila.
+const FUENTE_COORDINACION='Autorreporte (formulario Kobo)';
+// Clasifica el texto de contraparte tal como quedó en la fila (ya limpiado de "no"/"ninguna"/"-").
+// Reutiliza contrapartesDetalle() de inteligencia.js (vía window.INT) para no duplicar el criterio
+// de normalización; aquí solo se traduce el resultado a una etiqueta de tipo para la columna.
+function tipoContraparte(contraparteTexto){
+  if(!contraparteTexto) return 'No declarada';
+  try{
+    const INT=window.INT;
+    const det=INT.contrapartesDetalle({contraparte_gubernamental:contraparteTexto});
+    if(det.ninguna) return 'No declarada';
+    const tipos=new Set();
+    det.canon.forEach(c=>tipos.add(INT.CATEGORIAS_GENERICAS.has(c)?'Categoría institucional':'Institución nombrada'));
+    if(det.sinClasificar.length) tipos.add('Sin clasificar');
+    return [...tipos].join(' / ')||'Sin clasificar';
+  }catch(_){ return 'Sin clasificar'; }
 }
 
 let paMap=null, paLayer=null, paBoundaryLayer=null;
@@ -2960,6 +2992,6 @@ function renderPanorama(){
 
 iniciar().then(()=>{ try{ agregarBotonesCSV(); }catch(e){ console.warn(e); } });
 </script>
-<script src="inteligencia.js?v=8"></script>
+<script src="inteligencia.js?v=9"></script>
 </body>
 </html>
