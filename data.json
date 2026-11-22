@@ -1,5 +1,5 @@
 {
-  "generado": "2026-11-22T02:53:55.852729+00:00",
+  "generado": "2026-11-22T02:55:21.479213+00:00",
   "nota": "Datos sincronizados automáticamente desde KoboToolbox. La base territorial oficial se mantiene separada de los lugares adicionales reportados pendientes de validación.",
   "programas": [
     {
@@ -4950,7 +4950,7 @@
             "Hogares con adultos mayores": null,
             "Hogares monoparentales": 10
           },
-          "poblacion_total_estimada": 20,
+          "poblacion_total_estimada": 10,
           "accion_comunidad": [
             "Comités o comisiones de agua",
             "Sistemas de agua potable"
@@ -4994,7 +4994,7 @@
             "Hogares con adultos mayores": null,
             "Hogares monoparentales": 11
           },
-          "poblacion_total_estimada": 21,
+          "poblacion_total_estimada": 11,
           "accion_comunidad": [
             "Filtros de agua domiciliares (ecofiltros)"
           ],
@@ -5036,7 +5036,7 @@
             "Hogares con adultos mayores": null,
             "Hogares monoparentales": 12
           },
-          "poblacion_total_estimada": 22,
+          "poblacion_total_estimada": 12,
           "accion_comunidad": [
             "Jornadas nutricionales"
           ],
@@ -5078,7 +5078,7 @@
             "Hogares con adultos mayores": null,
             "Hogares monoparentales": 13
           },
-          "poblacion_total_estimada": 23,
+          "poblacion_total_estimada": 13,
           "accion_comunidad": [
             "Sistemas de agua potable",
             "Jornadas nutricionales"
@@ -5957,39 +5957,39 @@
   },
   "matriz_sector_municipio": {
     "Seguridad alimentaria y nutricional": {
-      "Camotán": 2,
       "Chiquimula": 2,
-      "Quezaltepeque": 1,
+      "Camotán": 2,
       "Esquipulas": 2,
+      "Quezaltepeque": 1,
       "Concepción las Minas": 1,
       "San Jacinto": 1,
       "San José la Arada": 1
     },
     "Gobernanza y fortalecimiento institucional": {
-      "Camotán": 5,
       "Chiquimula": 6,
+      "Camotán": 5,
       "Ipala": 1,
       "San Jacinto": 1,
       "Jocotán": 2,
-      "d": 1,
       "Concepción las Minas": 3,
+      "d": 1,
       "Quezaltepeque": 2,
       "Esquipulas": 2
     },
     "Agua y saneamiento": {
-      "Camotán": 4,
       "Chiquimula": 5,
+      "Camotán": 4,
       "Concepción las Minas": 2,
       "Olopa": 3,
-      "Jocotán": 2,
       "Esquipulas": 3,
+      "Jocotán": 2,
       "San Jacinto": 2,
       "San José la Arada": 2
     },
     "Infraestructura": {
       "Camotán": 1,
-      "Quezaltepeque": 1,
-      "Esquipulas": 1
+      "Esquipulas": 1,
+      "Quezaltepeque": 1
     },
     "Ambiente y cambio climático": {
       "Jocotán": 2,
@@ -5997,18 +5997,18 @@
       "Chiquimula": 1
     },
     "Educación": {
-      "Camotán": 1,
       "San Juan Ermita": 1,
+      "Camotán": 1,
       "Chiquimula": 4,
       "Concepción las Minas": 2,
-      "Jocotán": 2,
-      "Olopa": 2,
       "Esquipulas": 2,
+      "Olopa": 2,
+      "Jocotán": 2,
       "Quezaltepeque": 1
     },
     "Salud": {
-      "Concepción las Minas": 2,
       "Chiquimula": 2,
+      "Concepción las Minas": 2,
       "Olopa": 2,
       "Esquipulas": 1,
       "Quezaltepeque": 1,
@@ -6016,14 +6016,14 @@
       "Jocotán": 1
     },
     "Desarrollo económico local": {
-      "Concepción las Minas": 1,
+      "Chiquimula": 1,
       "Camotán": 1,
-      "Chiquimula": 1
+      "Concepción las Minas": 1
     },
     "Género": {
-      "Concepción las Minas": 1,
+      "Chiquimula": 1,
       "Camotán": 1,
-      "Chiquimula": 1
+      "Concepción las Minas": 1
     }
   },
   "comunidades_sin_cobertura": [
