@@ -1,5 +1,5 @@
 {
-  "generado": "2026-11-22T02:48:34.849979+00:00",
+  "generado": "2026-11-22T02:51:36.388269+00:00",
   "nota": "Datos sincronizados automáticamente desde KoboToolbox. La base territorial oficial se mantiene separada de los lugares adicionales reportados pendientes de validación.",
   "programas": [
     {
@@ -4774,6 +4774,260 @@
           "area": "Rural"
         }
       ]
+    },
+    {
+      "organizacion": "PRUEBA V18 Completa",
+      "tipo_actor": "ONG internacional",
+      "trabajo_comunitario": "Sí",
+      "pais_origen": "",
+      "contacto": "Prueba",
+      "nombre_programa": "Programa de prueba v18 (todas las opciones nuevas)",
+      "tipo_atencion": "Desarrollo / atención ordinaria",
+      "sector": [
+        "Salud",
+        "Agua y saneamiento"
+      ],
+      "modalidad": [
+        "Capacitaciones",
+        "Transferencias monetarias / bonos",
+        "Obras o infraestructura"
+      ],
+      "fecha_inicio": "2026-02-01",
+      "tipo_duracion": "Sí, tiene fecha de finalización definida",
+      "fecha_fin": "2027-12-31",
+      "duracion_aproximada": "",
+      "estado_programa": "En ejecución",
+      "contraparte_gubernamental": "Municipalidades (prueba)",
+      "monto_rango": "Q500,000 – Q2,000,000",
+      "monto_rango_codigo": "500k_2m",
+      "fuente_financiamiento": [
+        "Donante internacional"
+      ],
+      "espacios_coordinacion": [
+        "CODEDE (Consejo Departamental de Desarrollo)",
+        "COMUDE (Consejo Municipal de Desarrollo)"
+      ],
+      "disposicion_coordinar": "Sí",
+      "beneficiarios_institucionales": {
+        "Dirección Municipal de la Mujer (DMM)": 2,
+        "COMUDE (Consejo Municipal de Desarrollo)": 1,
+        "Oficina Municipal de Agua y Saneamiento (OMAS)": 1,
+        "Unidad de Gestión Ambiental Municipal (UGAM)": 2,
+        "Oficina Forestal Municipal": 1,
+        "INFOM (prueba)": 0,
+        "Escuelas o centros educativos": 0
+      },
+      "municipios_cobertura_institucional": [
+        "Camotán",
+        "Jocotán",
+        "Olopa"
+      ],
+      "comunidades": [
+        {
+          "codigo_lugar": "jocotan_canapara_abajo",
+          "lugar_poblado": "Canapara Abajo ",
+          "municipio": "Jocotán",
+          "clasificacion": "Aldea",
+          "viviendas_catalogo": 198,
+          "lat": 14.764622,
+          "lon": -89.37885,
+          "fuera_catalogo": false,
+          "estado_validacion": "Catálogo territorial",
+          "referencia_lugar": "",
+          "poblacion_meta": [
+            "Niñez menor de 5 años",
+            "Niñez mayor de 5 años",
+            "Hogares con personas con discapacidad",
+            "Hogares con adultos mayores",
+            "Hogares monoparentales"
+          ],
+          "datos_cuantitativos_poblacion": "Sí",
+          "pm_cantidades": {
+            "Niñez menor de 5 años": null,
+            "Niñez mayor de 5 años": 20,
+            "Hogares con personas con discapacidad": 4,
+            "Hogares con adultos mayores": null,
+            "Hogares monoparentales": 10
+          },
+          "poblacion_total_estimada": 20,
+          "accion_comunidad": [
+            "Comités o comisiones de agua",
+            "Sistemas de agua potable"
+          ],
+          "ac_cantidades": {
+            "Comités o comisiones de agua": null,
+            "Sistemas de agua potable": null
+          },
+          "etnia": [
+            "Maya"
+          ],
+          "grupo_etario": [
+            "Niñez (0-12 años)"
+          ],
+          "area": "Periurbana"
+        },
+        {
+          "codigo_lugar": "jocotan_canapara_arriba",
+          "lugar_poblado": "Canapara Arriba",
+          "municipio": "Jocotán",
+          "clasificacion": "Aldea",
+          "viviendas_catalogo": 92,
+          "lat": 14.759889,
+          "lon": -89.38797,
+          "fuera_catalogo": false,
+          "estado_validacion": "Catálogo territorial",
+          "referencia_lugar": "",
+          "poblacion_meta": [
+            "Niñez menor de 5 años",
+            "Niñez mayor de 5 años",
+            "Hogares con personas con discapacidad",
+            "Hogares con adultos mayores",
+            "Hogares monoparentales"
+          ],
+          "datos_cuantitativos_poblacion": "Sí",
+          "pm_cantidades": {
+            "Niñez menor de 5 años": null,
+            "Niñez mayor de 5 años": 21,
+            "Hogares con personas con discapacidad": null,
+            "Hogares con adultos mayores": null,
+            "Hogares monoparentales": 11
+          },
+          "poblacion_total_estimada": 21,
+          "accion_comunidad": [
+            "Filtros de agua domiciliares (ecofiltros)"
+          ],
+          "ac_cantidades": {
+            "Filtros de agua domiciliares (ecofiltros)": null
+          },
+          "etnia": [
+            "Maya"
+          ],
+          "grupo_etario": [
+            "Niñez (0-12 años)"
+          ],
+          "area": "Periurbana"
+        },
+        {
+          "codigo_lugar": "olopa_el_chucte",
+          "lugar_poblado": "El Chucte",
+          "municipio": "Olopa",
+          "clasificacion": "Caserío",
+          "viviendas_catalogo": 97,
+          "lat": 14.696124,
+          "lon": -89.32239,
+          "fuera_catalogo": false,
+          "estado_validacion": "Catálogo territorial",
+          "referencia_lugar": "",
+          "poblacion_meta": [
+            "Niñez menor de 5 años",
+            "Niñez mayor de 5 años",
+            "Hogares con personas con discapacidad",
+            "Hogares con adultos mayores",
+            "Hogares monoparentales"
+          ],
+          "datos_cuantitativos_poblacion": "Sí",
+          "pm_cantidades": {
+            "Niñez menor de 5 años": null,
+            "Niñez mayor de 5 años": 22,
+            "Hogares con personas con discapacidad": null,
+            "Hogares con adultos mayores": null,
+            "Hogares monoparentales": 12
+          },
+          "poblacion_total_estimada": 22,
+          "accion_comunidad": [
+            "Jornadas nutricionales"
+          ],
+          "ac_cantidades": {
+            "Jornadas nutricionales": null
+          },
+          "etnia": [
+            "Maya"
+          ],
+          "grupo_etario": [
+            "Niñez (0-12 años)"
+          ],
+          "area": "Periurbana"
+        },
+        {
+          "codigo_lugar": "olopa_el_cerron",
+          "lugar_poblado": "El Cerron",
+          "municipio": "Olopa",
+          "clasificacion": "Aldea",
+          "viviendas_catalogo": 156,
+          "lat": 14.710645,
+          "lon": -89.28635,
+          "fuera_catalogo": false,
+          "estado_validacion": "Catálogo territorial",
+          "referencia_lugar": "",
+          "poblacion_meta": [
+            "Niñez menor de 5 años",
+            "Niñez mayor de 5 años",
+            "Hogares con personas con discapacidad",
+            "Hogares con adultos mayores",
+            "Hogares monoparentales"
+          ],
+          "datos_cuantitativos_poblacion": "Sí",
+          "pm_cantidades": {
+            "Niñez menor de 5 años": null,
+            "Niñez mayor de 5 años": 23,
+            "Hogares con personas con discapacidad": null,
+            "Hogares con adultos mayores": null,
+            "Hogares monoparentales": 13
+          },
+          "poblacion_total_estimada": 23,
+          "accion_comunidad": [
+            "Sistemas de agua potable",
+            "Jornadas nutricionales"
+          ],
+          "ac_cantidades": {
+            "Sistemas de agua potable": null,
+            "Jornadas nutricionales": null
+          },
+          "etnia": [
+            "Maya"
+          ],
+          "grupo_etario": [
+            "Niñez (0-12 años)"
+          ],
+          "area": "Periurbana"
+        }
+      ]
+    },
+    {
+      "organizacion": "PRUEBA V18 Sin Territorio",
+      "tipo_actor": "Academia / centro de investigación",
+      "trabajo_comunitario": "No",
+      "pais_origen": "",
+      "contacto": "Prueba",
+      "nombre_programa": "Estudio departamental (prueba)",
+      "tipo_atencion": "Desarrollo / atención ordinaria",
+      "sector": [
+        "Gobernanza y fortalecimiento institucional"
+      ],
+      "modalidad": [
+        "Estudios, diagnósticos o investigación"
+      ],
+      "fecha_inicio": "2026-05-01",
+      "tipo_duracion": "Sí, tiene fecha de finalización definida",
+      "fecha_fin": "2026-12-31",
+      "duracion_aproximada": "",
+      "estado_programa": "En ejecución",
+      "contraparte_gubernamental": "",
+      "monto_rango": "Menos de Q500,000",
+      "monto_rango_codigo": "menos_500k",
+      "fuente_financiamiento": [
+        "Fondos propios"
+      ],
+      "espacios_coordinacion": [
+        "No participa"
+      ],
+      "disposicion_coordinar": "Sí",
+      "beneficiarios_institucionales": {},
+      "municipios_cobertura_institucional": [
+        "Esquipulas",
+        "Quezaltepeque"
+      ],
+      "comunidades": []
     }
   ],
   "municipios": [
@@ -4795,25 +5049,27 @@
         "Caritas",
         "D",
         "F",
-        "G"
+        "G",
+        "PRUEBA V18 Completa"
       ],
-      "total_programas": 12,
+      "total_programas": 13,
       "comunidades_cubiertas": 2,
       "comunidades_total_catalogo": 155,
       "inversion_estimada": 0,
       "sectores": {
         "Seguridad alimentaria y nutricional": 2,
         "Gobernanza y fortalecimiento institucional": 5,
-        "Agua y saneamiento": 3,
+        "Agua y saneamiento": 4,
         "Infraestructura": 1,
         "Ambiente y cambio climático": 2,
         "Educación": 1,
         "Desarrollo económico local": 1,
-        "Género": 1
+        "Género": 1,
+        "Salud": 1
       },
       "estado": {
         "Por iniciar": 4,
-        "En ejecución": 3,
+        "En ejecución": 4,
         "En formulación": 1,
         "Próximo a finalizar": 4
       },
@@ -4844,13 +5100,13 @@
           "con_cantidad": true
         },
         "Dirección Municipal de la Mujer (DMM)": {
-          "registros": 1,
-          "cantidad": 1,
+          "registros": 2,
+          "cantidad": 3,
           "con_cantidad": true
         },
         "COMUDE (Consejo Municipal de Desarrollo)": {
-          "registros": 1,
-          "cantidad": 1,
+          "registros": 2,
+          "cantidad": 2,
           "con_cantidad": true
         },
         "Oficina/Dirección Municipal de Seguridad Alimentaria y Nutricional (SAN)": {
@@ -4877,10 +5133,35 @@
           "registros": 1,
           "cantidad": 1,
           "con_cantidad": true
+        },
+        "Oficina Municipal de Agua y Saneamiento (OMAS)": {
+          "registros": 1,
+          "cantidad": 1,
+          "con_cantidad": true
+        },
+        "Unidad de Gestión Ambiental Municipal (UGAM)": {
+          "registros": 1,
+          "cantidad": 2,
+          "con_cantidad": true
+        },
+        "Oficina Forestal Municipal": {
+          "registros": 1,
+          "cantidad": 1,
+          "con_cantidad": true
+        },
+        "INFOM (prueba)": {
+          "registros": 1,
+          "cantidad": 0,
+          "con_cantidad": true
+        },
+        "Escuelas o centros educativos": {
+          "registros": 1,
+          "cantidad": 0,
+          "con_cantidad": true
         }
       },
       "fuente_financiamiento": {
-        "Donante internacional": 6,
+        "Donante internacional": 7,
         "Donante nacional": 3,
         "Fondos propios": 2,
         "Fondos gubernamentales": 1
@@ -5101,22 +5382,23 @@
         "Caritas",
         "D",
         "F",
-        "Helvetas (prueba)"
+        "Helvetas (prueba)",
+        "PRUEBA V18 Sin Territorio"
       ],
-      "total_programas": 6,
+      "total_programas": 7,
       "comunidades_cubiertas": 15,
       "comunidades_total_catalogo": 171,
       "inversion_estimada": 0,
       "sectores": {
         "Seguridad alimentaria y nutricional": 2,
         "Infraestructura": 1,
-        "Gobernanza y fortalecimiento institucional": 1,
+        "Gobernanza y fortalecimiento institucional": 2,
         "Educación": 2,
         "Agua y saneamiento": 3,
         "Salud": 1
       },
       "estado": {
-        "En ejecución": 2,
+        "En ejecución": 3,
         "Próximo a finalizar": 4
       },
       "instituciones": {
@@ -5178,7 +5460,8 @@
       },
       "fuente_financiamiento": {
         "Donante internacional": 4,
-        "Donante nacional": 2
+        "Donante nacional": 2,
+        "Fondos propios": 1
       },
       "lugares_adicionales_reportados": 0
     },
@@ -5205,21 +5488,24 @@
     "Jocotán": {
       "organizaciones": [
         "Caritas",
-        "D"
+        "D",
+        "PRUEBA V18 Completa"
       ],
-      "total_programas": 4,
-      "comunidades_cubiertas": 2,
+      "total_programas": 5,
+      "comunidades_cubiertas": 4,
       "comunidades_total_catalogo": 89,
       "inversion_estimada": 0,
       "sectores": {
         "Ambiente y cambio climático": 2,
         "Gobernanza y fortalecimiento institucional": 2,
         "Educación": 2,
-        "Agua y saneamiento": 1
+        "Agua y saneamiento": 2,
+        "Salud": 1
       },
       "estado": {
         "Por iniciar": 2,
-        "Próximo a finalizar": 2
+        "Próximo a finalizar": 2,
+        "En ejecución": 1
       },
       "instituciones": {
         "Oficina Municipal de Desarrollo Económico Local": {
@@ -5233,13 +5519,13 @@
           "con_cantidad": true
         },
         "Dirección Municipal de la Mujer (DMM)": {
-          "registros": 1,
-          "cantidad": 1,
+          "registros": 2,
+          "cantidad": 3,
           "con_cantidad": true
         },
         "Unidad de Gestión Ambiental Municipal (UGAM)": {
-          "registros": 1,
-          "cantidad": 1,
+          "registros": 2,
+          "cantidad": 3,
           "con_cantidad": true
         },
         "SOSEP": {
@@ -5253,7 +5539,7 @@
           "con_cantidad": true
         },
         "Escuelas o centros educativos": {
-          "registros": 1,
+          "registros": 2,
           "cantidad": 0,
           "con_cantidad": true
         },
@@ -5261,10 +5547,30 @@
           "registros": 1,
           "cantidad": 0,
           "con_cantidad": true
+        },
+        "COMUDE (Consejo Municipal de Desarrollo)": {
+          "registros": 1,
+          "cantidad": 1,
+          "con_cantidad": true
+        },
+        "Oficina Municipal de Agua y Saneamiento (OMAS)": {
+          "registros": 1,
+          "cantidad": 1,
+          "con_cantidad": true
+        },
+        "Oficina Forestal Municipal": {
+          "registros": 1,
+          "cantidad": 1,
+          "con_cantidad": true
+        },
+        "INFOM (prueba)": {
+          "registros": 1,
+          "cantidad": 0,
+          "con_cantidad": true
         }
       },
       "fuente_financiamiento": {
-        "Donante internacional": 2,
+        "Donante internacional": 3,
         "Donante nacional": 1,
         "Fondos multilaterales": 1
       },
@@ -5273,19 +5579,20 @@
     "Olopa": {
       "organizaciones": [
         "D",
+        "PRUEBA V18 Completa",
         "Prueba Claude"
       ],
-      "total_programas": 3,
-      "comunidades_cubiertas": 0,
+      "total_programas": 4,
+      "comunidades_cubiertas": 2,
       "comunidades_total_catalogo": 58,
       "inversion_estimada": 0,
       "sectores": {
-        "Agua y saneamiento": 2,
+        "Agua y saneamiento": 3,
         "Educación": 2,
-        "Salud": 1
+        "Salud": 2
       },
       "estado": {
-        "En ejecución": 1,
+        "En ejecución": 2,
         "Próximo a finalizar": 2
       },
       "instituciones": {
@@ -5310,13 +5617,13 @@
           "con_cantidad": true
         },
         "Dirección Municipal de la Mujer (DMM)": {
-          "registros": 1,
-          "cantidad": 2,
+          "registros": 2,
+          "cantidad": 4,
           "con_cantidad": true
         },
         "COMUDE (Consejo Municipal de Desarrollo)": {
-          "registros": 1,
-          "cantidad": 3,
+          "registros": 2,
+          "cantidad": 4,
           "con_cantidad": true
         },
         "MAGA": {
@@ -5338,12 +5645,37 @@
           "registros": 1,
           "cantidad": 0,
           "con_cantidad": true
+        },
+        "Oficina Municipal de Agua y Saneamiento (OMAS)": {
+          "registros": 1,
+          "cantidad": 1,
+          "con_cantidad": true
+        },
+        "Unidad de Gestión Ambiental Municipal (UGAM)": {
+          "registros": 1,
+          "cantidad": 2,
+          "con_cantidad": true
+        },
+        "Oficina Forestal Municipal": {
+          "registros": 1,
+          "cantidad": 1,
+          "con_cantidad": true
+        },
+        "INFOM (prueba)": {
+          "registros": 1,
+          "cantidad": 0,
+          "con_cantidad": true
+        },
+        "Escuelas o centros educativos": {
+          "registros": 1,
+          "cantidad": 0,
+          "con_cantidad": true
         }
       },
       "fuente_financiamiento": {
         "Fondos propios": 1,
         "Donante nacional": 1,
-        "Donante internacional": 1
+        "Donante internacional": 2
       },
       "lugares_adicionales_reportados": 1
     },
@@ -5351,21 +5683,22 @@
       "organizaciones": [
         "Caritas",
         "D",
+        "PRUEBA V18 Sin Territorio",
         "R"
       ],
-      "total_programas": 3,
+      "total_programas": 4,
       "comunidades_cubiertas": 9,
       "comunidades_total_catalogo": 99,
       "inversion_estimada": 0,
       "sectores": {
         "Seguridad alimentaria y nutricional": 1,
         "Infraestructura": 1,
-        "Gobernanza y fortalecimiento institucional": 1,
+        "Gobernanza y fortalecimiento institucional": 2,
         "Educación": 1,
         "Salud": 1
       },
       "estado": {
-        "En ejecución": 2,
+        "En ejecución": 3,
         "Próximo a finalizar": 1
       },
       "instituciones": {
@@ -5411,7 +5744,8 @@
         }
       },
       "fuente_financiamiento": {
-        "Donante internacional": 3
+        "Donante internacional": 3,
+        "Fondos propios": 1
       },
       "lugares_adicionales_reportados": 1
     },
@@ -5533,25 +5867,25 @@
       "Ipala": 1,
       "San Jacinto": 1,
       "Jocotán": 2,
-      "Quezaltepeque": 1,
       "Concepción las Minas": 3,
       "d": 1,
-      "Esquipulas": 1
+      "Quezaltepeque": 2,
+      "Esquipulas": 2
     },
     "Agua y saneamiento": {
       "Chiquimula": 5,
-      "Camotán": 3,
+      "Camotán": 4,
       "Concepción las Minas": 2,
-      "Olopa": 2,
+      "Olopa": 3,
+      "Jocotán": 2,
       "Esquipulas": 3,
-      "Jocotán": 1,
       "San Jacinto": 2,
       "San José la Arada": 2
     },
     "Infraestructura": {
       "Quezaltepeque": 1,
-      "Esquipulas": 1,
-      "Camotán": 1
+      "Camotán": 1,
+      "Esquipulas": 1
     },
     "Ambiente y cambio climático": {
       "Jocotán": 2,
@@ -5559,31 +5893,33 @@
       "Chiquimula": 1
     },
     "Educación": {
-      "San Juan Ermita": 1,
       "Chiquimula": 4,
+      "San Juan Ermita": 1,
       "Camotán": 1,
       "Concepción las Minas": 2,
-      "Olopa": 2,
-      "Esquipulas": 2,
       "Jocotán": 2,
+      "Esquipulas": 2,
+      "Olopa": 2,
       "Quezaltepeque": 1
     },
     "Salud": {
       "Chiquimula": 2,
       "Concepción las Minas": 2,
       "Quezaltepeque": 1,
-      "Olopa": 1,
-      "Esquipulas": 1
+      "Olopa": 2,
+      "Esquipulas": 1,
+      "Camotán": 1,
+      "Jocotán": 1
     },
     "Desarrollo económico local": {
       "Chiquimula": 1,
-      "Concepción las Minas": 1,
-      "Camotán": 1
+      "Camotán": 1,
+      "Concepción las Minas": 1
     },
     "Género": {
       "Chiquimula": 1,
-      "Concepción las Minas": 1,
-      "Camotán": 1
+      "Camotán": 1,
+      "Concepción las Minas": 1
     }
   },
   "comunidades_sin_cobertura": [
@@ -6692,20 +7028,6 @@
       "municipio": "Jocotán",
       "lat": 14.855738,
       "lon": -89.38686
-    },
-    {
-      "codigo_lugar": "jocotan_canapara_abajo",
-      "lugar_poblado": "Canapara Abajo ",
-      "municipio": "Jocotán",
-      "lat": 14.764622,
-      "lon": -89.37885
-    },
-    {
-      "codigo_lugar": "jocotan_canapara_arriba",
-      "lugar_poblado": "Canapara Arriba",
-      "municipio": "Jocotán",
-      "lat": 14.759889,
-      "lon": -89.38797
     },
     {
       "codigo_lugar": "jocotan_los_cardona",
@@ -8281,20 +8603,6 @@
       "municipio": "Olopa",
       "lat": 14.725228,
       "lon": -89.30456
-    },
-    {
-      "codigo_lugar": "olopa_el_chucte",
-      "lugar_poblado": "El Chucte",
-      "municipio": "Olopa",
-      "lat": 14.696124,
-      "lon": -89.32239
-    },
-    {
-      "codigo_lugar": "olopa_el_cerron",
-      "lugar_poblado": "El Cerron",
-      "municipio": "Olopa",
-      "lat": 14.710645,
-      "lon": -89.28635
     },
     {
       "codigo_lugar": "olopa_el_paternito",
@@ -11152,13 +11460,13 @@
       "con_cantidad": true
     },
     "Dirección Municipal de la Mujer (DMM)": {
-      "registros": 4,
-      "cantidad": 7,
+      "registros": 5,
+      "cantidad": 9,
       "con_cantidad": true
     },
     "COMUDE (Consejo Municipal de Desarrollo)": {
-      "registros": 2,
-      "cantidad": 4,
+      "registros": 3,
+      "cantidad": 5,
       "con_cantidad": true
     },
     "Oficina/Dirección Municipal de Seguridad Alimentaria y Nutricional (SAN)": {
@@ -11187,8 +11495,8 @@
       "con_cantidad": true
     },
     "Unidad de Gestión Ambiental Municipal (UGAM)": {
-      "registros": 1,
-      "cantidad": 1,
+      "registros": 2,
+      "cantidad": 3,
       "con_cantidad": true
     },
     "SOSEP": {
@@ -11197,7 +11505,7 @@
       "con_cantidad": true
     },
     "Escuelas o centros educativos": {
-      "registros": 1,
+      "registros": 2,
       "cantidad": 0,
       "con_cantidad": true
     },
@@ -11212,8 +11520,18 @@
       "con_cantidad": true
     },
     "Oficina Municipal de Agua y Saneamiento (OMAS)": {
+      "registros": 2,
+      "cantidad": 4,
+      "con_cantidad": true
+    },
+    "Oficina Forestal Municipal": {
       "registros": 1,
-      "cantidad": 3,
+      "cantidad": 1,
+      "con_cantidad": true
+    },
+    "INFOM (prueba)": {
+      "registros": 1,
+      "cantidad": 0,
       "con_cantidad": true
     }
   },
@@ -11275,19 +11593,45 @@
     },
     "Niñez menor de 5 años": {
       "Cuadrillas contra incendios": 1,
-      "Comités o comisiones de agua": 57,
-      "Sistemas de agua potable": 59,
-      "Saneamiento (letrinas, manejo de desechos)": 57
+      "Comités o comisiones de agua": 58,
+      "Sistemas de agua potable": 61,
+      "Saneamiento (letrinas, manejo de desechos)": 57,
+      "Filtros de agua domiciliares (ecofiltros)": 1,
+      "Jornadas nutricionales": 2
+    },
+    "Niñez mayor de 5 años": {
+      "Comités o comisiones de agua": 1,
+      "Sistemas de agua potable": 2,
+      "Filtros de agua domiciliares (ecofiltros)": 1,
+      "Jornadas nutricionales": 2
+    },
+    "Hogares con personas con discapacidad": {
+      "Comités o comisiones de agua": 1,
+      "Sistemas de agua potable": 2,
+      "Filtros de agua domiciliares (ecofiltros)": 1,
+      "Jornadas nutricionales": 2
+    },
+    "Hogares con adultos mayores": {
+      "Comités o comisiones de agua": 1,
+      "Sistemas de agua potable": 2,
+      "Filtros de agua domiciliares (ecofiltros)": 1,
+      "Jornadas nutricionales": 2
+    },
+    "Hogares monoparentales": {
+      "Comités o comisiones de agua": 1,
+      "Sistemas de agua potable": 2,
+      "Filtros de agua domiciliares (ecofiltros)": 1,
+      "Jornadas nutricionales": 2
     }
   },
   "inversion": {
-    "programas_con_monto": 22,
+    "programas_con_monto": 24,
     "programas_sin_monto": 0,
     "nota_metodologica": "La inversión se conserva como rango reportado. No se calculan puntos medios ni se distribuyen montos entre municipios o sectores."
   },
   "control": {
-    "registros_kobo": 17,
-    "programas_procesados": 22,
+    "registros_kobo": 19,
+    "programas_procesados": 24,
     "lugares_catalogo": 996,
     "lugares_con_coordenadas": 816,
     "lugares_adicionales_reportados": 13,
