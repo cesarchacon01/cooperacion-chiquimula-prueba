@@ -178,7 +178,7 @@ def programa_desde(rep, actor, extra=None):
     for x in inst:
         if x=='Otra':
             otro=str(find_value(rep,'beneficiarios_institucionales_otro','Otro')); inst_counts[otro]=num(find_value(rep,'bi_cant_otro'))
-        else: inst_counts[x]=num(find_value(rep,inst_code_to_field.get(x,''))) if inst_code_to_field.get(x) else 0
+        else: inst_counts[x]=num(find_value(rep,inst_code_to_field.get(x,''))) if inst_code_to_field.get(x) else None  # v18: sin cantidad (departamentales y locales) en lugar de 0
     comunidades=[]
     # Un mismo bloque puede traer varios lugares si el campo es de selección múltiple:
     # se separa en un lugar por código. Los bloques sin lugar se omiten.
@@ -195,7 +195,7 @@ def programa_desde(rep, actor, extra=None):
     # las cantidades van en el bloque repetido "cantidades_grupo" (un ítem por lugar,
     # con el código en g_lugar_i). Antes este modo no se leía y esos programas
     # quedaban sin comunidades en el mapa.
-    comunes={n:valor_grupo(rep,n) for n in ('poblacion_meta','poblacion_meta_otro','datos_cuantitativos_poblacion','accion_comunidad','accion_comunidad_otro','accion_comunidad_agropecuaria_otro','etnia','grupo_etario','area')}
+    comunes={n:valor_grupo(rep,n) for n in ('poblacion_meta','grupo_principal','poblacion_meta_otro','datos_cuantitativos_poblacion','accion_comunidad','accion_comunidad_otro','accion_comunidad_agropecuaria_otro','etnia','grupo_etario','area')}
     for g in find_repeat(rep,'cantidades_grupo'):
         code=str(find_value(g,'g_lugar_i','') or '').strip()
         if not code: continue
@@ -304,7 +304,12 @@ def programa_desde(rep, actor, extra=None):
         ceros_por_comunidad.append(ceros)
         valores_cuantificados=[v for v in cantidades.values() if isinstance(v,(int,float))]
         poblacion_total_estimada=max(valores_cuantificados) if valores_cuantificados else None
-        comunidades.append({'codigo_lugar':codigo_registro,'lugar_poblado':lugar,'municipio':muni,'clasificacion':meta.get('clasificacion'),'viviendas_catalogo':meta.get('viviendas'),'lat':lat,'lon':lon,'fuera_catalogo':es_adicional,'estado_validacion':'Pendiente de validación' if es_adicional else 'Catálogo territorial','referencia_lugar':referencia,'poblacion_meta':pob,'datos_cuantitativos_poblacion':datos_cuantitativos,'pm_cantidades':cantidades,'poblacion_total_estimada':poblacion_total_estimada,'accion_comunidad':acciones,'ac_cantidades':ac_counts,'etnia':labels('etnia',find_value(c,'etnia','')),'grupo_etario':labels('grupo_etario',find_value(c,'grupo_etario','')),'area':label('area',find_value(c,'area',''))})
+        # v18: el total de la comunidad usa la cantidad del grupo priorizado, si existe.
+        gp_codigo=str(find_value(c,'grupo_principal','') or '').strip()
+        if gp_codigo and tiene_cantidades:
+            v_gp=num(find_value(c,'pm_cant_'+gp_codigo))
+            if v_gp: poblacion_total_estimada=v_gp
+        comunidades.append({'codigo_lugar':codigo_registro,'lugar_poblado':lugar,'grupo_priorizado':(label('poblacion_meta',gp_codigo) if gp_codigo else ''),'municipio':muni,'clasificacion':meta.get('clasificacion'),'viviendas_catalogo':meta.get('viviendas'),'lat':lat,'lon':lon,'fuera_catalogo':es_adicional,'estado_validacion':'Pendiente de validación' if es_adicional else 'Catálogo territorial','referencia_lugar':referencia,'poblacion_meta':pob,'datos_cuantitativos_poblacion':datos_cuantitativos,'pm_cantidades':cantidades,'poblacion_total_estimada':poblacion_total_estimada,'accion_comunidad':acciones,'ac_cantidades':ac_counts,'etnia':labels('etnia',find_value(c,'etnia','')),'grupo_etario':labels('grupo_etario',find_value(c,'grupo_etario','')),'area':label('area',find_value(c,'area',''))})
     # Red de seguridad: lugares del catálogo presentes en otros campos del envío.
     ya={c['codigo_lugar'] for c in comunidades}
     nombre_prog=str(find_value(rep,'nombre_programa','') or '')
