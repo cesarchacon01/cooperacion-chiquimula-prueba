@@ -1,5 +1,5 @@
 {
-  "generado": "2026-11-22T02:51:36.388269+00:00",
+  "generado": "2026-11-22T02:53:55.852729+00:00",
   "nota": "Datos sincronizados automáticamente desde KoboToolbox. La base territorial oficial se mantiene separada de los lugares adicionales reportados pendientes de validación.",
   "programas": [
     {
@@ -44,6 +44,7 @@
         {
           "codigo_lugar": "chiquimula_chiquimula",
           "lugar_poblado": "Chiquimula",
+          "grupo_priorizado": "",
           "municipio": "Chiquimula",
           "clasificacion": "Ciudad",
           "viviendas_catalogo": 9169,
@@ -116,6 +117,7 @@
         {
           "codigo_lugar": "adicional:chiquimula:f",
           "lugar_poblado": "f",
+          "grupo_priorizado": "",
           "municipio": "Chiquimula",
           "clasificacion": null,
           "viviendas_catalogo": null,
@@ -153,6 +155,7 @@
         {
           "codigo_lugar": "chiquimula_chiquimula",
           "lugar_poblado": "Chiquimula",
+          "grupo_priorizado": "",
           "municipio": "Chiquimula",
           "clasificacion": "Ciudad",
           "viviendas_catalogo": 9169,
@@ -190,6 +193,7 @@
         {
           "codigo_lugar": "chiquimula_bella_vista",
           "lugar_poblado": "Bella Vista",
+          "grupo_priorizado": "",
           "municipio": "Chiquimula",
           "clasificacion": "Paraje",
           "viviendas_catalogo": 15,
@@ -227,6 +231,7 @@
         {
           "codigo_lugar": "chiquimula_canaan",
           "lugar_poblado": "Canaan",
+          "grupo_priorizado": "",
           "municipio": "Chiquimula",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 125,
@@ -302,6 +307,7 @@
         {
           "codigo_lugar": "chiquimula_chiquimula",
           "lugar_poblado": "Chiquimula",
+          "grupo_priorizado": "",
           "municipio": "Chiquimula",
           "clasificacion": "Ciudad",
           "viviendas_catalogo": 9169,
@@ -373,6 +379,7 @@
         {
           "codigo_lugar": "chiquimula_bella_vista",
           "lugar_poblado": "Bella Vista",
+          "grupo_priorizado": "",
           "municipio": "Chiquimula",
           "clasificacion": "Paraje",
           "viviendas_catalogo": 15,
@@ -408,6 +415,7 @@
         {
           "codigo_lugar": "chiquimula_campollano",
           "lugar_poblado": "Campollano",
+          "grupo_priorizado": "",
           "municipio": "Chiquimula",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 90,
@@ -443,6 +451,7 @@
         {
           "codigo_lugar": "ipala_villafer",
           "lugar_poblado": "Villafer",
+          "grupo_priorizado": "",
           "municipio": "Ipala",
           "clasificacion": "Finca",
           "viviendas_catalogo": 0,
@@ -518,6 +527,7 @@
         {
           "codigo_lugar": "adicional:camotan:gd",
           "lugar_poblado": "gd",
+          "grupo_priorizado": "",
           "municipio": "Camotán",
           "clasificacion": null,
           "viviendas_catalogo": null,
@@ -551,6 +561,7 @@
         {
           "codigo_lugar": "esquipulas_el_barrial",
           "lugar_poblado": "El Barrial",
+          "grupo_priorizado": "",
           "municipio": "Esquipulas",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 11,
@@ -584,6 +595,7 @@
         {
           "codigo_lugar": "quezaltepeque_la_pena",
           "lugar_poblado": "La Peña",
+          "grupo_priorizado": "",
           "municipio": "Quezaltepeque",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 124,
@@ -617,6 +629,7 @@
         {
           "codigo_lugar": "quezaltepeque_la_tigra",
           "lugar_poblado": "La Tigra",
+          "grupo_priorizado": "",
           "municipio": "Quezaltepeque",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 5,
@@ -684,6 +697,7 @@
         {
           "codigo_lugar": "jocotan_san_pedrito",
           "lugar_poblado": "San Pedrito",
+          "grupo_priorizado": "",
           "municipio": "Jocotán",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 66,
@@ -756,6 +770,7 @@
         {
           "codigo_lugar": "chiquimula_chiquimula",
           "lugar_poblado": "Chiquimula",
+          "grupo_priorizado": "",
           "municipio": "Chiquimula",
           "clasificacion": "Ciudad",
           "viviendas_catalogo": 9169,
@@ -789,6 +804,7 @@
         {
           "codigo_lugar": "jocotan_tansha",
           "lugar_poblado": "Tansha",
+          "grupo_priorizado": "",
           "municipio": "Jocotán",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 52,
@@ -822,6 +838,7 @@
         {
           "codigo_lugar": "camotan_plan_marimba",
           "lugar_poblado": "Plan Marimba",
+          "grupo_priorizado": "",
           "municipio": "Camotán",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 33,
@@ -855,6 +872,7 @@
         {
           "codigo_lugar": "san_jacinto_el_jocotal",
           "lugar_poblado": "El Jocotal",
+          "grupo_priorizado": "",
           "municipio": "San Jacinto",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 103,
@@ -888,6 +906,7 @@
         {
           "codigo_lugar": "san_jacinto_los_borja",
           "lugar_poblado": "Los Borja",
+          "grupo_priorizado": "",
           "municipio": "San Jacinto",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 57,
@@ -921,6 +940,7 @@
         {
           "codigo_lugar": "san_jacinto_los_borja",
           "lugar_poblado": "Los Borja",
+          "grupo_priorizado": "",
           "municipio": "San Jacinto",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 57,
@@ -954,6 +974,7 @@
         {
           "codigo_lugar": "san_jacinto_los_cruz",
           "lugar_poblado": "Los Cruz",
+          "grupo_priorizado": "",
           "municipio": "San Jacinto",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 8,
@@ -1058,6 +1079,7 @@
         {
           "codigo_lugar": "camotan_quebrada_grande",
           "lugar_poblado": "Quebrada Grande",
+          "grupo_priorizado": "",
           "municipio": "Camotán",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 36,
@@ -1131,6 +1153,7 @@
         {
           "codigo_lugar": "adicional:quezaltepeque:df",
           "lugar_poblado": "df",
+          "grupo_priorizado": "",
           "municipio": "Quezaltepeque",
           "clasificacion": null,
           "viviendas_catalogo": null,
@@ -1164,6 +1187,7 @@
         {
           "codigo_lugar": "concepcion_las_minas_valeriano",
           "lugar_poblado": "Valeriano",
+          "grupo_priorizado": "",
           "municipio": "Concepción las Minas",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 54,
@@ -1197,6 +1221,7 @@
         {
           "codigo_lugar": "concepcion_las_minas_valle_arriba",
           "lugar_poblado": "Valle Arriba",
+          "grupo_priorizado": "",
           "municipio": "Concepción las Minas",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 55,
@@ -1230,6 +1255,7 @@
         {
           "codigo_lugar": "quezaltepeque_quezaltepeque",
           "lugar_poblado": "Quezaltepeque",
+          "grupo_priorizado": "",
           "municipio": "Quezaltepeque",
           "clasificacion": "Villa",
           "viviendas_catalogo": 116,
@@ -1263,6 +1289,7 @@
         {
           "codigo_lugar": "quezaltepeque_aceitillal",
           "lugar_poblado": "Aceitillal",
+          "grupo_priorizado": "",
           "municipio": "Quezaltepeque",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 51,
@@ -1296,6 +1323,7 @@
         {
           "codigo_lugar": "quezaltepeque_achiote",
           "lugar_poblado": "Achiote",
+          "grupo_priorizado": "",
           "municipio": "Quezaltepeque",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 29,
@@ -1329,6 +1357,7 @@
         {
           "codigo_lugar": "quezaltepeque_agua_caliente",
           "lugar_poblado": "Agua Caliente",
+          "grupo_priorizado": "",
           "municipio": "Quezaltepeque",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 41,
@@ -1362,6 +1391,7 @@
         {
           "codigo_lugar": "quezaltepeque_agua_fria",
           "lugar_poblado": "Agua Fria",
+          "grupo_priorizado": "",
           "municipio": "Quezaltepeque",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 8,
@@ -1395,6 +1425,7 @@
         {
           "codigo_lugar": "quezaltepeque_azacualpa",
           "lugar_poblado": "Azacualpa",
+          "grupo_priorizado": "",
           "municipio": "Quezaltepeque",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 43,
@@ -1428,6 +1459,7 @@
         {
           "codigo_lugar": "quezaltepeque_caulotes",
           "lugar_poblado": "Caulotes",
+          "grupo_priorizado": "",
           "municipio": "Quezaltepeque",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 41,
@@ -1499,6 +1531,7 @@
         {
           "codigo_lugar": "adicional:san_juan_ermita:d",
           "lugar_poblado": "d",
+          "grupo_priorizado": "",
           "municipio": "San Juan Ermita",
           "clasificacion": null,
           "viviendas_catalogo": null,
@@ -1532,6 +1565,7 @@
         {
           "codigo_lugar": "chiquimula_alta_mira_6",
           "lugar_poblado": "Alta Mira 6",
+          "grupo_priorizado": "",
           "municipio": "Chiquimula",
           "clasificacion": "Otro",
           "viviendas_catalogo": 45,
@@ -1599,6 +1633,7 @@
         {
           "codigo_lugar": "chiquimula_anonal",
           "lugar_poblado": "Anonal",
+          "grupo_priorizado": "",
           "municipio": "Chiquimula",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 47,
@@ -1636,6 +1671,7 @@
         {
           "codigo_lugar": "chiquimula_chiquimula",
           "lugar_poblado": "Chiquimula",
+          "grupo_priorizado": "",
           "municipio": "Chiquimula",
           "clasificacion": "Ciudad",
           "viviendas_catalogo": 9169,
@@ -1673,6 +1709,7 @@
         {
           "codigo_lugar": "adicional:olopa:caser_o_prueba",
           "lugar_poblado": "Caserío Prueba",
+          "grupo_priorizado": "",
           "municipio": "Olopa",
           "clasificacion": null,
           "viviendas_catalogo": null,
@@ -1741,7 +1778,7 @@
       ],
       "disposicion_coordinar": "Sí",
       "beneficiarios_institucionales": {
-        "gobernacion_codede": 0
+        "gobernacion_codede": null
       },
       "municipios_cobertura_institucional": [
         "Concepción las Minas"
@@ -1750,6 +1787,7 @@
         {
           "codigo_lugar": "chiquimula_anonal",
           "lugar_poblado": "Anonal",
+          "grupo_priorizado": "",
           "municipio": "Chiquimula",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 47,
@@ -1787,6 +1825,7 @@
         {
           "codigo_lugar": "chiquimula_cerron",
           "lugar_poblado": "Cerron",
+          "grupo_priorizado": "",
           "municipio": "Chiquimula",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 51,
@@ -1851,7 +1890,7 @@
       ],
       "disposicion_coordinar": "Sí",
       "beneficiarios_institucionales": {
-        "COCODES u organizaciones comunitarias": 0
+        "COCODES u organizaciones comunitarias": null
       },
       "municipios_cobertura_institucional": [
         "Camotán"
@@ -1860,6 +1899,7 @@
         {
           "codigo_lugar": "chiquimula_el_carrizal",
           "lugar_poblado": "El Carrizal",
+          "grupo_priorizado": "Hogares con niñez menor de 5 años",
           "municipio": "Chiquimula",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 414,
@@ -1977,8 +2017,8 @@
       "disposicion_coordinar": "Sí",
       "beneficiarios_institucionales": {
         "Oficina/Dirección Municipal de Seguridad Alimentaria y Nutricional (SAN)": 3,
-        "SESAN": 0,
-        "MARN": 0
+        "SESAN": null,
+        "MARN": null
       },
       "municipios_cobertura_institucional": [
         "Camotán",
@@ -2108,10 +2148,10 @@
         "Dirección Municipal de la Mujer (DMM)": 1,
         "Oficina/Dirección Municipal de Seguridad Alimentaria y Nutricional (SAN)": 1,
         "Unidad de Gestión Ambiental Municipal (UGAM)": 1,
-        "SOSEP": 0,
-        "MARN": 0,
-        "Escuelas o centros educativos": 0,
-        "COCODES u organizaciones comunitarias": 0
+        "SOSEP": null,
+        "MARN": null,
+        "Escuelas o centros educativos": null,
+        "COCODES u organizaciones comunitarias": null
       },
       "municipios_cobertura_institucional": [
         "Jocotán"
@@ -2120,6 +2160,7 @@
         {
           "codigo_lugar": "chiquimula_el_barrial",
           "lugar_poblado": "El Barrial",
+          "grupo_priorizado": "Personas con discapacidad",
           "municipio": "Chiquimula",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 543,
@@ -2199,10 +2240,10 @@
         "Dirección Municipal de Planificación (DMP)": 2,
         "Dirección Municipal de la Mujer (DMM)": 2,
         "COMUDE (Consejo Municipal de Desarrollo)": 3,
-        "MAGA": 0,
-        "d": 0,
+        "MAGA": null,
+        "d": null,
         "Centros o puestos de salud": 4,
-        "COCODES u organizaciones comunitarias": 0
+        "COCODES u organizaciones comunitarias": null
       },
       "municipios_cobertura_institucional": [
         "Chiquimula",
@@ -2259,6 +2300,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_buena_vista",
           "lugar_poblado": "Buena Vista",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Finca",
           "viviendas_catalogo": 5,
@@ -2301,6 +2343,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_candelaria",
           "lugar_poblado": "Candelaria",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Finca",
           "viviendas_catalogo": 0,
@@ -2343,6 +2386,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_cerro_de_cal",
           "lugar_poblado": "Cerro De Cal",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 34,
@@ -2385,6 +2429,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_chilar",
           "lugar_poblado": "Chilar",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 13,
@@ -2427,6 +2472,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_chiscu",
           "lugar_poblado": "Chiscu",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Paraje",
           "viviendas_catalogo": 2,
@@ -2469,6 +2515,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_dominada_el_cerron",
           "lugar_poblado": "Dominada El Cerron",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Finca",
           "viviendas_catalogo": 1,
@@ -2511,6 +2558,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_barro",
           "lugar_poblado": "Barro",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Paraje",
           "viviendas_catalogo": 4,
@@ -2553,6 +2601,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_el_carrizal",
           "lugar_poblado": "El Carrizal",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 64,
@@ -2595,6 +2644,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_el_carrizal_2",
           "lugar_poblado": "El Carrizal",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Paraje",
           "viviendas_catalogo": 0,
@@ -2637,6 +2687,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_chucte",
           "lugar_poblado": "Chucte",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 5,
@@ -2679,6 +2730,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_el_conacaste",
           "lugar_poblado": "El Conacaste",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Paraje",
           "viviendas_catalogo": 6,
@@ -2721,6 +2773,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_el_junquillo",
           "lugar_poblado": "El Junquillo",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Paraje",
           "viviendas_catalogo": 13,
@@ -2763,6 +2816,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_el_obraje",
           "lugar_poblado": "El Obraje",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 5,
@@ -2805,6 +2859,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_pedrero",
           "lugar_poblado": "Pedrero",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Paraje",
           "viviendas_catalogo": 2,
@@ -2847,6 +2902,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_el_plan_de_las_vigas",
           "lugar_poblado": "El Plan De Las Vigas",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 3,
@@ -2889,6 +2945,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_el_potrero",
           "lugar_poblado": "El Potrero",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 35,
@@ -2931,6 +2988,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_el_rincon",
           "lugar_poblado": "El Rincon",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 247,
@@ -2973,6 +3031,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_el_rodeo_abajo",
           "lugar_poblado": "El Rodeo Abajo",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 11,
@@ -3015,6 +3074,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_el_salto",
           "lugar_poblado": "El Salto",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Paraje",
           "viviendas_catalogo": 2,
@@ -3057,6 +3117,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_guacamayas_abajo",
           "lugar_poblado": "Guacamayas Abajo",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 20,
@@ -3099,6 +3160,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_la_joya",
           "lugar_poblado": "La Joya",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 59,
@@ -3141,6 +3203,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_joyitas",
           "lugar_poblado": "Joyitas",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Paraje",
           "viviendas_catalogo": 5,
@@ -3183,6 +3246,7 @@
         {
           "codigo_lugar": "esquipulas_agua_caliente",
           "lugar_poblado": "Agua Caliente",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "Esquipulas",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 54,
@@ -3225,6 +3289,7 @@
         {
           "codigo_lugar": "esquipulas_agua_zarca",
           "lugar_poblado": "Agua Zarca",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "Esquipulas",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 46,
@@ -3267,6 +3332,7 @@
         {
           "codigo_lugar": "esquipulas_atulapa",
           "lugar_poblado": "Atulapa",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "Esquipulas",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 348,
@@ -3309,6 +3375,7 @@
         {
           "codigo_lugar": "esquipulas_el_barrial",
           "lugar_poblado": "El Barrial",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "Esquipulas",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 11,
@@ -3351,6 +3418,7 @@
         {
           "codigo_lugar": "esquipulas_belen",
           "lugar_poblado": "Belen",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "Esquipulas",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 153,
@@ -3393,6 +3461,7 @@
         {
           "codigo_lugar": "esquipulas_bojorquez",
           "lugar_poblado": "Bojorquez",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "Esquipulas",
           "clasificacion": "Paraje",
           "viviendas_catalogo": 60,
@@ -3435,6 +3504,7 @@
         {
           "codigo_lugar": "esquipulas_boyero",
           "lugar_poblado": "Boyero ",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "Esquipulas",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 45,
@@ -3477,6 +3547,7 @@
         {
           "codigo_lugar": "esquipulas_canas",
           "lugar_poblado": "Cañas",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "Esquipulas",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 18,
@@ -3519,6 +3590,7 @@
         {
           "codigo_lugar": "esquipulas_cafetales",
           "lugar_poblado": "Cafetales",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "Esquipulas",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 121,
@@ -3561,6 +3633,7 @@
         {
           "codigo_lugar": "esquipulas_canada_del_pino",
           "lugar_poblado": "Cañada Del Pino",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "Esquipulas",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 52,
@@ -3603,6 +3676,7 @@
         {
           "codigo_lugar": "esquipulas_carboneras",
           "lugar_poblado": "Carboneras",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "Esquipulas",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 52,
@@ -3645,6 +3719,7 @@
         {
           "codigo_lugar": "esquipulas_carrizal",
           "lugar_poblado": "Carrizal",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "Esquipulas",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 111,
@@ -3687,6 +3762,7 @@
         {
           "codigo_lugar": "esquipulas_el_cascajal",
           "lugar_poblado": "El Cascajal",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "Esquipulas",
           "clasificacion": "Paraje",
           "viviendas_catalogo": 9,
@@ -3729,6 +3805,7 @@
         {
           "codigo_lugar": "esquipulas_la_ceibita",
           "lugar_poblado": "La Ceibita",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "Esquipulas",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 62,
@@ -3771,6 +3848,7 @@
         {
           "codigo_lugar": "esquipulas_cerron",
           "lugar_poblado": "Cerron",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "Esquipulas",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 10,
@@ -3813,6 +3891,7 @@
         {
           "codigo_lugar": "san_jacinto_agua_zarca",
           "lugar_poblado": "Agua Zarca",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San Jacinto",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 193,
@@ -3855,6 +3934,7 @@
         {
           "codigo_lugar": "san_jacinto_dolores",
           "lugar_poblado": "Dolores",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San Jacinto",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 45,
@@ -3897,6 +3977,7 @@
         {
           "codigo_lugar": "san_jacinto_el_carrizal",
           "lugar_poblado": "El Carrizal ",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San Jacinto",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 116,
@@ -3939,6 +4020,7 @@
         {
           "codigo_lugar": "san_jacinto_el_escalon",
           "lugar_poblado": "El Escalon",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San Jacinto",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 179,
@@ -3981,6 +4063,7 @@
         {
           "codigo_lugar": "san_jacinto_el_jocotal",
           "lugar_poblado": "El Jocotal",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San Jacinto",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 103,
@@ -4023,6 +4106,7 @@
         {
           "codigo_lugar": "san_jacinto_la_majada",
           "lugar_poblado": "La Majada",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San Jacinto",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 255,
@@ -4065,6 +4149,7 @@
         {
           "codigo_lugar": "san_jacinto_laguneta_del_carrizo",
           "lugar_poblado": "Laguneta Del Carrizo",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San Jacinto",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 10,
@@ -4107,6 +4192,7 @@
         {
           "codigo_lugar": "san_jacinto_los_cruz",
           "lugar_poblado": "Los Cruz",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San Jacinto",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 8,
@@ -4149,6 +4235,7 @@
         {
           "codigo_lugar": "san_jacinto_las_lomas",
           "lugar_poblado": "Las Lomas",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San Jacinto",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 446,
@@ -4191,6 +4278,7 @@
         {
           "codigo_lugar": "san_jacinto_los_agosto",
           "lugar_poblado": "Los Agosto",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San Jacinto",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 22,
@@ -4233,6 +4321,7 @@
         {
           "codigo_lugar": "san_jacinto_los_borja",
           "lugar_poblado": "Los Borja",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San Jacinto",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 57,
@@ -4275,6 +4364,7 @@
         {
           "codigo_lugar": "san_jacinto_valle_de_la_escuela_2",
           "lugar_poblado": "Valle De La Escuela",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San Jacinto",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 27,
@@ -4317,6 +4407,7 @@
         {
           "codigo_lugar": "san_jacinto_los_linares",
           "lugar_poblado": "Los Linares",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San Jacinto",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 8,
@@ -4359,6 +4450,7 @@
         {
           "codigo_lugar": "adicional:san_jose_la_arada:caser_o_el_pinal_prueba",
           "lugar_poblado": "Caserío El Pinal (prueba)",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": null,
           "viviendas_catalogo": null,
@@ -4401,6 +4493,7 @@
         {
           "codigo_lugar": "adicional:san_jose_la_arada:caser_o_los_llanitos_prueba",
           "lugar_poblado": "Caserío Los Llanitos (prueba)",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": null,
           "viviendas_catalogo": null,
@@ -4443,6 +4536,7 @@
         {
           "codigo_lugar": "adicional:san_jose_la_arada:caser_o_la_ceibita_prueba",
           "lugar_poblado": "Caserío La Ceibita (prueba)",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": null,
           "viviendas_catalogo": null,
@@ -4485,6 +4579,7 @@
         {
           "codigo_lugar": "adicional:san_jose_la_arada:caser_o_el_zapote_prueba",
           "lugar_poblado": "Caserío El Zapote (prueba)",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": null,
           "viviendas_catalogo": null,
@@ -4527,6 +4622,7 @@
         {
           "codigo_lugar": "adicional:san_jose_la_arada:caser_o_agua_tibia_prueba",
           "lugar_poblado": "Caserío Agua Tibia (prueba)",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": null,
           "viviendas_catalogo": null,
@@ -4569,6 +4665,7 @@
         {
           "codigo_lugar": "adicional:san_jose_la_arada:caser_o_las_pozas_prueba",
           "lugar_poblado": "Caserío Las Pozas (prueba)",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": null,
           "viviendas_catalogo": null,
@@ -4611,6 +4708,7 @@
         {
           "codigo_lugar": "adicional:san_jose_la_arada:caser_o_el_chorro_prueba",
           "lugar_poblado": "Caserío El Chorro (prueba)",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": null,
           "viviendas_catalogo": null,
@@ -4694,6 +4792,7 @@
         {
           "codigo_lugar": "san_jose_la_arada_guacamayas_abajo",
           "lugar_poblado": "Guacamayas Abajo",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 20,
@@ -4735,6 +4834,7 @@
         {
           "codigo_lugar": "adicional:san_jose_la_arada:guacamaya_arriba",
           "lugar_poblado": "Guacamaya Arriba",
+          "grupo_priorizado": "Hogares / familias",
           "municipio": "San José la Arada",
           "clasificacion": null,
           "viviendas_catalogo": null,
@@ -4814,8 +4914,8 @@
         "Oficina Municipal de Agua y Saneamiento (OMAS)": 1,
         "Unidad de Gestión Ambiental Municipal (UGAM)": 2,
         "Oficina Forestal Municipal": 1,
-        "INFOM (prueba)": 0,
-        "Escuelas o centros educativos": 0
+        "INFOM (prueba)": null,
+        "Escuelas o centros educativos": null
       },
       "municipios_cobertura_institucional": [
         "Camotán",
@@ -4826,6 +4926,7 @@
         {
           "codigo_lugar": "jocotan_canapara_abajo",
           "lugar_poblado": "Canapara Abajo ",
+          "grupo_priorizado": "Hogares monoparentales",
           "municipio": "Jocotán",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 198,
@@ -4869,6 +4970,7 @@
         {
           "codigo_lugar": "jocotan_canapara_arriba",
           "lugar_poblado": "Canapara Arriba",
+          "grupo_priorizado": "Hogares monoparentales",
           "municipio": "Jocotán",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 92,
@@ -4910,6 +5012,7 @@
         {
           "codigo_lugar": "olopa_el_chucte",
           "lugar_poblado": "El Chucte",
+          "grupo_priorizado": "Hogares monoparentales",
           "municipio": "Olopa",
           "clasificacion": "Caserío",
           "viviendas_catalogo": 97,
@@ -4951,6 +5054,7 @@
         {
           "codigo_lugar": "olopa_el_cerron",
           "lugar_poblado": "El Cerron",
+          "grupo_priorizado": "Hogares monoparentales",
           "municipio": "Olopa",
           "clasificacion": "Aldea",
           "viviendas_catalogo": 156,
@@ -5097,7 +5201,7 @@
         "COCODES u organizaciones comunitarias": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "Dirección Municipal de la Mujer (DMM)": {
           "registros": 2,
@@ -5117,12 +5221,12 @@
         "SESAN": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "MARN": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "Oficina Municipal de Gestión Integral de Riesgo de Desastres (GIRD)": {
           "registros": 1,
@@ -5152,12 +5256,12 @@
         "INFOM (prueba)": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "Escuelas o centros educativos": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         }
       },
       "fuente_financiamiento": {
@@ -5239,12 +5343,12 @@
         "SESAN": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "MARN": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "Oficina Municipal de Gestión Integral de Riesgo de Desastres (GIRD)": {
           "registros": 1,
@@ -5254,17 +5358,17 @@
         "MAGA": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "d": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "COCODES u organizaciones comunitarias": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         }
       },
       "fuente_financiamiento": {
@@ -5307,7 +5411,7 @@
         "gobernacion_codede": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "Municipalidades": {
           "registros": 2,
@@ -5337,12 +5441,12 @@
         "SESAN": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "MARN": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "Oficina Municipal de Gestión Integral de Riesgo de Desastres (GIRD)": {
           "registros": 1,
@@ -5357,17 +5461,17 @@
         "MAGA": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "d": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "COCODES u organizaciones comunitarias": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         }
       },
       "fuente_financiamiento": {
@@ -5435,12 +5539,12 @@
         "MAGA": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "d": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "Centros o puestos de salud": {
           "registros": 1,
@@ -5450,7 +5554,7 @@
         "COCODES u organizaciones comunitarias": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "Oficina Municipal de Agua y Saneamiento (OMAS)": {
           "registros": 1,
@@ -5531,22 +5635,22 @@
         "SOSEP": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "MARN": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "Escuelas o centros educativos": {
           "registros": 2,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "COCODES u organizaciones comunitarias": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "COMUDE (Consejo Municipal de Desarrollo)": {
           "registros": 1,
@@ -5566,7 +5670,7 @@
         "INFOM (prueba)": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         }
       },
       "fuente_financiamiento": {
@@ -5629,12 +5733,12 @@
         "MAGA": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "d": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "Centros o puestos de salud": {
           "registros": 1,
@@ -5644,7 +5748,7 @@
         "COCODES u organizaciones comunitarias": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "Oficina Municipal de Agua y Saneamiento (OMAS)": {
           "registros": 1,
@@ -5664,12 +5768,12 @@
         "INFOM (prueba)": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "Escuelas o centros educativos": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         }
       },
       "fuente_financiamiento": {
@@ -5725,12 +5829,12 @@
         "MAGA": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "d": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         },
         "Centros o puestos de salud": {
           "registros": 1,
@@ -5740,7 +5844,7 @@
         "COCODES u organizaciones comunitarias": {
           "registros": 1,
           "cantidad": 0,
-          "con_cantidad": true
+          "con_cantidad": false
         }
       },
       "fuente_financiamiento": {
@@ -5853,8 +5957,8 @@
   },
   "matriz_sector_municipio": {
     "Seguridad alimentaria y nutricional": {
-      "Chiquimula": 2,
       "Camotán": 2,
+      "Chiquimula": 2,
       "Quezaltepeque": 1,
       "Esquipulas": 2,
       "Concepción las Minas": 1,
@@ -5862,19 +5966,19 @@
       "San José la Arada": 1
     },
     "Gobernanza y fortalecimiento institucional": {
-      "Chiquimula": 6,
       "Camotán": 5,
+      "Chiquimula": 6,
       "Ipala": 1,
       "San Jacinto": 1,
       "Jocotán": 2,
-      "Concepción las Minas": 3,
       "d": 1,
+      "Concepción las Minas": 3,
       "Quezaltepeque": 2,
       "Esquipulas": 2
     },
     "Agua y saneamiento": {
-      "Chiquimula": 5,
       "Camotán": 4,
+      "Chiquimula": 5,
       "Concepción las Minas": 2,
       "Olopa": 3,
       "Jocotán": 2,
@@ -5883,8 +5987,8 @@
       "San José la Arada": 2
     },
     "Infraestructura": {
-      "Quezaltepeque": 1,
       "Camotán": 1,
+      "Quezaltepeque": 1,
       "Esquipulas": 1
     },
     "Ambiente y cambio climático": {
@@ -5893,33 +5997,33 @@
       "Chiquimula": 1
     },
     "Educación": {
-      "Chiquimula": 4,
-      "San Juan Ermita": 1,
       "Camotán": 1,
+      "San Juan Ermita": 1,
+      "Chiquimula": 4,
       "Concepción las Minas": 2,
       "Jocotán": 2,
-      "Esquipulas": 2,
       "Olopa": 2,
+      "Esquipulas": 2,
       "Quezaltepeque": 1
     },
     "Salud": {
-      "Chiquimula": 2,
       "Concepción las Minas": 2,
-      "Quezaltepeque": 1,
+      "Chiquimula": 2,
       "Olopa": 2,
       "Esquipulas": 1,
+      "Quezaltepeque": 1,
       "Camotán": 1,
       "Jocotán": 1
     },
     "Desarrollo económico local": {
-      "Chiquimula": 1,
+      "Concepción las Minas": 1,
       "Camotán": 1,
-      "Concepción las Minas": 1
+      "Chiquimula": 1
     },
     "Género": {
-      "Chiquimula": 1,
+      "Concepción las Minas": 1,
       "Camotán": 1,
-      "Concepción las Minas": 1
+      "Chiquimula": 1
     }
   },
   "comunidades_sin_cobertura": [
@@ -11452,12 +11556,12 @@
     "gobernacion_codede": {
       "registros": 1,
       "cantidad": 0,
-      "con_cantidad": true
+      "con_cantidad": false
     },
     "COCODES u organizaciones comunitarias": {
       "registros": 3,
       "cantidad": 0,
-      "con_cantidad": true
+      "con_cantidad": false
     },
     "Dirección Municipal de la Mujer (DMM)": {
       "registros": 5,
@@ -11477,12 +11581,12 @@
     "SESAN": {
       "registros": 1,
       "cantidad": 0,
-      "con_cantidad": true
+      "con_cantidad": false
     },
     "MARN": {
       "registros": 2,
       "cantidad": 0,
-      "con_cantidad": true
+      "con_cantidad": false
     },
     "Oficina Municipal de Desarrollo Económico Local": {
       "registros": 1,
@@ -11502,22 +11606,22 @@
     "SOSEP": {
       "registros": 1,
       "cantidad": 0,
-      "con_cantidad": true
+      "con_cantidad": false
     },
     "Escuelas o centros educativos": {
       "registros": 2,
       "cantidad": 0,
-      "con_cantidad": true
+      "con_cantidad": false
     },
     "MAGA": {
       "registros": 1,
       "cantidad": 0,
-      "con_cantidad": true
+      "con_cantidad": false
     },
     "d": {
       "registros": 1,
       "cantidad": 0,
-      "con_cantidad": true
+      "con_cantidad": false
     },
     "Oficina Municipal de Agua y Saneamiento (OMAS)": {
       "registros": 2,
@@ -11532,7 +11636,7 @@
     "INFOM (prueba)": {
       "registros": 1,
       "cantidad": 0,
-      "con_cantidad": true
+      "con_cantidad": false
     }
   },
   "matriz_poblacion_accion": {
