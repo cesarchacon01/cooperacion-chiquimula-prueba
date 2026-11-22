@@ -385,7 +385,10 @@ def corregir_programas(programas):
                     if isinstance(v,(int,float)) and v<0:
                         c[bolsa][g]=None; CORRECCIONES.append(f"Cantidad negativa descartada: {t} · {c['lugar_poblado']} · {g}: {v}")
             nums=[v for v in (c.get('pm_cantidades') or {}).values() if isinstance(v,(int,float))]
-            c['poblacion_total_estimada']=max(nums) if nums else None
+            # v18: si la comunidad tiene grupo priorizado con cantidad, el total es esa cantidad;
+            # si no, se mantiene el criterio anterior (la mayor cantidad reportada).
+            vp=(c.get('pm_cantidades') or {}).get(c.get('grupo_priorizado')) if c.get('grupo_priorizado') else None
+            c['poblacion_total_estimada']=vp if isinstance(vp,(int,float)) and vp>0 else (max(nums) if nums else None)
         # 3) Trabajo comunitario sin respuesta, pero con comunidades registradas.
         if not p.get('trabajo_comunitario') and p['comunidades']:
             p['trabajo_comunitario']='Sí'; CORRECCIONES.append(f"Trabajo comunitario deducido como 'Sí' (tiene comunidades): {t}")
