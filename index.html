@@ -1624,20 +1624,8 @@ function renderMapa(filtrados){
         fillOpacity:.72,weight:2.2,dashArray:'4 3'
       });
       mk.bindTooltip(`${escaparHtml(m)} · presencia institucional/municipal`,{direction:'top',opacity:.95,permanent:false,sticky:false});
-      const detalleProgs=progs.map(p=>{
-        const inst=Object.entries(p.beneficiarios_institucionales||{}).map(([k,v])=>escaparHtml(k)+(Number(v)>0?` (${Number(v)})`:'')).join('; ');
-        const otrosMun=(p.municipios_cobertura_institucional||[]).filter(x=>x!==m);
-        const nCom=(p.comunidades||[]).length;
-        return `<div style="border-top:1px solid #E5E7EB;padding-top:6px;margin-top:6px">`
-          +`<b>${escaparHtml(p.organizacion||'')}</b><br>${escaparHtml(p.nombre_programa||'')}`
-          +((p.sector||[]).length?`<br><span style="color:#5B6672">Sector: ${(p.sector||[]).map(escaparHtml).join(', ')}</span>`:'')
-          +(p.estado_programa?`<br><span style="color:#5B6672">Estado: ${escaparHtml(p.estado_programa)}</span>`:'')
-          +(inst?`<br><b>Instituciones que fortalece:</b> ${inst}`:'<br><span style="color:#5B6672">No detalla instituciones.</span>')
-          +(otrosMun.length?`<br><span style="color:#5B6672;font-size:11px">Las cantidades son del programa completo; también cubre ${otrosMun.map(escaparHtml).join(', ')}.</span>`:'')
-          +(nCom?`<br><span style="color:#5B6672;font-size:11px">Además trabaja en ${nCom} comunidad(es), que se ven como puntos en el mapa.</span>`:'')
-          +`</div>`;
-      }).join('');
-      mk.bindPopup(`<div style="max-height:300px;overflow:auto;padding-right:4px"><b>${escaparHtml(m)}</b> · <b>Presencia institucional / municipal</b><br>${orgs.length} organización(es) · ${programas.length} programa(s) / proyecto(s)${detalleProgs}<div style="color:#5B6672;font-size:11px;margin-top:8px">Marcador de referencia ubicado en el centro del municipio; no representa una comunidad específica.</div></div>`,{closeButton:true,autoPan:true,maxWidth:320,minWidth:240});
+      const detalleProgs=progs.map(p=>`<div style="border-top:1px solid #E5E7EB;padding-top:6px;margin-top:6px"><b>${escaparHtml(p.organizacion||'')}</b><br>${escaparHtml(p.nombre_programa||'')}</div>`).join('');
+      mk.bindPopup(`<div style="max-height:300px;overflow:auto;padding-right:4px"><b>${escaparHtml(m)}</b> · <b>Presencia institucional / municipal</b>${detalleProgs}<div style="color:#5B6672;font-size:11px;margin-top:8px">Marcador de referencia ubicado en el centro del municipio; no representa una comunidad específica.</div></div>`,{closeButton:true,autoPan:true,maxWidth:320,minWidth:220});
       mk.on('click',(e)=>{
         if(e?.originalEvent) L.DomEvent.stopPropagation(e.originalEvent);
         mk.closeTooltip();
