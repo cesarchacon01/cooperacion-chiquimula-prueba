@@ -1,5 +1,9 @@
-# Copia de PRUEBA — Visor de Mapeo de Actores de Cooperación (Chiquimula)
+# PRUEBA — Espejo del visor oficial de Mapeo de Actores de Cooperación (Chiquimula)
 
-Repositorio de validación. **No es el sitio de producción** y no tiene conexión con KoboToolbox.
-Los datos (`data.json`) son una copia estática del sitio publicado al 3-nov-2026 (UTC) y no se actualizan.
-Contiene la candidata definitiva del visor para revisión final. No contiene credenciales.
+Este repositorio sirve para **probar cambios antes de aplicarlos al visor oficial** (`cesarchacon01/cooperacion-chiquimula`). No es el sitio público oficial.
+
+- `index.html`, `actualizar_datos.py`, `catalogo_xlsform.json` y `coordenadas_lugares.json` son copia del oficial, con los cambios en prueba.
+- `data.json` se genera desde la **clonación** del formulario en Kobo (datos de prueba), con la tarea manual *Actions → «Actualizar PRUEBA desde la clonación de Kobo» → Run workflow*.
+- `candidata/` guarda la versión candidata anterior del visor (con `inteligencia.js`), como referencia.
+
+Flujo: probar aquí → revisar → copiar al oficial → verificar el sitio publicado.
